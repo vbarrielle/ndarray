@@ -26,13 +26,17 @@ fn main()
     println!("{}", rm);
     println!("{}", rm.slice([Slice(0, None, -1), Slice(0, None, 2)]));
     println!("{}", mm);
-    println!("{}", rm.diag());
+    println!("Diagonal={}", rm.diag());
     rm.iadd(&mm);
+    println!("Added=\n{}", rm);
+    let snd = rm.slice([C, Slice(1, None, 1)]);
+    println!("Snd=\n{}", snd);
+    println!("Snd Reshape={}", snd.reshape(4u));
 
     let sl = rm.slice([Slice(0, None, -1), Slice(0, None, -1)]);
     //println!("{}", rm);
     let mut tm = sl.reshape((3u, 2u));
-    println!("{}{}", sl, tm);
+    println!("sl={}, tm={}", sl, tm);
     //println!("{}, {}", sl.data, tm.data);
 
 
@@ -51,4 +55,22 @@ fn main()
 
     //x[0] = 1.0;
     println!("{}", x);
+
+    let mut m = Array::<f32,_>::zeros(());
+    m[()] = 1729.0;
+    println!("{}", m);
+    println!("{}", m.reshape(1u));
+    println!("{}", m + m);
+
+    let ar = Array::from_iter(range(0.0f32, 32.)).reshape((2u,4u,4u));
+    println!("{},\n{}", ar, ar * ar);
+    println!("{}", ar.collapse(0, 1).reshape((4u,4u)));
+    let sub = ar.sub(2, 1);
+    println!("sub shape={}, sub={}", sub.shape(), sub);
+    let mut mat = Array::from_iter(range(0.0f32, 16.0)).reshape((2u, 4u, 2u));
+    println!("{}", mat);
+    //println!("{}", mat.sub(0,0));
+    //println!("{}", mat.sub(0,1));
+    println!("{}", mat.sub(1,1).sub(0,1));
+    
 }

@@ -68,6 +68,12 @@ trait Dimension : Default + Clone + Eq {
     }
 }
 
+impl Dimension for () {
+    // empty product is 1 -> size is 1
+    fn shape(&self) -> &[uint] { &[] }
+    fn shape_mut(&mut self) -> &mut [uint] { &mut [] }
+}
+
 impl Dimension for uint {
     fn shape<'a>(&'a self) -> &'a [uint] {
         std::slice::ref_slice(self)
@@ -192,6 +198,28 @@ impl_dimension!(10u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint
 impl_dimension!(11u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint))
 impl_dimension!(12u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint))
 
+/// Define a sub-dimension hierarchy
+trait Shrink<T: Dimension> : Dimension {
+    fn from_slice(&self, ignored: uint) -> T {
+        let mut tup: T = Default::default();
+        {
+            let mut it = tup.shape_mut().mut_iter();
+            for (i, &d) in self.shape().iter().enumerate() {
+                if i == ignored {
+                    continue;
+                }
+                *it.next().unwrap() = d;
+            }
+        }
+        tup
+    }
+}
+
+impl Shrink<()> for uint { }
+impl Shrink<uint> for (uint, uint) { }
+impl Shrink<(uint, uint)> for (uint, uint, uint) { }
+impl Shrink<(uint, uint, uint)> for (uint, uint, uint, uint) { }
+
 unsafe fn to_ref<A>(ptr: *const A) -> &'static A {
     mem::transmute(ptr)
 }
@@ -236,13 +264,12 @@ impl<A: Clone, D: Dimension> Array<A, D>
     pub fn new(dim: D, elem: A) -> Array<A, D> {
         let v = Vec::from_elem(dim.size(), elem);
         unsafe {
-            Array::from_vec(dim, v)
+            Array::from_vec_dim(dim, v)
         }
     }
 
     pub fn make_unique<'a>(&'a mut self) {
-        println!("make_unique, needs clone={}",
-            !std::rc::is_unique(&self.data));
+        //println!("make_unique, needs clone={}", !std::rc::is_unique(&self.data));
         let our_off = (self.ptr as int - self.data.as_ptr() as int)
             / mem::size_of::<A>() as int;
         let rvec = self.data.make_unique();
@@ -252,10 +279,25 @@ impl<A: Clone, D: Dimension> Array<A, D>
     }
 }
 
+impl<A> Array<A, uint>
+{
+    /// Create a one-dimensional array from a vector (no allocation needed)
+    pub fn from_vec(v: Vec<A>) -> Array<A, uint> {
+        unsafe {
+            Array::from_vec_dim(v.len(), v)
+        }
+    }
+
+    /// Create a one-dimensional array from an iterator
+    pub fn from_iter<I: Iterator<A>>(mut it: I) -> Array<A, uint> {
+        Array::from_vec(it.collect())
+    }
+}
+
 impl<A, D: Dimension> Array<A, D>
 {
     /// Unsafe because dimension is unchecked
-    unsafe fn from_vec(dim: D, mut v: Vec<A>) -> Array<A, D> {
+    pub unsafe fn from_vec_dim(dim: D, mut v: Vec<A>) -> Array<A, D> {
         let ptr = v.as_mut_ptr();
         Array{
             data: std::rc::Rc::new(v),
@@ -311,6 +353,37 @@ impl<A, D: Dimension> Array<A, D>
             index: Some(Default::default()),
             life: kinds::marker::ContravariantLifetime,
         }
+    }
+
+    /// Collapse dimension `axis` into length one,
+    /// and select the subview of `index` along that axis.
+    pub fn collapse(&self, axis: uint, index: uint) -> Array<A, D>
+    {
+        let mut res = self.clone();
+        res.icollapse(axis, index);
+        res
+    }
+
+    pub fn icollapse(&mut self, axis: uint, index: uint)
+    {
+        let dim = self.dim.shape()[axis];
+        let stride = self.strides.shape()[axis] as int;
+        assert!(index < dim);
+        self.dim.shape_mut()[axis] = 1;
+        let off = stride * index as int;
+        unsafe {
+            self.ptr = self.ptr.offset(off);
+        }
+    }
+}
+
+impl<A: Clone, E: Dimension, D: Dimension + Shrink<E>> Array<A, D> {
+    /// Like collapse, but return a subarray one dimension smaller
+    pub fn sub(&self, axis: uint, index: uint) -> Array<A, E>
+    {
+        let mut res = self.clone();
+        res.icollapse(axis, index);
+        res.reshape(res.dim.from_slice(axis))
     }
 }
 
@@ -377,7 +450,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
         } else {
             let v = self.iter().map(|x| x.clone()).collect::<Vec<A>>();
             unsafe {
-                Array::from_vec(shape, v)
+                Array::from_vec_dim(shape, v)
             }
         }
     }
@@ -419,7 +492,7 @@ impl<A, D: Dimension> Array<A, D>
         }
     }
 
-    pub fn diag<'a>(&'a self) -> it::Stride<'a, A> {
+    pub fn diag_iter<'a>(&'a self) -> it::Stride<'a, A> {
         let len = self.dim.shape().iter().map(|x| *x).min().unwrap_or(0);
         let stride = self.strides.shape().iter()
                         .map(|x| *x as int)
@@ -428,24 +501,41 @@ impl<A, D: Dimension> Array<A, D>
             stride_new(self.ptr as *const _, len, stride as int)
         }
     }
+
+    pub fn diag(&self) -> Array<A, uint> {
+        let len = self.dim.shape().iter().map(|x| *x).min().unwrap_or(0);
+        let stride = self.strides.shape().iter()
+                        .map(|x| *x as int)
+                        .fold(0i, |s, a| s + a);
+        Array {
+            data: self.data.clone(),
+            ptr: self.ptr,
+            dim: len,
+            strides: stride as uint,
+        }
+    }
 }
 
 
-fn write_rc_array<A: fmt::Show, D: fmt::Show + Dimension>
+fn write_rc_array<A: fmt::Show, D: Dimension>
     (view: &Array<A, D>, f: &mut fmt::Formatter) -> fmt::Result {
     let mut slices = Vec::from_elem(view.dim.shape().len(), C);
-    let n_loops = slices.len() - 2;
-    let mut fixed = Vec::from_elem(n_loops, 0u);
     assert!(slices.len() >= 2);
+    let n_loops = slices.len() - 2;
+    let row_width = view.dim.shape()[slices.len() - 1];
+    let mut fixed = Vec::from_elem(n_loops, 0u);
+    let mut first = true;
     loop {
         /* Use fixed indices to make a slice*/
         for (fidx, slc) in fixed.iter().zip(slices.mut_iter()) {
             *slc = Slice(*fidx as int, Some(*fidx as int + 1), 1);
         }
-        let width = view.dim.shape()[n_loops+1];
+        if !first {
+            try!(write!(f, "\n"));
+        }
         /* Print out this view */
         for (i, elt) in view.slice_iter(slices.as_slice()).enumerate() {
-            if i % width != 0 {
+            if i % row_width != 0 {
                 try!(write!(f, ", "));
             } else if i != 0 {
                 try!(write!(f, "\n ["));
@@ -453,12 +543,12 @@ fn write_rc_array<A: fmt::Show, D: fmt::Show + Dimension>
                 try!(write!(f, "[["));
             }
             try!(write!(f, "{:4}", elt));
-            if i != 0 && (i+1) % width == 0 {
+            if i != 0 && (i+1) % row_width == 0 {
                 try!(write!(f, "]"));
             }
         }
-        try!(write!(f, "]\n"));
-        //println!("thisvi shape={}", thisvi.dim.shape());
+        first = false;
+        try!(write!(f, "]"));
         let mut done = true;
         for (fidx, &dim) in fixed.mut_iter().zip(view.dim.shape().iter()) {
             *fidx += 1;
@@ -483,6 +573,9 @@ fmt::Show for Array<A, D>
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
         match self.dim.shape() {
+            [] => {
+                write!(f, "{}", self.iter().next().unwrap())
+            }
             [_] => {
                 try!(write!(f, "["));
                 for (i, elt) in self.iter().enumerate() {
@@ -755,7 +848,7 @@ impl<'a, A: Clone + Add<A, A> + Mul<A, A> + num::Zero> Array<A, (uint, uint)>
         unsafe {
             res_elems.set_len(m * n);
         }
-        let mut res_matrix = unsafe { Array::from_vec((m, n), res_elems) };
+        let mut res_matrix = unsafe { Array::from_vec_dim((m, n), res_elems) };
         for i in range(0, m) {
             for j in range(0, n) {
                 let row = self.iter1d(1, &(i, 0));
@@ -790,7 +883,7 @@ fn test_matmul_rcarray()
     println!("B = \n{}", B);
     println!("A x B = \n{}", c);
     unsafe {
-        let result = Array::from_vec((2u, 4u), vec![20u, 23, 26, 29, 56, 68, 80, 92]);
+        let result = Array::from_vec_dim((2u, 4u), vec![20u, 23, 26, 29, 56, 68, 80, 92]);
         assert_eq!(c.shape(), result.shape());
         assert!(c.iter().zip(result.iter()).all(|(a,b)| a == b));
         assert!(c == result);
@@ -940,4 +1033,18 @@ fn test_cow()
     assert_eq!(before[1], 3);
     assert_eq!(before[2], 2);
     assert_eq!(before[3], 1);
+}
+
+#[test]
+fn test_sub()
+{
+    let mat = Array::from_iter(range(0.0f32, 16.0)).reshape((2u, 4u, 2u));
+    let s1 = mat.sub(0,0);
+    let s2 = mat.sub(0,1);
+    assert_eq!(s1.shape(), &[4, 2]);
+    assert_eq!(s2.shape(), &[4, 2]);
+    let n = Array::from_iter(range(8.0f32, 16.0)).reshape((4u,2u));
+    assert_eq!(n, s2);
+    let m = Array::from_vec(vec![2f32, 3., 10., 11.]).reshape((2u, 2u));
+    assert_eq!(m, mat.sub(1, 1));
 }
