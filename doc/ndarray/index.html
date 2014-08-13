@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The ndarray library documentation.">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ndarray` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ndarray">
 
     <title>ndarray - Rust</title>
 
@@ -11,8 +13,25 @@
 
     
     
+<!--
+tweak rustdoc css
+-->
+<style type="text/css">
+.method {
+    padding-left: 1em;
+}
+.collapse-toggle {
+    display: none;
+}
+
+.stability {
+    display: none;
+}
+</style>
+
+
 </head>
-<body>
+<body class="rustdoc">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -39,13 +58,18 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Crate <a class='mod' href=''>ndarray</a><span class='out-of-band'><a href='stability.html'>[stability dashboard]</a> <a id='src-0' href='../src/ndarray/src/lib.rs.html#1-1050'>[src]</a></span></h1>
-<h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<h1 class='fqn'><div class='in-band'>Crate <a class='mod' href=''>ndarray</a>&#8203;</div><div class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
+            <a id="collapse-all" href="#">[-]
+            </a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-0' href='../src/ndarray/src/lib.rs.html#1-1129'>[src]</a></div></h1>
+<div class='docblock'><p>The <code>ndarray</code> crate provides the <code>Array</code> type, an n-dimensional
+numerical container similar to numpy&#39;s ndarray.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
                         <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Array.html'
                                title='ndarray::Array'>Array</a></td>
-                        <td class='docblock short'><p>N-dimensional array</p>
+                        <td class='docblock short'><p>N-dimensional array.</p>
 </td>
                     </tr>
                 
@@ -66,14 +90,14 @@
                     <tr>
                         <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Slice.html'
                                title='ndarray::Slice'>Slice</a></td>
-                        <td class='docblock short'><p>start, end, step</p>
+                        <td class='docblock short'><p>Description of a range of an Array axis.</p>
 </td>
                     </tr>
                 </table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
 <table>
                     <tr>
                         <td><a class='stability Unmarked' title='No stability level'></a><code>pub static C: <a class='struct' href='../ndarray/struct.Slice.html' title='ndarray::Slice'>Slice</a></code><code> = </code><code>Slice(0, None, 1)</code></td>
-                        <td class='docblock'><p>Full column slice</p>
+                        <td class='docblock'><p>Full range as slice.</p>
 &nbsp;</td>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
@@ -89,6 +113,13 @@
                                title='ndarray::Shrink'>Shrink</a></td>
                         <td class='docblock short'><p>Define a sub-dimension hierarchy</p>
 </td>
+                    </tr>
+                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='type' href='type.Ix.html'
+                               title='ndarray::Ix'>Ix</a></td>
+                        <td class='docblock short'></td>
                     </tr>
                 </table></section>
     <section id='search' class="content hidden"></section>
@@ -119,7 +150,7 @@
             </p>
             <p>
                 Accepted types are: <code>fn</code>, <code>mod</code>,
-                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
             </p>
