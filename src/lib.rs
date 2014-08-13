@@ -4,6 +4,10 @@
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
 
+//! The `ndarray` crate provides the `Array` type, an n-dimensional
+//! numerical container similar to numpy's ndarray.
+//!
+
 #[phase(plugin, link)] extern crate itertools;
 
 // NOTE: Numpy claims it does broadcasting by
@@ -18,12 +22,30 @@ use std::mem;
 use std::num;
 use std::default::Default;
 
-trait Dimension : Default + Clone + Eq {
-    fn shape<'a>(&'a self) -> &'a [uint];
-    fn shape_mut<'a>(&'a mut self) -> &'a mut [uint];
+pub type Ix = uint;
+
+pub trait Dimension : Default + Clone + Eq {
+    fn ndim(&self) -> uint;
+    fn shape<'a>(&'a self) -> &'a [Ix] {
+        unsafe {
+            std::mem::transmute(std::raw::Slice {
+                data: self as *const _ as *const Ix,
+                len: self.ndim(),
+            })
+        }
+    }
+
+    fn shape_mut<'a>(&'a mut self) -> &'a mut [Ix] {
+        unsafe {
+            std::mem::transmute(std::raw::Slice {
+                data: self as *mut _ as *const Ix,
+                len: self.ndim(),
+            })
+        }
+    }
 
     fn size(&self) -> uint {
-        self.shape().iter().fold(1, |s, &a| s * a)
+        self.shape().iter().fold(1u, |s, &a| s * a as uint)
     }
 
     fn default_strides(&self) -> Self {
@@ -70,18 +92,14 @@ trait Dimension : Default + Clone + Eq {
 
 impl Dimension for () {
     // empty product is 1 -> size is 1
-    fn shape(&self) -> &[uint] { &[] }
-    fn shape_mut(&mut self) -> &mut [uint] { &mut [] }
+    fn ndim(&self) -> uint { 0 }
+    fn shape(&self) -> &[Ix] { &[] }
+    fn shape_mut(&mut self) -> &mut [Ix] { &mut [] }
 }
 
-impl Dimension for uint {
-    fn shape<'a>(&'a self) -> &'a [uint] {
-        std::slice::ref_slice(self)
-    }
-    fn shape_mut<'a>(&'a mut self) -> &'a mut [uint] {
-        std::slice::mut_ref_slice(self)
-    }
-    fn next_for(&self, mut index: uint) -> Option<uint> {
+impl Dimension for Ix {
+    fn ndim(&self) -> uint { 1 }
+    fn next_for(&self, mut index: Ix) -> Option<Ix> {
         index += 1;
         if index < *self {
             Some(index)
@@ -89,32 +107,16 @@ impl Dimension for uint {
     }
 }
 
-impl Dimension for (uint, uint) {
-    fn shape<'a>(&'a self) -> &'a [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *const _ as *const uint,
-                len: 2,
-            })
-        }
-    }
-
-    fn shape_mut<'a>(&'a mut self) -> &'a mut [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *mut _ as *const uint,
-                len: 2,
-            })
-        }
-    }
-
-    fn next_for(&self, index: (uint, uint)) -> Option<(uint, uint)> {
+impl Dimension for (Ix, Ix) {
+    fn ndim(&self) -> uint { 2 }
+    fn next_for(&self, index: (Ix, Ix)) -> Option<(Ix, Ix)> {
         let (mut i, mut j) = index;
+        let (imax, jmax) = *self;
         j += 1;
-        if j == self.val1() {
+        if j == jmax {
             j = 0;
             i += 1;
-            if i == self.val0() {
+            if i == imax {
                 return None;
             }
         }
@@ -122,81 +124,36 @@ impl Dimension for (uint, uint) {
     }
 }
 
-/*
-impl Dimension for (uint, uint, uint) {
-    fn shape<'a>(&'a self) -> &'a [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *const _ as *const uint,
-                len: 3,
-            })
-        }
-    }
-
-    fn shape_mut<'a>(&'a mut self) -> &'a mut [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *mut _ as *const uint,
-                len: 3,
-            })
-        }
-    }
-
-    /*
-    fn next_for(&self, index: (uint, uint, uint)) -> Option<(uint, uint, uint)> {
+impl Dimension for (Ix, Ix, Ix) {
+    fn ndim(&self) -> uint { 3 }
+    fn next_for(&self, index: (Ix, Ix, Ix)) -> Option<(Ix, Ix, Ix)> {
         let (mut i, mut j, mut k) = index;
+        let (imax, jmax, kmax) = *self;
         k += 1;
-        if k == self.val2() {
+        if k == kmax {
             k = 0;
             j += 1;
-            if j == self.val1() {
+            if j == jmax {
                 j = 0;
                 i += 1;
-                if i == self.val0() {
+                if i == imax {
                     return None;
                 }
             }
         }
         Some((i, j, k))
     }
-    */
 }
-*/
 
-macro_rules! impl_dimension(
-    ($n:expr, $tuple:ty) => (
-impl Dimension for $tuple {
-    fn shape<'a>(&'a self) -> &'a [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *const _ as *const uint,
-                len: $n,
-            })
-        }
-    }
-
-    fn shape_mut<'a>(&'a mut self) -> &'a mut [uint] {
-        unsafe {
-            std::mem::transmute(std::raw::Slice {
-                data: self as *mut _ as *const uint,
-                len: $n,
-            })
-        }
-    }
-}
-    );
-)
-
-impl_dimension!(3u, (uint, uint, uint))
-impl_dimension!(4u, (uint, uint, uint, uint))
-impl_dimension!(5u, (uint, uint, uint, uint, uint))
-impl_dimension!(6u, (uint, uint, uint, uint, uint, uint))
-impl_dimension!(7u, (uint, uint, uint, uint, uint, uint, uint))
-impl_dimension!(8u, (uint, uint, uint, uint, uint, uint, uint, uint))
-impl_dimension!(9u, (uint, uint, uint, uint, uint, uint, uint, uint, uint))
-impl_dimension!(10u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint))
-impl_dimension!(11u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint))
-impl_dimension!(12u, (uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint, uint))
+impl Dimension for (Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 4 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 5 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 6 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 7 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 8 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 9 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 10 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 11 } }
+impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn ndim(&self) -> uint { 12 } }
 
 /// Define a sub-dimension hierarchy
 trait Shrink<T: Dimension> : Dimension {
@@ -215,10 +172,18 @@ trait Shrink<T: Dimension> : Dimension {
     }
 }
 
-impl Shrink<()> for uint { }
-impl Shrink<uint> for (uint, uint) { }
-impl Shrink<(uint, uint)> for (uint, uint, uint) { }
-impl Shrink<(uint, uint, uint)> for (uint, uint, uint, uint) { }
+impl Shrink<()> for Ix { }
+impl Shrink<Ix> for (Ix, Ix) { }
+impl Shrink<(Ix, Ix)> for (Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
+impl Shrink<(Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix)> for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { }
 
 unsafe fn to_ref<A>(ptr: *const A) -> &'static A {
     mem::transmute(ptr)
@@ -228,14 +193,30 @@ unsafe fn to_ref_mut<A>(ptr: *mut A) -> &'static mut A {
     mem::transmute(ptr)
 }
 
-/// N-dimensional array
+/// N-dimensional array.
 ///
-/// A reference counted array with Copy-on-write mutability
+/// A reference counted array with copy-on-write mutability.
+///
+/// The n-dimensional array is a container of numerical use, supporting
+/// all mathematical operators by applying them elementwise.
+///
+/// The array is both a view and a shared owner of its data. Some methods
+/// like `slice` merely change the view of the data, while methods like `iadd()`
+/// or `iter_mut()` allow mutating the element values.
+///
+/// Calling a method for mutating elements, like for example `iadd()`,
+/// `at_mut()` or `iter_mut()` will break sharing and require a clone of the
+/// data (if it is not uniquely held).
 pub struct Array<A, D> {
     // FIXME: Unsafecell around vec needed?
+    /// Rc data when used as view, Uniquely held data when being mutated
     data: std::rc::Rc<Vec<A>>,
+    /// A pointer into the buffer held by data, may point anywhere
+    /// in its range.
     ptr: *mut A,
+    /// The size of each axis
     dim: D,
+    /// The element count stride per axis. To be parsed as `int`.
     strides: D,
 }
 
@@ -253,22 +234,24 @@ impl<A, D: Clone> Clone for Array<A, D>
 
 impl<A: Clone + num::Zero, D: Dimension> Array<A, D>
 {
+    /// Construct an Array with zeros
     pub fn zeros(dim: D) -> Array<A, D>
     {
-        Array::new(dim, num::zero())
+        Array::from_elem(dim, num::zero())
     }
 }
 
 impl<A: Clone, D: Dimension> Array<A, D>
 {
-    pub fn new(dim: D, elem: A) -> Array<A, D> {
+    /// Construct an Array with copies of `elem`
+    pub fn from_elem(dim: D, elem: A) -> Array<A, D> {
         let v = Vec::from_elem(dim.size(), elem);
         unsafe {
             Array::from_vec_dim(dim, v)
         }
     }
 
-    pub fn make_unique<'a>(&'a mut self) {
+    fn make_unique<'a>(&'a mut self) {
         //println!("make_unique, needs clone={}", !std::rc::is_unique(&self.data));
         let our_off = (self.ptr as int - self.data.as_ptr() as int)
             / mem::size_of::<A>() as int;
@@ -294,6 +277,23 @@ impl<A> Array<A, uint>
     }
 }
 
+/// Collapse axis `axis` and shift so that only subarray `index` is
+/// available.
+///
+/// Fails if `index` is larger than the size of the axis
+fn do_sub<A, D: Dimension, P: Copy + RawPtr<A>>(dims: &mut D, ptr: &mut P, strides: &D,
+                           axis: uint, index: uint)
+{
+    let dim = dims.shape()[axis];
+    let stride = strides.shape()[axis] as int;
+    assert!(index < dim);
+    dims.shape_mut()[axis] = 1;
+    let off = stride * index as int;
+    unsafe {
+        *ptr = ptr.offset(off);
+    }
+}
+
 impl<A, D: Dimension> Array<A, D>
 {
     /// Unsafe because dimension is unchecked
@@ -311,7 +311,18 @@ impl<A, D: Dimension> Array<A, D>
         self.dim.shape()
     }
 
-    pub fn apply_slice(&mut self, indexes: &[Slice])
+    /// Return a sliced array.
+    ///
+    /// `indexes` must have one element per array axis.
+    pub fn slice(&self, indexes: &[Slice]) -> Array<A, D>
+    {
+        let mut arr = self.clone();
+        arr.islice(indexes);
+        arr
+    }
+
+    /// Like `slice`, except this array's view is mutated in place
+    pub fn islice(&mut self, indexes: &[Slice])
     {
         let offset = do_slices(&mut self.dim, &mut self.strides, indexes);
         unsafe {
@@ -319,20 +330,13 @@ impl<A, D: Dimension> Array<A, D>
         }
     }
 
-    pub fn slice(&self, indexes: &[Slice]) -> Array<A, D>
-    {
-        let mut arr = self.clone();
-        arr.apply_slice(indexes);
-        arr
-    }
-
     /// Iterate over the sliced view
     pub fn slice_iter<'a>(&'a self, indexes: &[Slice]) -> Elements<'a, A, D>
     {
         let mut it = self.iter();
-        let offset = do_slices(&mut it.dim, &mut it.strides, indexes);
+        let offset = do_slices(&mut it.inner.dim, &mut it.inner.strides, indexes);
         unsafe {
-            it.ptr = it.ptr.offset(offset);
+            it.inner.ptr = it.inner.ptr.offset(offset);
         }
         it
     }
@@ -344,10 +348,11 @@ impl<A, D: Dimension> Array<A, D>
             })
     }
 
-    pub fn iter<'a>(&'a self) -> Elements<'a, A, D>
+    /// Return a protoiterator
+    fn base_iter<'a>(&'a self) -> Baseiter<'a, A, D>
     {
-        Elements {
-            ptr: self.ptr as *const _,
+        Baseiter {
+            ptr: self.ptr,
             dim: self.dim.clone(),
             strides: self.strides.clone(),
             index: Some(Default::default()),
@@ -355,36 +360,52 @@ impl<A, D: Dimension> Array<A, D>
         }
     }
 
-    /// Collapse dimension `axis` into length one,
-    /// and select the subview of `index` along that axis.
-    pub fn collapse(&self, axis: uint, index: uint) -> Array<A, D>
+    pub fn iter<'a>(&'a self) -> Elements<'a, A, D>
     {
-        let mut res = self.clone();
-        res.icollapse(axis, index);
-        res
+        Elements { inner: self.base_iter() }
     }
 
-    pub fn icollapse(&mut self, axis: uint, index: uint)
+    /// Collapse dimension `axis` into length one,
+    /// and select the subview of `index` along that axis.
+    ///
+    /// Fail if `index` is past the length of the axis
+    pub fn iat_sub(&mut self, axis: uint, index: uint)
     {
-        let dim = self.dim.shape()[axis];
-        let stride = self.strides.shape()[axis] as int;
-        assert!(index < dim);
-        self.dim.shape_mut()[axis] = 1;
-        let off = stride * index as int;
-        unsafe {
-            self.ptr = self.ptr.offset(off);
-        }
+        do_sub(&mut self.dim, &mut self.ptr, &self.strides, axis, index)
     }
 }
 
-impl<A: Clone, E: Dimension, D: Dimension + Shrink<E>> Array<A, D> {
-    /// Like collapse, but return a subarray one dimension smaller
-    pub fn sub(&self, axis: uint, index: uint) -> Array<A, E>
+impl<A, E: Dimension, D: Dimension + Shrink<E>> Array<A, D> {
+    /// Select the subview `index` along `axis` and return the reduced
+    /// dimension array.
+    pub fn at_sub(&self, axis: uint, index: uint) -> Array<A, E>
     {
         let mut res = self.clone();
-        res.icollapse(axis, index);
-        res.reshape(res.dim.from_slice(axis))
+        res.iat_sub(axis, index);
+        // don't use reshape -- we always know it will fit the size,
+        // and we can use from_slice on the strides as well
+        Array{
+            data: res.data,
+            ptr: res.ptr,
+            dim: res.dim.from_slice(axis),
+            strides: res.strides.from_slice(axis),
+        }
     }
+
+    /*
+    pub fn sub_iter<'a>(&'a self, axis: uint, index: uint) -> Elements<'a, A, E>
+    {
+        let mut it = self.iter();
+        do_sub(&mut it.dim, &mut it.ptr, &it.strides, axis, index);
+        Elements {
+            ptr: it.ptr,
+            dim: it.dim.from_slice(axis),
+            strides: it.strides.from_slice(axis),
+            index: Some(Default::default()),
+            life: it.life,
+        }
+    }
+    */
 }
 
 impl<'a, A, D: Dimension> Index<D, A> for Array<A, D>
@@ -401,9 +422,9 @@ impl<A: Clone, D: Dimension> Array<A, D>
     pub fn slice_iter_mut<'a>(&'a mut self, indexes: &[Slice]) -> ElementsMut<'a, A, D>
     {
         let mut it = self.iter_mut();
-        let offset = do_slices(&mut it.dim, &mut it.strides, indexes);
+        let offset = do_slices(&mut it.inner.dim, &mut it.inner.strides, indexes);
         unsafe {
-            it.ptr = it.ptr.offset(offset);
+            it.inner.ptr = it.inner.ptr.offset(offset);
         }
         it
     }
@@ -419,13 +440,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     pub fn iter_mut<'a>(&'a mut self) -> ElementsMut<'a, A, D>
     {
         self.make_unique();
-        ElementsMut {
-            ptr: self.ptr,
-            dim: self.dim.clone(),
-            strides: self.strides.clone(),
-            index: Some(Default::default()),
-            life: kinds::marker::ContravariantLifetime,
-        }
+        ElementsMut { inner: self.base_iter() }
     }
 
     /// Transform the array into `shape`, must correspond
@@ -476,6 +491,32 @@ unsafe fn stride_new<A>(ptr: *const A, len: uint, stride: int) -> it::Stride<'st
         end = std::ptr::null();
     }
     it::Stride::from_ptrs(begin, end, stride)
+}
+
+
+impl<A> Array<A, (Ix, Ix)>
+{
+    pub fn row_iter<'a>(&'a self, index: uint) -> it::Stride<'a, A>
+    {
+        let (m, n) = self.dim;
+        let (sr, sc) = self.strides;
+        let (sr, sc) = (sr as int, sc as int);
+        assert!(index < m);
+        unsafe {
+            stride_new(self.ptr.offset(sr * index as int) as *const A, n, sc)
+        }
+    }
+
+    pub fn col_iter<'a>(&'a self, index: uint) -> it::Stride<'a, A>
+    {
+        let (m, n) = self.dim;
+        let (sr, sc) = self.strides;
+        let (sr, sc) = (sr as int, sc as int);
+        assert!(index < n);
+        unsafe {
+            stride_new(self.ptr.offset(sc * index as int) as *const A, m, sr)
+        }
+    }
 }
 
 impl<A, D: Dimension> Array<A, D>
@@ -567,7 +608,7 @@ fn write_rc_array<A: fmt::Show, D: Dimension>
     Ok(())
 }
 
-impl<'a, A: fmt::Show, D: fmt::Show + Dimension>
+impl<'a, A: fmt::Show, D: Dimension>
 fmt::Show for Array<A, D>
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
@@ -635,6 +676,7 @@ impl_binary_op!(Add, add, iadd)
 impl_binary_op!(Sub, sub, isub)
 impl_binary_op!(Mul, mul, imul)
 impl_binary_op!(Div, div, idiv)
+impl_binary_op!(Rem, rem, irem)
 impl_binary_op!(BitAnd, bitand, ibitand)
 impl_binary_op!(BitOr, bitor, ibitor)
 impl_binary_op!(BitXor, bitxor, ibitxor)
@@ -660,21 +702,20 @@ Neg<Array<A, D>> for Array<A, D>
         res
     }
 }
-
-/// Array iterator
+/// Base for array iterators
 ///
 /// Iterator element type is `&'a A`
-pub struct Elements<'a, A, D> {
-    ptr: *const A,
+struct Baseiter<'a, A, D> {
+    ptr: *mut A,
     dim: D,
     strides: D,
     index: Option<D>,
     life: kinds::marker::ContravariantLifetime<'a>,
 }
 
-impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
+impl<'a, A, D: Dimension> Baseiter<'a, A, D>
 {
-    fn next(&mut self) -> Option<&'a A>
+    fn next(&mut self) -> Option<*mut A>
     {
         let index = match self.index {
             None => return None,
@@ -683,7 +724,24 @@ impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
         let offset = stride_offset(&self.strides, &index);
         self.index = self.dim.next_for(index);
         unsafe {
-            Some(to_ref(self.ptr.offset(offset)))
+            Some(self.ptr.offset(offset))
+        }
+    }
+}
+
+/// Array iterator
+///
+/// Iterator element type is `&'a A`
+pub struct Elements<'a, A, D> {
+    inner: Baseiter<'a, A, D>,
+}
+
+impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
+{
+    fn next(&mut self) -> Option<&'a A>
+    {
+        unsafe {
+            self.inner.next().map(|p| to_ref(p as *const _))
         }
     }
 }
@@ -692,25 +750,15 @@ impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
 ///
 /// Iterator element type is `&'a mut A`
 pub struct ElementsMut<'a, A, D> {
-    ptr: *mut A,
-    dim: D,
-    strides: D,
-    index: Option<D>,
-    life: kinds::marker::ContravariantLifetime<'a>,
+    inner: Baseiter<'a, A, D>,
 }
 
 impl<'a, A, D: Dimension> Iterator<&'a mut A> for ElementsMut<'a, A, D>
 {
     fn next(&mut self) -> Option<&'a mut A>
     {
-        let index = match self.index {
-            None => return None,
-            Some(ref ix) => ix.clone(),
-        };
-        let offset = stride_offset(&self.strides, &index);
-        self.index = self.dim.next_for(index);
         unsafe {
-            Some(to_ref_mut(self.ptr.offset(offset)))
+            self.inner.next().map(|p| to_ref_mut(p))
         }
     }
 }
@@ -746,10 +794,27 @@ fn stride_offset_checked<D: Dimension>(dim: &D, strides: &D, index: &D) -> Optio
 // [:,0] -- first column of matrix
 
 #[deriving(Clone, PartialEq, Eq, Hash, Show)]
-/// start, end, step
+/// Description of a range of an Array axis.
+///
+/// Fields are `begin`, `end` and `stride`, where
+/// negative `begin` or `end` indexes are counted from the back
+/// of the axis.
+///
+/// If `end` is `None`, the slice extends to the end of the axis.
+///
+/// ## Examples
+///
+/// `Slice(0, None, 1)` is the full range of an axis.
+/// Python equivalent is `[:]`.
+///
+/// `Slice(a, Some(b), 2)` is every second element from `a` until `b`.
+/// Python equivalent is `[a:b:2]`.
+///
+/// `Slice(a, None, -1)` is every element, in reverse order, from `a`
+/// until the end. Python equivalent is `[a::-1]`
 pub struct Slice(pub int, pub Option<int>, pub int);
 
-/// Full column slice
+/// Full range as slice.
 pub static C: Slice = Slice(0, None, 1);
 
 #[cfg(test)]
@@ -836,32 +901,46 @@ fn do_slices<D: Dimension>(dim: &mut D, strides: &mut D, slices: &[Slice]) -> in
 }
 
 
-impl<'a, A: Clone + Add<A, A> + Mul<A, A> + num::Zero> Array<A, (uint, uint)>
+// Matrix multiplication only defined for Primitive to
+// avoid trouble with failing + and *
+impl<'a, A: Primitive> Array<A, (Ix, Ix)>
 {
-    pub fn mat_mul(&self, other: &Array<A, (uint, uint)>) -> Array<A, (uint, uint)>
+    /// Matrix multiplication of arrays `self` and `other`
+    ///
+    /// The array sizes must agree in the way that
+    /// `self` is M x N  and `other` is N x K, the result then being
+    /// size M x K
+    pub fn mat_mul(&self, other: &Array<A, (Ix, Ix)>) -> Array<A, (Ix, Ix)>
     {
         let ((m, a), (b, n)) = (self.dim, other.dim);
-        assert!(a == b);
+        let (self_columns, other_rows) = (a, b);
+        assert!(self_columns == other_rows);
 
         // Avoid initializing the memory in vec -- set it during iteration
-        let mut res_elems = Vec::with_capacity(m * n);
+        let mut res_elems = Vec::<A>::with_capacity(m * n);
         unsafe {
             res_elems.set_len(m * n);
         }
-        let mut res_matrix = unsafe { Array::from_vec_dim((m, n), res_elems) };
-        for i in range(0, m) {
-            for j in range(0, n) {
-                let row = self.iter1d(1, &(i, 0));
-                let col = other.iter1d(0, &(0, j));
-                let dot = row.zip(col).fold(num::zero(), |s: A, (a, b)| {
-                            s + *a * *b
-                        });
-                unsafe {
-                    std::ptr::write(&mut res_matrix[(i, j)], dot);
-                }
+        let mut i = 0;
+        let mut j = 0;
+        for rr in res_elems.mut_iter() {
+            let row = self.row_iter(i);
+            let col = other.col_iter(j);
+            let dot = row.zip(col).fold(num::zero(), |s: A, (x, y)| {
+                    s + *x * *y
+                });
+            unsafe {
+                std::ptr::write(rr, dot);
+            }
+            j += 1;
+            if j == n {
+                j = 0;
+                i += 1;
             }
         }
-        res_matrix
+        unsafe {
+            Array::from_vec_dim((m, n), res_elems)
+        }
     }
 }
 
@@ -1039,12 +1118,12 @@ fn test_cow()
 fn test_sub()
 {
     let mat = Array::from_iter(range(0.0f32, 16.0)).reshape((2u, 4u, 2u));
-    let s1 = mat.sub(0,0);
-    let s2 = mat.sub(0,1);
+    let s1 = mat.at_sub(0,0);
+    let s2 = mat.at_sub(0,1);
     assert_eq!(s1.shape(), &[4, 2]);
     assert_eq!(s2.shape(), &[4, 2]);
     let n = Array::from_iter(range(8.0f32, 16.0)).reshape((4u,2u));
     assert_eq!(n, s2);
     let m = Array::from_vec(vec![2f32, 3., 10., 11.]).reshape((2u, 2u));
-    assert_eq!(m, mat.sub(1, 1));
+    assert_eq!(m, mat.at_sub(1, 1));
 }
