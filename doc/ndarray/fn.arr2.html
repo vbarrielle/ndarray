@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `C` static in crate `ndarray`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, C">
+    <meta name="description" content="API documentation for the Rust `arr2` fn in crate `ndarray`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, arr2">
 
-    <title>ndarray::C - Rust</title>
+    <title>ndarray::arr2 - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../main.css">
 
@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Slice.html'>Slice</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Slice.html'>Slice</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn current' href='fn.arr2.html'>arr2</a></div>
     </section>
 
     <nav class="sub">
@@ -57,12 +57,15 @@ tweak rustdoc css
         </form>
     </nav>
 
-    <section id='main' class="content static">
-<h1 class='fqn'><div class='in-band'><a href='index.html'>ndarray</a>&#8203;::<a class='static' href=''>C</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content fn">
+<h1 class='fqn'><div class='in-band'>Function <a href='index.html'>ndarray</a>&#8203;::<a class='fn' href=''>arr2</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-8604' href='../src/ndarray/src/lib.rs.html#1225'>[src]</a></div></h1>
-</section>
+        </span><a id='src-3706' href='../src/ndarray/src/lib.rs.html#842-845'>[src]</a></div></h1>
+<pre class='rust fn'>pub fn arr2&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt;(xs: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[&amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</pre><div class='docblock'><p>Return a two-dimensional array with elements from <code>xs</code>.</p>
+
+<p>Fail if the slices are not all of the same length.</p>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

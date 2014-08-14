@@ -1394,10 +1394,17 @@ tweak rustdoc css
 <span id='1335'>1335</span>
 <span id='1336'>1336</span>
 <span id='1337'>1337</span>
+<span id='1338'>1338</span>
+<span id='1339'>1339</span>
+<span id='1340'>1340</span>
+<span id='1341'>1341</span>
+<span id='1342'>1342</span>
+<span id='1343'>1343</span>
+<span id='1344'>1344</span>
+<span id='1345'>1345</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>uppercase_variables</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>default_type_params</span>)]</span> <span class='comment'>/* Hash&lt;S&gt; */</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_name</span><span class='op'>=</span><span class='string'>&quot;ndarray&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span><span class='op'>=</span><span class='string'>&quot;dylib&quot;</span>]</span>
 
@@ -1405,16 +1412,13 @@ tweak rustdoc css
 <span class='doccomment'>//! numerical container similar to numpy&#39;s ndarray.</span>
 <span class='doccomment'>//!</span>
 
-<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>itertools</span>;
-
-<span class='comment'>// NOTE: Numpy claims it does broadcasting by</span>
-<span class='comment'>// setting up iterators with inflated shapes and several 0-stride</span>
-<span class='comment'>// dimensions.</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>itertools</span>;
 
 <span class='kw'>use</span> <span class='ident'>itertools</span>::<span class='ident'>ItertoolsClonable</span>;
 <span class='kw'>use</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>itertools</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>hash</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>kinds</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>;
@@ -1423,7 +1427,7 @@ tweak rustdoc css
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Ix</span> <span class='op'>=</span> <span class='ident'>uint</span>;
 
 <span class='doccomment'>/// Trait for the shape and index types of arrays.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Dimension</span> : <span class='ident'>Default</span> <span class='op'>+</span> <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Eq</span> {
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Dimension</span> : <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Eq</span> {
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
     <span class='kw'>fn</span> <span class='ident'>shape</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>Ix</span>] {
         <span class='kw'>unsafe</span> {
@@ -1465,6 +1469,15 @@ tweak rustdoc css
             }
         }
         <span class='ident'>strides</span>
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>first_index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Self</span>
+    {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
+        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>index</span>.<span class='ident'>shape_mut</span>().<span class='ident'>mut_iter</span>() {
+            <span class='op'>*</span><span class='ident'>rr</span> <span class='op'>=</span> <span class='number'>0</span>;
+        }
+        <span class='ident'>index</span>
     }
 
     <span class='doccomment'>/// Iteration -- Use self as size, and return next index after `index`</span>
@@ -1554,8 +1567,19 @@ tweak rustdoc css
 <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> { <span class='number'>11</span> } }
 <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> { <span class='number'>12</span> } }
 
+<span class='comment'>// Vec&lt;Ix&gt; is a &quot;dynamic&quot; index, pretty hard to use when indexing,</span>
+<span class='comment'>// and memory wasteful, but it allows an arbitrary number of dimensions.</span>
+<span class='comment'>//</span>
+<span class='comment'>// NOTE: No Shrink impl for Vec&lt;Ix&gt; yet.</span>
+<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
+{
+    <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> { <span class='self'>self</span>.<span class='ident'>len</span>() }
+    <span class='kw'>fn</span> <span class='ident'>shape</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span>[<span class='ident'>Ix</span>] { <span class='self'>self</span>.<span class='ident'>as_slice</span>() }
+    <span class='kw'>fn</span> <span class='ident'>shape_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>Ix</span>] { <span class='self'>self</span>.<span class='ident'>as_mut_slice</span>() }
+}
+
 <span class='doccomment'>/// Helper trait to define a smaller-than relation for array shapes.</span>
-<span class='kw'>trait</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> : <span class='ident'>Dimension</span> {
+<span class='kw'>trait</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Default</span><span class='op'>&gt;</span> : <span class='ident'>Dimension</span> {
     <span class='kw'>fn</span> <span class='ident'>from_slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>ignored</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tup</span>: <span class='ident'>T</span> <span class='op'>=</span> <span class='ident'>Default</span>::<span class='ident'>default</span>();
         {
@@ -1564,7 +1588,10 @@ tweak rustdoc css
                 <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>==</span> <span class='ident'>ignored</span> {
                     <span class='kw'>continue</span>;
                 }
-                <span class='op'>*</span><span class='ident'>it</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>() <span class='op'>=</span> <span class='ident'>d</span>;
+                <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>it</span> {
+                    <span class='op'>*</span><span class='ident'>rr</span> <span class='op'>=</span> <span class='ident'>d</span>;
+                    <span class='kw'>break</span>
+                }
             }
         }
         <span class='ident'>tup</span>
@@ -1607,18 +1634,26 @@ tweak rustdoc css
 <span class='doccomment'>/// `at_mut()` or `iter_mut()` will break sharing and require a clone of the</span>
 <span class='doccomment'>/// data (if it is not uniquely held).</span>
 <span class='doccomment'>///</span>
+<span class='doccomment'>/// ## Method Conventions</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Methods mutating the view or array elements in place use an *i* prefix,</span>
+<span class='doccomment'>/// for example `slice` vs. `islice` and `add` vs `iadd`.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ## Broadcasting</span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// Arrays support limited *broadcasting*, where arithmetic operations with</span>
 <span class='doccomment'>/// array operands of different sizes can be carried out by repeating the</span>
 <span class='doccomment'>/// elements of the smaller dimension array.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use ndarray::Array;</span>
+<span class='doccomment'>/// use ndarray::arr2;</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// let a = Array::from_slices([[1, 2],</span>
-<span class='doccomment'>///                             [3, 4i]]);</span>
-<span class='doccomment'>/// let b = Array::from_slice([0, 1i]);</span>
-<span class='doccomment'>/// let c = Array::from_slices([[1, 3],</span>
-<span class='doccomment'>///                             [3, 5i]]);</span>
+<span class='doccomment'>/// let a = arr2::&lt;f32&gt;([[1., 2.],</span>
+<span class='doccomment'>///                      [3., 4.]]);</span>
+<span class='doccomment'>/// let b = arr2::&lt;f32&gt;([[0., 1.]]);</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let c = arr2::&lt;f32&gt;([[1., 3.],</span>
+<span class='doccomment'>///                      [3., 5.]]);</span>
 <span class='doccomment'>/// assert!(c == a + b);</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>///</span>
@@ -1666,14 +1701,15 @@ tweak rustdoc css
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>make_unique</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='comment'>//println!(&quot;make_unique, needs clone={}&quot;, !std::rc::is_unique(&amp;self.data));</span>
+    <span class='kw'>fn</span> <span class='ident'>make_unique</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>
+    {
         <span class='kw'>let</span> <span class='ident'>our_off</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='ident'>int</span>)
             <span class='op'>/</span> <span class='ident'>mem</span>::<span class='ident'>size_of</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>() <span class='kw'>as</span> <span class='ident'>int</span>;
         <span class='kw'>let</span> <span class='ident'>rvec</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>make_unique</span>();
         <span class='kw'>unsafe</span> {
             <span class='self'>self</span>.<span class='ident'>ptr</span> <span class='op'>=</span> <span class='ident'>rvec</span>.<span class='ident'>as_mut_ptr</span>().<span class='ident'>offset</span>(<span class='ident'>our_off</span>);
         }
+        <span class='ident'>rvec</span>
     }
 }
 
@@ -1706,7 +1742,7 @@ tweak rustdoc css
 {
     <span class='doccomment'>/// Create a two-dimensional array from a slice</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Fail if slices are not all of the same length</span>
+    <span class='doccomment'>/// Fail if the slices are not all of the same length.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// use ndarray::Array;</span>
@@ -1768,6 +1804,27 @@ tweak rustdoc css
         <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>()
     }
 
+    <span class='doccomment'>/// Return `true` if the array data is laid out in</span>
+    <span class='doccomment'>/// contiguous “C order” where the last index is the most rapidly</span>
+    <span class='doccomment'>/// varying.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Return `false` otherwise, i.e the array is possibly not</span>
+    <span class='doccomment'>/// contiguous in memory, it has custom strides, etc.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_standard_layout</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>
+    {
+        <span class='self'>self</span>.<span class='ident'>strides</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>default_strides</span>()
+    }
+
+    <span class='doccomment'>/// Return a slice of the array&#39;s backing data in memory order.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Note:** Data memory order may not correspond to the index order</span>
+    <span class='doccomment'>/// of the array. Neither is the raw data slice is restricted to just the</span>
+    <span class='doccomment'>/// Array&#39;s view.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>raw_data</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>A</span>]
+    {
+        <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_slice</span>()
+    }
+
     <span class='doccomment'>/// Return a sliced array.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// `indexes` must have one element per array axis.</span>
@@ -1814,7 +1871,7 @@ tweak rustdoc css
             <span class='ident'>ptr</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
             <span class='ident'>dim</span>: <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>clone</span>(),
             <span class='ident'>strides</span>: <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>clone</span>(),
-            <span class='ident'>index</span>: <span class='prelude-val'>Some</span>(<span class='ident'>Default</span>::<span class='ident'>default</span>()),
+            <span class='ident'>index</span>: <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>first_index</span>()),
             <span class='ident'>life</span>: <span class='ident'>kinds</span>::<span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span>,
         }
     }
@@ -1831,7 +1888,7 @@ tweak rustdoc css
     <span class='doccomment'>/// and select the subview of `index` along that axis.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Fail if `index` is past the length of the axis</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iat_sub</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>)
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>isubview</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>)
     {
         <span class='ident'>do_sub</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>dim</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ptr</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>strides</span>, <span class='ident'>axis</span>, <span class='ident'>index</span>)
     }
@@ -1865,7 +1922,7 @@ tweak rustdoc css
         <span class='doccomment'>/// to repeat are in axes with 0 stride, so that several indexes point</span>
         <span class='doccomment'>/// to the same element.</span>
         <span class='doccomment'>///</span>
-        <span class='doccomment'>/// NOTE: Cannot be used for mutable iterators, since repeating</span>
+        <span class='doccomment'>/// **Note:** Cannot be used for mutable iterators, since repeating</span>
         <span class='doccomment'>/// elements would create aliasing pointers.</span>
         <span class='kw'>fn</span> <span class='ident'>upcast</span><span class='op'>&lt;</span><span class='ident'>D</span>: <span class='ident'>Dimension</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='ident'>to</span>: <span class='ident'>D</span>, <span class='ident'>from</span>: <span class='ident'>E</span>, <span class='ident'>stride</span>: <span class='ident'>E</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>D</span><span class='op'>&gt;</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_stride</span> <span class='op'>=</span> <span class='ident'>to</span>.<span class='ident'>clone</span>();
@@ -1908,23 +1965,32 @@ tweak rustdoc css
             };
         <span class='kw'>let</span> <span class='ident'>base</span> <span class='op'>=</span> <span class='ident'>Baseiter</span> {
             <span class='ident'>ptr</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
-            <span class='ident'>dim</span>: <span class='ident'>dim</span>,
             <span class='ident'>strides</span>: <span class='ident'>broadcast_strides</span>,
-            <span class='ident'>index</span>: <span class='prelude-val'>Some</span>(<span class='ident'>Default</span>::<span class='ident'>default</span>()),
+            <span class='ident'>index</span>: <span class='prelude-val'>Some</span>(<span class='ident'>dim</span>.<span class='ident'>first_index</span>()),
+            <span class='ident'>dim</span>: <span class='ident'>dim</span>,
             <span class='ident'>life</span>: <span class='ident'>kinds</span>::<span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span>,
         };
         <span class='prelude-val'>Some</span>(<span class='ident'>Elements</span>{<span class='ident'>inner</span>: <span class='ident'>base</span>})
     }
+
+    <span class='doccomment'>/// Swap axes `ax` and `bx`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Fail if the axes are out of bounds.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>swap_axes</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>ax</span>: <span class='ident'>uint</span>, <span class='ident'>bx</span>: <span class='ident'>uint</span>)
+    {
+        <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape_mut</span>().<span class='ident'>swap</span>(<span class='ident'>ax</span>, <span class='ident'>bx</span>);
+        <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape_mut</span>().<span class='ident'>swap</span>(<span class='ident'>ax</span>, <span class='ident'>bx</span>);
+    }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Default</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
     <span class='doccomment'>/// Select the subview `index` along `axis` and return the reduced</span>
     <span class='doccomment'>/// dimension array.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>at_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>subview</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
-        <span class='ident'>res</span>.<span class='ident'>iat_sub</span>(<span class='ident'>axis</span>, <span class='ident'>index</span>);
+        <span class='ident'>res</span>.<span class='ident'>isubview</span>(<span class='ident'>axis</span>, <span class='ident'>index</span>);
         <span class='comment'>// don&#39;t use reshape -- we always know it will fit the size,</span>
         <span class='comment'>// and we can use from_slice on the strides as well</span>
         <span class='ident'>Array</span>{
@@ -2007,6 +2073,20 @@ tweak rustdoc css
         <span class='ident'>it</span>
     }
 
+    <span class='doccomment'>/// Return a mutable slice of the array&#39;s backing data in memory order.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Note:** Data memory order may not correspond to the index order</span>
+    <span class='doccomment'>/// of the array. Neither is the raw data slice is restricted to just the</span>
+    <span class='doccomment'>/// Array&#39;s view.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Note:** The data is uniquely held and nonaliased</span>
+    <span class='doccomment'>/// while it is mutably borrowed.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>raw_data_mut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> [<span class='ident'>A</span>]
+    {
+        <span class='self'>self</span>.<span class='ident'>make_unique</span>().<span class='ident'>as_mut_slice</span>()
+    }
+
+
     <span class='doccomment'>/// Transform the array into `shape`, must correspond</span>
     <span class='doccomment'>/// to the same number of elements.</span>
     <span class='doccomment'>///</span>
@@ -2016,9 +2096,8 @@ tweak rustdoc css
             <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Incompatible sizes in reshape, attempted from: {}, to: {}&quot;</span>,
                   <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>(), <span class='ident'>shape</span>.<span class='ident'>shape</span>())
         }
-        <span class='comment'>// FIXME: Check if contiguous,</span>
-        <span class='comment'>// if not =&gt; copy all, else just adapt strides</span>
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>strides</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>default_strides</span>() {
+        <span class='comment'>// Check if contiguous, if not =&gt; copy all, else just adapt strides</span>
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_standard_layout</span>() {
             <span class='kw'>let</span> <span class='ident'>cl</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
             <span class='ident'>Array</span>{
                 <span class='ident'>data</span>: <span class='ident'>cl</span>.<span class='ident'>data</span>,
@@ -2030,6 +2109,28 @@ tweak rustdoc css
             <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>clone</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>();
             <span class='kw'>unsafe</span> {
                 <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>(<span class='ident'>shape</span>, <span class='ident'>v</span>)
+            }
+        }
+    }
+
+    <span class='doccomment'>/// Perform an elementwise assigment to `self` from `other`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// If their shapes disagree, `other` is broadcast to the shape of `self`.</span>
+    <span class='doccomment'>/// Fails if broadcasting isn&#39;t possible.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>assign</span><span class='op'>&lt;</span><span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>)
+    {
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>shape</span>() <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>shape</span>() {
+            <span class='kw'>for</span> (<span class='ident'>x</span>, <span class='ident'>y</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>other</span>.<span class='ident'>iter</span>()) {
+                <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>y</span>.<span class='ident'>clone</span>();
+            }
+        } <span class='kw'>else</span> {
+            <span class='kw'>let</span> <span class='ident'>other_iter</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>other</span>.<span class='ident'>broadcast_iter</span>(<span class='self'>self</span>.<span class='ident'>dim</span>()) {
+                <span class='prelude-val'>Some</span>(<span class='ident'>it</span>) <span class='op'>=&gt;</span> <span class='ident'>it</span>,
+                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}: Could not broadcast array from shape {} into: {}&quot;</span>,
+                              <span class='string'>&quot;assign&quot;</span>, <span class='ident'>other</span>.<span class='ident'>shape</span>(), <span class='self'>self</span>.<span class='ident'>shape</span>())
+            };
+            <span class='kw'>for</span> (<span class='ident'>x</span>, <span class='ident'>y</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>other_iter</span>) {
+                <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>y</span>.<span class='ident'>clone</span>();
             }
         }
     }
@@ -2097,21 +2198,26 @@ tweak rustdoc css
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span>).<span class='ident'>min</span>().<span class='ident'>unwrap_or</span>(<span class='number'>0</span>);
+    <span class='comment'>// Return (length, stride) for diagonal</span>
+    <span class='kw'>fn</span> <span class='ident'>diag_params</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>int</span>)
+    {
+        <span class='comment'>/* empty shape has len 1 */</span>
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>clones</span>().<span class='ident'>min</span>().<span class='ident'>unwrap_or</span>(<span class='number'>1</span>);
         <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
                         .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='kw'>as</span> <span class='ident'>int</span>)
                         .<span class='ident'>fold</span>(<span class='number'>0i</span>, <span class='op'>|</span><span class='ident'>s</span>, <span class='ident'>a</span><span class='op'>|</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>a</span>);
+        <span class='kw'>return</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>)
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
         <span class='kw'>unsafe</span> {
-            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>len</span>, <span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>int</span>)
+            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>len</span>, <span class='ident'>stride</span>)
         }
     }
 
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>uint</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span>).<span class='ident'>min</span>().<span class='ident'>unwrap_or</span>(<span class='number'>0</span>);
-        <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
-                        .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='kw'>as</span> <span class='ident'>int</span>)
-                        .<span class='ident'>fold</span>(<span class='number'>0i</span>, <span class='op'>|</span><span class='ident'>s</span>, <span class='ident'>a</span><span class='op'>|</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>a</span>);
+        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
         <span class='ident'>Array</span> {
             <span class='ident'>data</span>: <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>clone</span>(),
             <span class='ident'>ptr</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
@@ -2121,9 +2227,94 @@ tweak rustdoc css
     }
 }
 
+<span class='doccomment'>/// Return a zero-dimensional array with the element `x`.</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>arr0</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>(<span class='ident'>x</span>: <span class='ident'>A</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, ()<span class='op'>&gt;</span>
+{
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='number'>1</span>);
+    <span class='ident'>v</span>.<span class='ident'>push</span>(<span class='ident'>x</span>);
+    <span class='kw'>unsafe</span> { <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>((), <span class='ident'>v</span>) }
+}
 
-<span class='kw'>fn</span> <span class='ident'>write_rc_array</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>fmt</span>::<span class='ident'>Show</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-    (<span class='ident'>view</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+<span class='doccomment'>/// Return a one-dimensional array with elements from `xs`.</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>arr1</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span>(<span class='ident'>xs</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>A</span>]) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>
+{
+    <span class='ident'>Array</span>::<span class='ident'>from_slice</span>(<span class='ident'>xs</span>)
+}
+
+<span class='doccomment'>/// Return a two-dimensional array with elements from `xs`.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Fail if the slices are not all of the same length.</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>arr2</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span>(<span class='ident'>xs</span>: <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='ident'>A</span>]]) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
+{
+    <span class='ident'>Array</span>::<span class='ident'>from_slices</span>(<span class='ident'>xs</span>)
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Num</span>,
+     <span class='ident'>E</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Default</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;&gt;</span>
+    <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+{
+    <span class='doccomment'>/// Return sum along `axis`</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use ndarray::{arr0, arr1, arr2};</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = arr2::&lt;f32&gt;([[1., 2.],</span>
+    <span class='doccomment'>///                      [3., 4.]]);</span>
+    <span class='doccomment'>/// assert_eq!(a.sum(0), arr1([4., 6.]));</span>
+    <span class='doccomment'>/// assert_eq!(a.sum(1), arr1([3., 7.]));</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// assert_eq!(a.sum(0).sum(0), arr0(10.));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>subview</span>(<span class='ident'>axis</span>, <span class='number'>0</span>);
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>1</span>, <span class='ident'>n</span>) {
+            <span class='ident'>res</span>.<span class='ident'>iadd</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>subview</span>(<span class='ident'>axis</span>, <span class='ident'>i</span>))
+        }
+        <span class='ident'>res</span>
+    }
+
+    <span class='doccomment'>/// Return mean along `axis`</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mean</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>sum</span>(<span class='ident'>axis</span>);
+        <span class='kw'>let</span> <span class='ident'>one</span> <span class='op'>=</span> <span class='ident'>num</span>::<span class='ident'>one</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cnt</span> <span class='op'>=</span> <span class='ident'>one</span>.<span class='ident'>clone</span>();
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>1</span>, <span class='ident'>n</span>) {
+            <span class='ident'>cnt</span> <span class='op'>=</span> <span class='ident'>cnt</span> <span class='op'>+</span> <span class='ident'>one</span>;
+        }
+        <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='ident'>sum</span>.<span class='ident'>iter_mut</span>() {
+            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>/</span> <span class='ident'>cnt</span>;
+        }
+        <span class='ident'>sum</span>
+    }
+}
+
+<span class='kw'>fn</span> <span class='ident'>format_array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='ident'>view</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>,
+                                 <span class='ident'>format</span>: <span class='op'>|</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>, <span class='kw-2'>&amp;</span><span class='ident'>A</span><span class='op'>|</span> <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>)
+                                <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>
+{
+    <span class='kw'>if</span> <span class='ident'>f</span>.<span class='ident'>width</span>.<span class='ident'>is_none</span>() {
+        <span class='ident'>f</span>.<span class='ident'>width</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='number'>4</span>)
+    }
+    <span class='kw'>match</span> <span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>() {
+        [] <span class='op'>=&gt;</span> {
+            <span class='kw'>return</span> <span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>view</span>.<span class='ident'>iter</span>().<span class='ident'>next</span>().<span class='ident'>unwrap</span>());
+        }
+        [_] <span class='op'>=&gt;</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[&quot;</span>));
+            <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>view</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+                <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;, &quot;</span>));
+                }
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>elt</span>));
+            }
+            <span class='kw'>return</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>);
+        }
+        _ <span class='op'>=&gt;</span> <span class='comment'>/* fallthrough */</span> {}
+    }
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slices</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>len</span>(), <span class='ident'>C</span>);
     <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>2</span>);
     <span class='kw'>let</span> <span class='ident'>n_loops</span> <span class='op'>=</span> <span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span>;
@@ -2147,7 +2338,8 @@ tweak rustdoc css
             } <span class='kw'>else</span> {
                 <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[[&quot;</span>));
             }
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:4}&quot;</span>, <span class='ident'>elt</span>));
+            <span class='comment'>//try!(write!(f, &quot;{:4}&quot;, elt));</span>
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>elt</span>));
             <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> (<span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>) <span class='op'>%</span> <span class='ident'>row_width</span> <span class='op'>==</span> <span class='number'>0</span> {
                 <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>));
             }
@@ -2172,29 +2364,11 @@ tweak rustdoc css
     <span class='prelude-val'>Ok</span>(())
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>fmt</span>::<span class='ident'>Show</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-<span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='comment'>// NOTE: We can impl other fmt traits here</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>fmt</span>::<span class='ident'>Show</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>
-    {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>() {
-            [] <span class='op'>=&gt;</span> {
-                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>next</span>().<span class='ident'>unwrap</span>())
-            }
-            [_] <span class='op'>=&gt;</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[&quot;</span>));
-                <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
-                    <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;, &quot;</span>));
-                    }
-                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>elt</span>));
-                }
-                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>)
-            }
-            _ <span class='op'>=&gt;</span> {
-                <span class='ident'>write_rc_array</span>(<span class='self'>self</span>, <span class='ident'>f</span>)
-            }
-        }
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
+        <span class='ident'>format_array</span>(<span class='self'>self</span>, <span class='ident'>f</span>, <span class='op'>|</span><span class='ident'>f</span>, <span class='ident'>elt</span><span class='op'>|</span> <span class='ident'>elt</span>.<span class='ident'>fmt</span>(<span class='ident'>f</span>))
     }
 }
 
@@ -2203,12 +2377,18 @@ tweak rustdoc css
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>PartialEq</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
 <span class='ident'>PartialEq</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
+    <span class='doccomment'>/// Return `true` if all elements of `self` and `other` are equal.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Fail if shapes are not equal.</span>
     <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>
     {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>shape</span>() <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>shape</span>());
         <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>other</span>.<span class='ident'>iter</span>()).<span class='ident'>all</span>(<span class='op'>|</span>(<span class='ident'>a</span>, <span class='ident'>b</span>)<span class='op'>|</span> <span class='ident'>a</span> <span class='op'>==</span> <span class='ident'>b</span>)
     }
 }
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Eq</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>Eq</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {}
 
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>impl_binary_op</span>(
     (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>mth</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>imethod</span>:<span class='ident'>ident</span>) <span class='op'>=&gt;</span> (
@@ -2230,8 +2410,8 @@ tweak rustdoc css
         } <span class='kw'>else</span> {
             <span class='kw'>let</span> <span class='ident'>other_iter</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>other</span>.<span class='ident'>broadcast_iter</span>(<span class='self'>self</span>.<span class='ident'>dim</span>()) {
                 <span class='prelude-val'>Some</span>(<span class='ident'>it</span>) <span class='op'>=&gt;</span> <span class='ident'>it</span>,
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Could not broadcast array from shape {} into: {}&quot;</span>,
-                              <span class='ident'>other</span>.<span class='ident'>shape</span>(), <span class='self'>self</span>.<span class='ident'>shape</span>())
+                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}: Could not broadcast array from shape {} into: {}&quot;</span>,
+                              <span class='macro'>stringify</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>imethod</span>), <span class='ident'>other</span>.<span class='ident'>shape</span>(), <span class='self'>self</span>.<span class='ident'>shape</span>())
             };
             <span class='kw'>for</span> (<span class='ident'>x</span>, <span class='ident'>y</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>other_iter</span>) {
                 <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>x</span>). <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>mth</span> (<span class='ident'>y</span>);
@@ -2267,6 +2447,8 @@ tweak rustdoc css
 <span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>BitAnd</span>, <span class='ident'>bitand</span>, <span class='ident'>ibitand</span>)
 <span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>BitOr</span>, <span class='ident'>bitor</span>, <span class='ident'>ibitor</span>)
 <span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>BitXor</span>, <span class='ident'>bitxor</span>, <span class='ident'>ibitxor</span>)
+<span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>Shl</span>, <span class='ident'>shl</span>, <span class='ident'>ishl</span>)
+<span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>Shr</span>, <span class='ident'>shr</span>, <span class='ident'>ishr</span>)
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
 <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
@@ -2291,6 +2473,31 @@ tweak rustdoc css
         <span class='ident'>res</span>
     }
 }
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+{
+    <span class='doccomment'>/// Perform an elementwise unary not of `self`, *in place*.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>inot</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>)
+    {
+        <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>() {
+            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>elt</span>).<span class='ident'>not</span>()
+        }
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+{
+    <span class='doccomment'>/// Perform an elementwise unary not of `self` and return the result.</span>
+    <span class='kw'>fn</span> <span class='ident'>not</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
+        <span class='ident'>res</span>.<span class='ident'>inot</span>();
+        <span class='ident'>res</span>
+    }
+}
+
 <span class='doccomment'>/// Base for array iterators</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Iterator element type is `&amp;&#39;a A`</span>
@@ -2371,8 +2578,8 @@ tweak rustdoc css
 <span class='kw'>fn</span> <span class='ident'>stride_offset</span><span class='op'>&lt;</span><span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='ident'>strides</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>, <span class='ident'>index</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>int</span>
 {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='number'>0</span>;
-    <span class='kw'>for</span> (<span class='kw-2'>&amp;</span><span class='ident'>i</span>, <span class='kw-2'>&amp;</span><span class='ident'>s</span>) <span class='kw'>in</span> <span class='macro'>izip</span><span class='macro'>!</span>(<span class='ident'>index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>(),
-                          <span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()) {
+    <span class='kw'>for</span> (<span class='kw-2'>&amp;</span><span class='ident'>i</span>, <span class='kw-2'>&amp;</span><span class='ident'>s</span>) <span class='kw'>in</span> <span class='ident'>index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
+                        .<span class='ident'>zip</span>(<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()) {
         <span class='ident'>offset</span> <span class='op'>+=</span> <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>s</span> <span class='kw'>as</span> <span class='ident'>int</span>;
     }
     <span class='ident'>offset</span>
@@ -2381,9 +2588,9 @@ tweak rustdoc css
 <span class='kw'>fn</span> <span class='ident'>stride_offset_checked</span><span class='op'>&lt;</span><span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='ident'>dim</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>, <span class='ident'>strides</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>, <span class='ident'>index</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span>
 {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='number'>0</span>;
-    <span class='kw'>for</span> (<span class='kw-2'>&amp;</span><span class='ident'>d</span>, (<span class='kw-2'>&amp;</span><span class='ident'>i</span>, <span class='kw-2'>&amp;</span><span class='ident'>s</span>)) <span class='kw'>in</span>   <span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>zip</span>(
-                            <span class='ident'>index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>zip</span>(
-                            <span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()))
+    <span class='kw'>for</span> ((<span class='kw-2'>&amp;</span><span class='ident'>d</span>, <span class='kw-2'>&amp;</span><span class='ident'>i</span>), <span class='kw-2'>&amp;</span><span class='ident'>s</span>) <span class='kw'>in</span> <span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
+                            .<span class='ident'>zip</span>(<span class='ident'>index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>())
+                            .<span class='ident'>zip</span>(<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>())
     {
         <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>&gt;=</span> <span class='ident'>d</span> {
             <span class='kw'>return</span> <span class='prelude-val'>None</span>;
@@ -2422,33 +2629,6 @@ tweak rustdoc css
 <span class='doccomment'>/// Full range as slice.</span>
 <span class='kw'>pub</span> <span class='kw'>static</span> <span class='ident'>C</span>: <span class='ident'>Slice</span> <span class='op'>=</span> <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>);
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='doccomment'>/// Parse python slice notation into `Slice`,</span>
-<span class='doccomment'>/// including `a:b`, `a:b:c`, `::s`, `1:`</span>
-<span class='kw'>fn</span> <span class='ident'>parse_slice_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Slice</span> {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sp</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>split</span>(<span class='string'>&#39;:&#39;</span>);
-    <span class='kw'>let</span> <span class='ident'>fst</span> <span class='op'>=</span> <span class='ident'>sp</span>.<span class='ident'>next</span>();
-    <span class='kw'>let</span> <span class='ident'>snd</span> <span class='op'>=</span> <span class='ident'>sp</span>.<span class='ident'>next</span>();
-    <span class='kw'>let</span> <span class='ident'>step</span> <span class='op'>=</span> <span class='ident'>sp</span>.<span class='ident'>next</span>();
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>sp</span>.<span class='ident'>next</span>().<span class='ident'>is_none</span>());
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>fst</span>.<span class='ident'>is_some</span>() <span class='op'>&amp;&amp;</span> <span class='ident'>snd</span>.<span class='ident'>is_some</span>());
-
-    <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>fst</span>.<span class='ident'>unwrap</span>().<span class='ident'>trim</span>() {
-        <span class='string'>&quot;&quot;</span> <span class='op'>=&gt;</span> <span class='number'>0i</span>,
-        <span class='ident'>s</span> <span class='op'>=&gt;</span> <span class='ident'>from_str</span>::<span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span>(<span class='ident'>s</span>).<span class='ident'>unwrap</span>(),
-    };
-    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>snd</span>.<span class='ident'>unwrap</span>().<span class='ident'>trim</span>() {
-        <span class='string'>&quot;&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
-        <span class='ident'>s</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>from_str</span>::<span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span>(<span class='ident'>s</span>).<span class='ident'>unwrap</span>()),
-    };
-    <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>step</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>trim</span>()) {
-        <span class='prelude-val'>None</span> <span class='op'>|</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>) <span class='op'>=&gt;</span> <span class='number'>1</span>,
-        <span class='prelude-val'>Some</span>(<span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>from_str</span>::<span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span>(<span class='ident'>s</span>).<span class='ident'>unwrap</span>(),
-    };
-    <span class='ident'>Slice</span>(<span class='ident'>a</span>, <span class='ident'>b</span>, <span class='ident'>c</span>)
-}
-
-
 <span class='kw'>fn</span> <span class='ident'>abs_index</span>(<span class='ident'>len</span>: <span class='ident'>int</span>, <span class='ident'>index</span>: <span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
     <span class='kw'>if</span> <span class='ident'>index</span> <span class='op'>&lt;</span> <span class='number'>0</span> {
         (<span class='ident'>len</span> <span class='op'>+</span> <span class='ident'>index</span>) <span class='kw'>as</span> <span class='ident'>uint</span>
@@ -2460,9 +2640,9 @@ tweak rustdoc css
 {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>len</span>());
-    <span class='kw'>for</span> (<span class='ident'>dr</span>, <span class='ident'>sr</span>, <span class='kw-2'>&amp;</span><span class='ident'>slc</span>) <span class='kw'>in</span> <span class='macro'>izip</span><span class='macro'>!</span>(<span class='ident'>dim</span>.<span class='ident'>shape_mut</span>().<span class='ident'>mut_iter</span>(),
-                                <span class='ident'>strides</span>.<span class='ident'>shape_mut</span>().<span class='ident'>mut_iter</span>(),
-                                <span class='ident'>slices</span>.<span class='ident'>iter</span>())
+    <span class='kw'>for</span> ((<span class='ident'>dr</span>, <span class='ident'>sr</span>), <span class='kw-2'>&amp;</span><span class='ident'>slc</span>) <span class='kw'>in</span> <span class='ident'>dim</span>.<span class='ident'>shape_mut</span>().<span class='ident'>mut_iter</span>()
+                            .<span class='ident'>zip</span>(<span class='ident'>strides</span>.<span class='ident'>shape_mut</span>().<span class='ident'>mut_iter</span>())
+                            .<span class='ident'>zip</span>(<span class='ident'>slices</span>.<span class='ident'>iter</span>())
     {
         <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>dr</span>;
         <span class='kw'>let</span> <span class='ident'>mi</span> <span class='op'>=</span> <span class='ident'>m</span> <span class='kw'>as</span> <span class='ident'>int</span>;
@@ -2549,188 +2729,24 @@ tweak rustdoc css
     }
 }
 
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_matmul_rcarray</span>()
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span> <span class='ident'>FromIterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>uint</span><span class='op'>&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>: <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>uint</span>, (<span class='ident'>uint</span>, <span class='ident'>uint</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>2u</span>, <span class='number'>3u</span>));
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>A</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span>;
-    }
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>B</span>: <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>uint</span>, (<span class='ident'>uint</span>, <span class='ident'>uint</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>3u</span>, <span class='number'>4u</span>));
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>B</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span>;
-    }
-
-    <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>A</span>.<span class='ident'>mat_mul</span>(<span class='kw-2'>&amp;</span><span class='ident'>B</span>);
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;A = \n{}&quot;</span>, <span class='ident'>A</span>);
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;B = \n{}&quot;</span>, <span class='ident'>B</span>);
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;A x B = \n{}&quot;</span>, <span class='ident'>c</span>);
-    <span class='kw'>unsafe</span> {
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>((<span class='number'>2u</span>, <span class='number'>4u</span>), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>20u</span>, <span class='number'>23</span>, <span class='number'>26</span>, <span class='number'>29</span>, <span class='number'>56</span>, <span class='number'>68</span>, <span class='number'>80</span>, <span class='number'>92</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>shape</span>(), <span class='ident'>result</span>.<span class='ident'>shape</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>result</span>.<span class='ident'>iter</span>()).<span class='ident'>all</span>(<span class='op'>|</span>(<span class='ident'>a</span>,<span class='ident'>b</span>)<span class='op'>|</span> <span class='ident'>a</span> <span class='op'>==</span> <span class='ident'>b</span>));
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>c</span> <span class='op'>==</span> <span class='ident'>result</span>);
-    }
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_slice</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>: <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>uint</span>, (<span class='ident'>uint</span>, <span class='ident'>uint</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>3u</span>, <span class='number'>4u</span>));
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>A</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span>;
-    }
-
-    <span class='kw'>let</span> <span class='ident'>vi</span> <span class='op'>=</span> <span class='ident'>A</span>.<span class='ident'>slice</span>([<span class='ident'>Slice</span>(<span class='number'>1</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>), <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>2</span>)]);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vi</span>.<span class='ident'>shape</span>(), <span class='kw-2'>&amp;</span>[<span class='number'>2u</span>, <span class='number'>2u</span>]);
-    <span class='kw'>let</span> <span class='ident'>vi</span> <span class='op'>=</span> <span class='ident'>A</span>.<span class='ident'>slice</span>([<span class='ident'>C</span>, <span class='ident'>C</span>]);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vi</span>.<span class='ident'>shape</span>(), <span class='ident'>A</span>.<span class='ident'>shape</span>());
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>vi</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>A</span>.<span class='ident'>iter</span>()).<span class='ident'>all</span>(<span class='op'>|</span>(<span class='ident'>a</span>, <span class='ident'>b</span>)<span class='op'>|</span> <span class='ident'>a</span> <span class='op'>==</span> <span class='ident'>b</span>));
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_index</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>: <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>uint</span>, (<span class='ident'>uint</span>, <span class='ident'>uint</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>2u</span>, <span class='number'>3u</span>));
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>A</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span>;
-    }
-
-    <span class='kw'>for</span> ((<span class='ident'>i</span>, <span class='ident'>j</span>), <span class='ident'>x</span>) <span class='kw'>in</span> <span class='macro'>iproduct</span><span class='macro'>!</span>(<span class='ident'>range</span>(<span class='number'>0</span>,<span class='number'>2u</span>), <span class='ident'>range</span>(<span class='number'>0</span>,<span class='number'>3u</span>)).<span class='ident'>zip</span>(<span class='ident'>A</span>.<span class='ident'>iter</span>()) {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>x</span>, <span class='ident'>A</span>[(<span class='ident'>i</span>, <span class='ident'>j</span>)]);
-    }
-
-    <span class='kw'>let</span> <span class='ident'>vi</span> <span class='op'>=</span> <span class='ident'>A</span>.<span class='ident'>slice</span>([<span class='ident'>Slice</span>(<span class='number'>1</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>), <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>2</span>)]);
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>vi</span>.<span class='ident'>iter</span>();
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>j</span>) <span class='kw'>in</span> <span class='macro'>iproduct</span><span class='macro'>!</span>(<span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>1u</span>), <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>2u</span>)) {
-        <span class='kw'>let</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>it</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>x</span>, <span class='ident'>vi</span>[(<span class='ident'>i</span>, <span class='ident'>j</span>)]);
-    }
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>it</span>.<span class='ident'>next</span>().<span class='ident'>is_none</span>());
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_add</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>: <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>uint</span>, (<span class='ident'>uint</span>, <span class='ident'>uint</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>2u</span>, <span class='number'>2u</span>));
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>A</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span>;
-    }
-
-    <span class='kw'>let</span> <span class='ident'>B</span> <span class='op'>=</span> <span class='ident'>A</span>.<span class='ident'>clone</span>();
-    <span class='ident'>A</span>.<span class='ident'>iadd</span>(<span class='kw-2'>&amp;</span><span class='ident'>B</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>A</span>[(<span class='number'>0</span>,<span class='number'>0</span>)], <span class='number'>0u</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>A</span>[(<span class='number'>0</span>,<span class='number'>1</span>)], <span class='number'>2u</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>A</span>[(<span class='number'>1</span>,<span class='number'>0</span>)], <span class='number'>4u</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>A</span>[(<span class='number'>1</span>,<span class='number'>1</span>)], <span class='number'>6u</span>);
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_parse</span>()
-{
-    <span class='kw'>let</span> <span class='ident'>slice_strings</span> <span class='op'>=</span> [<span class='string'>&quot;1:2:3&quot;</span>, <span class='string'>&quot;::&quot;</span>, <span class='string'>&quot;1:&quot;</span>, <span class='string'>&quot;::-1&quot;</span>, <span class='string'>&quot;::2&quot;</span>];
-    <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>slice_strings</span>.<span class='ident'>iter</span>() {
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Parse {} \t=&gt; {}&quot;</span>, <span class='op'>*</span><span class='ident'>s</span>, <span class='ident'>parse_slice_str</span>(<span class='op'>*</span><span class='ident'>s</span>));
-    }
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_multidim</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mat</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>(<span class='number'>2u</span><span class='op'>*</span><span class='number'>3</span><span class='op'>*</span><span class='number'>4</span><span class='op'>*</span><span class='number'>5</span><span class='op'>*</span><span class='number'>6</span>).<span class='ident'>reshape</span>((<span class='number'>2u</span>,<span class='number'>3u</span>,<span class='number'>4u</span>,<span class='number'>5u</span>,<span class='number'>6u</span>));
-    <span class='ident'>mat</span>[(<span class='number'>0</span>,<span class='number'>0</span>,<span class='number'>0</span>,<span class='number'>0</span>,<span class='number'>0</span>)] <span class='op'>=</span> <span class='number'>22u8</span>;
+    <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>uint</span><span class='op'>&gt;</span>
     {
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>mat</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>u8</span>;
+        <span class='ident'>Array</span>::<span class='ident'>from_iter</span>(<span class='ident'>it</span>)
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>hash</span>::<span class='ident'>Writer</span>, <span class='ident'>A</span>: <span class='ident'>hash</span>::<span class='ident'>Hash</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>hash</span>::<span class='ident'>Hash</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+{
+    <span class='kw'>fn</span> <span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>state</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>S</span>)
+    {
+        <span class='self'>self</span>.<span class='ident'>shape</span>().<span class='ident'>hash</span>(<span class='ident'>state</span>);
+        <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter</span>() {
+            <span class='ident'>elt</span>.<span class='ident'>hash</span>(<span class='ident'>state</span>)
         }
     }
-    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;shape={}, strides={}&quot;</span>, <span class='ident'>mat</span>.<span class='ident'>shape</span>(), <span class='ident'>mat</span>.<span class='ident'>strides</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>mat</span>.<span class='ident'>shape</span>(), <span class='kw-2'>&amp;</span>[<span class='number'>2u</span>,<span class='number'>3</span>,<span class='number'>4</span>,<span class='number'>5</span>,<span class='number'>6</span>]);
-}
-
-
-<span class='comment'>/*
-array([[[ 7,  6],
-        [ 5,  4],
-        [ 3,  2],
-        [ 1,  0]],
-
-       [[15, 14],
-        [13, 12],
-        [11, 10],
-        [ 9,  8]]])
-*/</span>
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_negative_stride_rcarray</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mat</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>zeros</span>((<span class='number'>2u</span>, <span class='number'>4u</span>, <span class='number'>2u</span>));
-    <span class='ident'>mat</span>[(<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>)] <span class='op'>=</span> <span class='number'>1.0f32</span>;
-    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>mat</span>.<span class='ident'>iter_mut</span>().<span class='ident'>enumerate</span>() {
-        <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>f32</span>;
-    }
-
-    {
-        <span class='kw'>let</span> <span class='ident'>vi</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>slice</span>([<span class='ident'>C</span>, <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='op'>-</span><span class='number'>1</span>), <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='op'>-</span><span class='number'>1</span>)]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vi</span>.<span class='ident'>shape</span>(), <span class='kw-2'>&amp;</span>[<span class='number'>2</span>,<span class='number'>4</span>,<span class='number'>2</span>]);
-        <span class='comment'>// Test against sequential iterator</span>
-        <span class='kw'>let</span> <span class='ident'>seq</span> <span class='op'>=</span> [<span class='number'>7f32</span>,<span class='number'>6.</span>, <span class='number'>5.</span>,<span class='number'>4.</span>,<span class='number'>3.</span>,<span class='number'>2.</span>,<span class='number'>1.</span>,<span class='number'>0.</span>,<span class='number'>15.</span>,<span class='number'>14.</span>,<span class='number'>13.</span>, <span class='number'>12.</span>,<span class='number'>11.</span>,  <span class='number'>10.</span>,   <span class='number'>9.</span>,   <span class='number'>8.</span>];
-        <span class='kw'>for</span> (<span class='ident'>a</span>, <span class='ident'>b</span>) <span class='kw'>in</span> <span class='ident'>vi</span>.<span class='ident'>clone</span>().<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>seq</span>.<span class='ident'>iter</span>()) {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>a</span>, <span class='op'>*</span><span class='ident'>b</span>);
-        }
-    }
-    {
-        <span class='kw'>let</span> <span class='ident'>vi</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>slice</span>([<span class='ident'>C</span>, <span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='op'>-</span><span class='number'>5</span>), <span class='ident'>C</span>]);
-        <span class='kw'>let</span> <span class='ident'>seq</span> <span class='op'>=</span> [<span class='number'>6_f32</span>, <span class='number'>7.</span>, <span class='number'>14.</span>, <span class='number'>15.</span>];
-        <span class='kw'>for</span> (<span class='ident'>a</span>, <span class='ident'>b</span>) <span class='kw'>in</span> <span class='ident'>vi</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>seq</span>.<span class='ident'>iter</span>()) {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>a</span>, <span class='op'>*</span><span class='ident'>b</span>);
-        }
-    }
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_cow</span>()
-{
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mat</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='op'>&lt;</span><span class='ident'>int</span>, _<span class='op'>&gt;</span>::<span class='ident'>zeros</span>((<span class='number'>2u</span>,<span class='number'>2u</span>));
-    <span class='ident'>mat</span>[(<span class='number'>0</span>, <span class='number'>0</span>)] <span class='op'>=</span> <span class='number'>1</span>;
-    <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>clone</span>();
-    <span class='ident'>mat</span>[(<span class='number'>0</span>, <span class='number'>1</span>)] <span class='op'>=</span> <span class='number'>2</span>;
-    <span class='ident'>mat</span>[(<span class='number'>1</span>, <span class='number'>0</span>)] <span class='op'>=</span> <span class='number'>3</span>;
-    <span class='ident'>mat</span>[(<span class='number'>1</span>, <span class='number'>1</span>)] <span class='op'>=</span> <span class='number'>4</span>;
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>mat</span>[(<span class='number'>0</span>,<span class='number'>0</span>)], <span class='number'>1</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>mat</span>[(<span class='number'>0</span>,<span class='number'>1</span>)], <span class='number'>2</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>[(<span class='number'>0</span>,<span class='number'>0</span>)], <span class='number'>1</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>[(<span class='number'>0</span>,<span class='number'>1</span>)], <span class='number'>0</span>);
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rev</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>reshape</span>(<span class='number'>4u</span>).<span class='ident'>slice</span>([<span class='ident'>Slice</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='op'>-</span><span class='number'>1</span>)]);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>0</span>], <span class='number'>4</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>1</span>], <span class='number'>3</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>2</span>], <span class='number'>2</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>3</span>], <span class='number'>1</span>);
-    <span class='kw'>let</span> <span class='ident'>before</span> <span class='op'>=</span> <span class='ident'>rev</span>.<span class='ident'>clone</span>();
-    <span class='comment'>// mutation</span>
-    <span class='ident'>rev</span>[<span class='number'>0</span>] <span class='op'>=</span> <span class='number'>5</span>;
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>0</span>], <span class='number'>5</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>1</span>], <span class='number'>3</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>2</span>], <span class='number'>2</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>rev</span>[<span class='number'>3</span>], <span class='number'>1</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>before</span>[<span class='number'>0</span>], <span class='number'>4</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>before</span>[<span class='number'>1</span>], <span class='number'>3</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>before</span>[<span class='number'>2</span>], <span class='number'>2</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>before</span>[<span class='number'>3</span>], <span class='number'>1</span>);
-}
-
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_sub</span>()
-{
-    <span class='kw'>let</span> <span class='ident'>mat</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_iter</span>(<span class='ident'>range</span>(<span class='number'>0.0f32</span>, <span class='number'>16.0</span>)).<span class='ident'>reshape</span>((<span class='number'>2u</span>, <span class='number'>4u</span>, <span class='number'>2u</span>));
-    <span class='kw'>let</span> <span class='ident'>s1</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>at_sub</span>(<span class='number'>0</span>,<span class='number'>0</span>);
-    <span class='kw'>let</span> <span class='ident'>s2</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>at_sub</span>(<span class='number'>0</span>,<span class='number'>1</span>);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>s1</span>.<span class='ident'>shape</span>(), <span class='kw-2'>&amp;</span>[<span class='number'>4</span>, <span class='number'>2</span>]);
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>s2</span>.<span class='ident'>shape</span>(), <span class='kw-2'>&amp;</span>[<span class='number'>4</span>, <span class='number'>2</span>]);
-    <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_iter</span>(<span class='ident'>range</span>(<span class='number'>8.0f32</span>, <span class='number'>16.0</span>)).<span class='ident'>reshape</span>((<span class='number'>4u</span>,<span class='number'>2u</span>));
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>n</span>, <span class='ident'>s2</span>);
-    <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_vec</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2f32</span>, <span class='number'>3.</span>, <span class='number'>10.</span>, <span class='number'>11.</span>]).<span class='ident'>reshape</span>((<span class='number'>2u</span>, <span class='number'>2u</span>));
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>m</span>, <span class='ident'>mat</span>.<span class='ident'>at_sub</span>(<span class='number'>1</span>, <span class='number'>1</span>));
 }
 </pre>
 </section>
