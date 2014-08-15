@@ -5,7 +5,7 @@
 extern crate test;
 extern crate ndarray;
 
-use ndarray::{Array, C, Slice};
+use ndarray::{Array, S, Si};
 use ndarray::{arr0, arr1, arr2};
 
 #[test]
@@ -41,9 +41,9 @@ fn test_slice()
         *elt = i;
     }
 
-    let vi = A.slice([Slice(1, None, 1), Slice(0, None, 2)]);
+    let vi = A.slice([Si(1, None, 1), Si(0, None, 2)]);
     assert_eq!(vi.shape(), &[2u, 2u]);
-    let vi = A.slice([C, C]);
+    let vi = A.slice([S, S]);
     assert_eq!(vi.shape(), A.shape());
     assert!(vi.iter().zip(A.iter()).all(|(a, b)| a == b));
 }
@@ -60,7 +60,7 @@ fn test_index()
         assert_eq!(*x, A[(i, j)]);
     }
 
-    let vi = A.slice([Slice(1, None, 1), Slice(0, None, 2)]);
+    let vi = A.slice([Si(1, None, 1), Si(0, None, 2)]);
     let mut it = vi.iter();
     for (i, j) in iproduct!(range(0, 1u), range(0, 2u)) {
         let x = it.next().unwrap();
@@ -121,7 +121,7 @@ fn test_negative_stride_rcarray()
     }
 
     {
-        let vi = mat.slice([C, Slice(0, None, -1), Slice(0, None, -1)]);
+        let vi = mat.slice([S, Si(0, None, -1), Si(0, None, -1)]);
         assert_eq!(vi.shape(), &[2,4,2]);
         // Test against sequential iterator
         let seq = [7f32,6., 5.,4.,3.,2.,1.,0.,15.,14.,13., 12.,11.,  10.,   9.,   8.];
@@ -130,7 +130,7 @@ fn test_negative_stride_rcarray()
         }
     }
     {
-        let vi = mat.slice([C, Slice(0, None, -5), C]);
+        let vi = mat.slice([S, Si(0, None, -5), S]);
         let seq = [6_f32, 7., 14., 15.];
         for (a, b) in vi.iter().zip(seq.iter()) {
             assert_eq!(*a, *b);
@@ -151,7 +151,7 @@ fn test_cow()
     assert_eq!(mat[(0,1)], 2);
     assert_eq!(n[(0,0)], 1);
     assert_eq!(n[(0,1)], 0);
-    let mut rev = mat.reshape(4u).slice([Slice(0, None, -1)]);
+    let mut rev = mat.reshape(4u).slice([Si(0, None, -1)]);
     assert_eq!(rev[0], 4);
     assert_eq!(rev[1], 3);
     assert_eq!(rev[2], 2);
@@ -254,10 +254,46 @@ fn dyn_dimension()
 #[test]
 fn sum_mean()
 {
-    let a = arr2([[1., 2.], [3., 4.0_f32]]);
+    let a = arr2::<f32>([[1., 2.], [3., 4.]]);
     assert_eq!(a.sum(0), arr1([4., 6.]));
     assert_eq!(a.sum(1), arr1([3., 7.]));
     assert_eq!(a.mean(0), arr1([2., 3.]));
     assert_eq!(a.mean(1), arr1([1.5, 3.5]));
     assert_eq!(a.sum(1).sum(0), arr0(10.));
+}
+
+#[test]
+fn iter_size_hint()
+{
+    let mut a = arr2::<f32>([[1., 2.], [3., 4.]]);
+    {
+        let mut it = a.iter();
+        assert_eq!(it.size_hint(), (4, Some(4)));
+        it.next();
+        assert_eq!(it.size_hint().val0(), 3);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 2);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 1);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 0);
+        assert!(it.next().is_none());
+        assert_eq!(it.size_hint().val0(), 0);
+    }
+
+    a.swap_axes(0, 1);
+    {
+        let mut it = a.iter();
+        assert_eq!(it.size_hint(), (4, Some(4)));
+        it.next();
+        assert_eq!(it.size_hint().val0(), 3);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 2);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 1);
+        it.next();
+        assert_eq!(it.size_hint().val0(), 0);
+        assert!(it.next().is_none());
+        assert_eq!(it.size_hint().val0(), 0);
+    }
 }

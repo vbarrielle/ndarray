@@ -3,7 +3,7 @@
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
 
-//! The `ndarray` crate provides the `Array` type, an n-dimensional
+//! The **ndarray** crate provides the **Array** type, an n-dimensional
 //! numerical container similar to numpy's ndarray.
 //!
 
@@ -19,7 +19,10 @@ use std::mem;
 use std::num;
 use std::default::Default;
 
+/// Array index type
 pub type Ix = uint;
+/// Array index type (signed)
+pub type Ixs = int;
 
 /// Trait for the shape and index types of arrays.
 pub trait Dimension : Clone + Eq {
@@ -66,6 +69,7 @@ pub trait Dimension : Clone + Eq {
         strides
     }
 
+    #[inline]
     fn first_index(&self) -> Self
     {
         let mut index = self.clone();
@@ -77,6 +81,7 @@ pub trait Dimension : Clone + Eq {
 
     /// Iteration -- Use self as size, and return next index after `index`
     /// or None if there are no more.
+    #[inline]
     fn next_for(&self, index: Self) -> Option<Self> {
         let mut index = index;
         let mut done = false;
@@ -95,27 +100,51 @@ pub trait Dimension : Clone + Eq {
             Some(index)
         } else { None }
     }
+
+    /// Return stride offset for index.
+    fn stride_offset(index: &Self, strides: &Self) -> int
+    {
+        let mut offset = 0;
+        for (&i, &s) in index.shape().iter()
+                            .zip(strides.shape().iter()) {
+            offset += i as int * s as int;
+        }
+        offset
+    }
+
 }
 
 impl Dimension for () {
     // empty product is 1 -> size is 1
+    #[inline]
     fn ndim(&self) -> uint { 0 }
     fn shape(&self) -> &[Ix] { &[] }
     fn shape_mut(&mut self) -> &mut [Ix] { &mut [] }
 }
 
 impl Dimension for Ix {
+    #[inline]
     fn ndim(&self) -> uint { 1 }
+    #[inline]
     fn next_for(&self, mut index: Ix) -> Option<Ix> {
         index += 1;
         if index < *self {
             Some(index)
         } else { None }
     }
+
+    /// Self is an index, return the stride offset
+    #[inline]
+    fn stride_offset(index: &Ix, strides: &Ix) -> int
+    {
+        *index as int * (*strides) as int
+    }
 }
 
 impl Dimension for (Ix, Ix) {
+    #[inline]
     fn ndim(&self) -> uint { 2 }
+    #[inline]
     fn next_for(&self, index: (Ix, Ix)) -> Option<(Ix, Ix)> {
         let (mut i, mut j) = index;
         let (imax, jmax) = *self;
@@ -129,10 +158,21 @@ impl Dimension for (Ix, Ix) {
         }
         Some((i, j))
     }
+
+    /// Self is an index, return the stride offset
+    #[inline]
+    fn stride_offset(index: &(Ix, Ix), strides: &(Ix, Ix)) -> int
+    {
+        let (i, j) = *index;
+        let (s, t) = *strides;
+        (i as int * s as int) + (j as int * t as int)
+    }
 }
 
 impl Dimension for (Ix, Ix, Ix) {
+    #[inline]
     fn ndim(&self) -> uint { 3 }
+    #[inline]
     fn next_for(&self, index: (Ix, Ix, Ix)) -> Option<(Ix, Ix, Ix)> {
         let (mut i, mut j, mut k) = index;
         let (imax, jmax, kmax) = *self;
@@ -149,6 +189,15 @@ impl Dimension for (Ix, Ix, Ix) {
             }
         }
         Some((i, j, k))
+    }
+
+    /// Self is an index, return the stride offset
+    #[inline]
+    fn stride_offset(index: &(Ix, Ix, Ix), strides: &(Ix, Ix, Ix)) -> int
+    {
+        let (i, j, k) = *index;
+        let (s, t, u) = *strides;
+        (i as int * s as int) + (j as int * t as int) + (k as int * u as int)
     }
 }
 
@@ -174,7 +223,7 @@ impl Dimension for Vec<Ix>
 }
 
 /// Helper trait to define a smaller-than relation for array shapes.
-trait Shrink<T: Dimension + Default> : Dimension {
+pub trait Shrink<T: Dimension + Default> : Dimension {
     fn from_slice(&self, ignored: uint) -> T {
         let mut tup: T = Default::default();
         {
@@ -214,25 +263,27 @@ unsafe fn to_ref_mut<A>(ptr: *mut A) -> &'static mut A {
     mem::transmute(ptr)
 }
 
-/// N-dimensional array.
+/// The **Array** type is an *N-dimensional array*.
 ///
 /// A reference counted array with copy-on-write mutability.
 ///
-/// The n-dimensional array is a container of numerical use, supporting
+/// The array is a container of numerical use, supporting
 /// all mathematical operators by applying them elementwise.
 ///
-/// The array is both a view and a shared owner of its data. Some methods
-/// like `slice` merely change the view of the data, while methods like `iadd()`
-/// or `iter_mut()` allow mutating the element values.
+/// The array is both a view and a shared owner of its data. Some methods,
+/// for example [*slice()*](#method.slice), merely change the view of the data,
+/// while methods like [*iadd()*](#method.iadd) allow mutating the element
+/// values.
 ///
-/// Calling a method for mutating elements, like for example `iadd()`,
-/// `at_mut()` or `iter_mut()` will break sharing and require a clone of the
-/// data (if it is not uniquely held).
+/// Calling a method for mutating elements, for example 
+/// [*at_mut()*](#method.at_mut), [*iadd()*](#method.iadd) or
+/// [*iter_mut()*](#method.iter_mut) will break sharing and require a clone of
+/// the data (if it is not uniquely held).
 ///
 /// ## Method Conventions
 ///
 /// Methods mutating the view or array elements in place use an *i* prefix,
-/// for example `slice` vs. `islice` and `add` vs `iadd`.
+/// for example *slice* vs. *islice* and *add* vs *iadd*.
 ///
 /// ## Broadcasting
 ///
@@ -308,32 +359,32 @@ impl<A: Clone, D: Dimension> Array<A, D>
     }
 }
 
-impl<A> Array<A, uint>
+impl<A> Array<A, Ix>
 {
     /// Create a one-dimensional array from a vector (no allocation needed)
-    pub fn from_vec(v: Vec<A>) -> Array<A, uint> {
+    pub fn from_vec(v: Vec<A>) -> Array<A, Ix> {
         unsafe {
             Array::from_vec_dim(v.len(), v)
         }
     }
 
     /// Create a one-dimensional array from an iterator
-    pub fn from_iter<I: Iterator<A>>(mut it: I) -> Array<A, uint> {
+    pub fn from_iter<I: Iterator<A>>(mut it: I) -> Array<A, Ix> {
         Array::from_vec(it.collect())
     }
 
 }
 
-impl<A: Clone> Array<A, uint>
+impl<A: Clone> Array<A, Ix>
 {
     /// Create a one-dimensional array from a slice
-    pub fn from_slice(s: &[A]) -> Array<A, uint>
+    pub fn from_slice(xs: &[A]) -> Array<A, Ix>
     {
-        Array::from_vec(s.to_vec())
+        Array::from_vec(xs.to_vec())
     }
 }
 
-impl<A: Clone> Array<A, (uint, uint)>
+impl<A: Clone> Array<A, (Ix, Ix)>
 {
     /// Create a two-dimensional array from a slice
     ///
@@ -343,20 +394,19 @@ impl<A: Clone> Array<A, (uint, uint)>
     /// use ndarray::Array;
     /// let a = Array::from_slices([[1, 2, 3],
     ///                             [4, 5, 6i]]);
-    /// assert!(a.dim() == (2, 3));
+    /// assert!(a.shape() == &[2, 3]);
     /// ```
-    pub fn from_slices(s: &[&[A]]) -> Array<A, (uint, uint)>
+    pub fn from_slices(xs: &[&[A]]) -> Array<A, (Ix, Ix)>
     {
         unsafe {
-            match s.get(0).map(|t| t.len()) {
-                None => Array::from_vec_dim((0u, 0u), Vec::new()),
-                Some(n) => {
-                    assert!(s.iter().all(|l| l.len() == n));
-                    let m = s.len();
-                    let v = s.iter().flat_map(|l| l.iter()).clones().collect::<Vec<A>>();
-                    Array::from_vec_dim((m, n), v)
-                }
+            let (m, n) = (xs.len(), xs.get(0).map_or(0, |snd| snd.len()));
+            let dim = (m, n);
+            let mut result = Vec::<A>::with_capacity(dim.size());
+            for &snd in xs.iter() {
+                assert!(snd.len() == n);
+                result.extend(snd.iter().clones())
             }
+            Array::from_vec_dim(dim, result)
         }
     }
 }
@@ -365,6 +415,7 @@ impl<A: Clone> Array<A, (uint, uint)>
 /// available.
 ///
 /// Fails if `index` is larger than the size of the axis
+// FIXME: Move to Dimension trait
 fn do_sub<A, D: Dimension, P: Copy + RawPtr<A>>(dims: &mut D, ptr: &mut P, strides: &D,
                            axis: uint, index: uint)
 {
@@ -395,7 +446,7 @@ impl<A, D: Dimension> Array<A, D>
         self.dim.clone()
     }
 
-    pub fn shape(&self) -> &[uint] {
+    pub fn shape(&self) -> &[Ix] {
         self.dim.shape()
     }
 
@@ -423,7 +474,7 @@ impl<A, D: Dimension> Array<A, D>
     /// Return a sliced array.
     ///
     /// `indexes` must have one element per array axis.
-    pub fn slice(&self, indexes: &[Slice]) -> Array<A, D>
+    pub fn slice(&self, indexes: &[Si]) -> Array<A, D>
     {
         let mut arr = self.clone();
         arr.islice(indexes);
@@ -431,7 +482,7 @@ impl<A, D: Dimension> Array<A, D>
     }
 
     /// Like `slice`, except this array's view is mutated in place
-    pub fn islice(&mut self, indexes: &[Slice])
+    pub fn islice(&mut self, indexes: &[Si])
     {
         let offset = do_slices(&mut self.dim, &mut self.strides, indexes);
         unsafe {
@@ -440,7 +491,7 @@ impl<A, D: Dimension> Array<A, D>
     }
 
     /// Iterate over the sliced view
-    pub fn slice_iter<'a>(&'a self, indexes: &[Slice]) -> Elements<'a, A, D>
+    pub fn slice_iter<'a>(&'a self, indexes: &[Si]) -> Elements<'a, A, D>
     {
         let mut it = self.iter();
         let offset = do_slices(&mut it.inner.dim, &mut it.inner.strides, indexes);
@@ -645,7 +696,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// of the array.
     ///
     /// Iterator element type is `&'a mut A`
-    pub fn slice_iter_mut<'a>(&'a mut self, indexes: &[Slice]) -> ElementsMut<'a, A, D>
+    pub fn slice_iter_mut<'a>(&'a mut self, indexes: &[Si]) -> ElementsMut<'a, A, D>
     {
         let mut it = self.iter_mut();
         let offset = do_slices(&mut it.inner.dim, &mut it.inner.strides, indexes);
@@ -727,6 +778,14 @@ impl<A: Clone, D: Dimension> Array<A, D>
             for (x, y) in self.iter_mut().zip(other_iter) {
                 *x = y.clone();
             }
+        }
+    }
+
+    /// Perform an elementwise assigment to `self` from scalar `x`.
+    pub fn assign_scalar(&mut self, x: &A)
+    {
+        for elt in self.iter_mut() {
+            *elt = x.clone();
         }
     }
 }
@@ -811,13 +870,13 @@ impl<A, D: Dimension> Array<A, D>
         }
     }
 
-    pub fn diag(&self) -> Array<A, uint> {
+    pub fn diag(&self) -> Array<A, Ix> {
         let (len, stride) = self.diag_params();
         Array {
             data: self.data.clone(),
             ptr: self.ptr,
             dim: len,
-            strides: stride as uint,
+            strides: stride as Ix,
         }
     }
 }
@@ -910,7 +969,7 @@ fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
         }
         _ => /* fallthrough */ {}
     }
-    let mut slices = Vec::from_elem(view.dim.shape().len(), C);
+    let mut slices = Vec::from_elem(view.dim.shape().len(), S);
     assert!(slices.len() >= 2);
     let n_loops = slices.len() - 2;
     let row_width = view.dim.shape()[slices.len() - 1];
@@ -919,7 +978,7 @@ fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
     loop {
         /* Use fixed indices to make a slice*/
         for (fidx, slc) in fixed.iter().zip(slices.mut_iter()) {
-            *slc = Slice(*fidx as int, Some(*fidx as int + 1), 1);
+            *slc = Si(*fidx as int, Some(*fidx as int + 1), 1);
         }
         if !first {
             try!(write!(f, "\n"));
@@ -986,8 +1045,8 @@ impl<A: Eq, D: Dimension>
 Eq for Array<A, D> {}
 
 macro_rules! impl_binary_op(
-    ($trt:ident, $mth:ident, $imethod:ident) => (
-impl<A: Clone + $trt<A, A>, D: Dimension, E: Dimension>
+    ($trt:ident, $mth:ident, $imethod:ident, $imth_scalar:ident) => (
+impl<A: Clone + $trt<A, A>, D: Dimension>
 Array<A, D>
 {
     /// Perform an elementwise arithmetic operation between `self` and `other`,
@@ -995,7 +1054,7 @@ Array<A, D>
     ///
     /// If their shapes disagree, `other` is broadcast to the shape of `self`.
     /// Fails if broadcasting isn't possible.
-    pub fn $imethod (&mut self, other: &Array<A, E>)
+    pub fn $imethod <E: Dimension> (&mut self, other: &Array<A, E>)
     {
         if self.dim.ndim() == other.dim.ndim() &&
             self.shape() == other.shape() {
@@ -1013,9 +1072,18 @@ Array<A, D>
             }
         }
     }
+
+    /// Perform an elementwise arithmetic operation between `self` and the scalar `x`,
+    /// *in place*.
+    pub fn $imth_scalar (&mut self, x: &A)
+    {
+        for elt in self.iter_mut() {
+            *elt = elt. $mth (x);
+        }
+    }
 }
 
-impl<A: Clone + $trt<A, A>, D: Dimension, E: Dimension>
+impl<A: $trt<A, A>, D: Dimension, E: Dimension>
 $trt<Array<A, E>, Array<A, D>> for Array<A, D>
 {
     /// Perform an elementwise arithmetic operation between `self` and `other`,
@@ -1026,24 +1094,39 @@ $trt<Array<A, E>, Array<A, D>> for Array<A, D>
     fn $mth (&self, other: &Array<A, E>) -> Array<A, D>
     {
         // FIXME: Can we co-broadcast arrays here? And how?
-        let mut res = self.clone();
-        res.$imethod (other);
-        res
+        let mut result = Vec::<A>::with_capacity(self.dim.size());
+        if self.shape() == other.shape() {
+            for (x, y) in self.iter().zip(other.iter()) {
+                result.push((*x). $mth (y));
+            }
+        } else {
+            let other_iter = match other.broadcast_iter(self.dim()) {
+                Some(it) => it,
+                None => fail!("{}: Could not broadcast array from shape {} into: {}",
+                              stringify!($mth), other.shape(), self.shape())
+            };
+            for (x, y) in self.iter().zip(other_iter) {
+                result.push((*x). $mth (y));
+            }
+        }
+        unsafe {
+            Array::from_vec_dim(self.dim.clone(), result)
+        }
     }
 }
     );
 )
 
-impl_binary_op!(Add, add, iadd)
-impl_binary_op!(Sub, sub, isub)
-impl_binary_op!(Mul, mul, imul)
-impl_binary_op!(Div, div, idiv)
-impl_binary_op!(Rem, rem, irem)
-impl_binary_op!(BitAnd, bitand, ibitand)
-impl_binary_op!(BitOr, bitor, ibitor)
-impl_binary_op!(BitXor, bitxor, ibitxor)
-impl_binary_op!(Shl, shl, ishl)
-impl_binary_op!(Shr, shr, ishr)
+impl_binary_op!(Add, add, iadd, iadd_scalar)
+impl_binary_op!(Sub, sub, isub, isub_scalar)
+impl_binary_op!(Mul, mul, imul, imul_scalar)
+impl_binary_op!(Div, div, idiv, idiv_scalar)
+impl_binary_op!(Rem, rem, irem, irem_scalar)
+impl_binary_op!(BitAnd, bitand, ibitand, ibitand_scalar)
+impl_binary_op!(BitOr, bitor, ibitor, ibitor_scalar)
+impl_binary_op!(BitXor, bitxor, ibitxor, ibitxor_scalar)
+impl_binary_op!(Shl, shl, ishl, ishl_scalar)
+impl_binary_op!(Shr, shr, ishr, ishr_scalar)
 
 impl<A: Clone + Neg<A>, D: Dimension>
 Array<A, D>
@@ -1106,16 +1189,30 @@ struct Baseiter<'a, A, D> {
 
 impl<'a, A, D: Dimension> Baseiter<'a, A, D>
 {
+    #[inline]
     fn next(&mut self) -> Option<*mut A>
     {
         let index = match self.index {
             None => return None,
             Some(ref ix) => ix.clone(),
         };
-        let offset = stride_offset(&self.strides, &index);
+        let offset = Dimension::stride_offset(&index, &self.strides);
         self.index = self.dim.next_for(index);
         unsafe {
             Some(self.ptr.offset(offset))
+        }
+    }
+
+    fn size_hint(&self) -> uint
+    {
+        match self.index {
+            None => 0,
+            Some(ref ix) => {
+                let gone = self.dim.default_strides().shape().iter()
+                            .zip(ix.shape().iter())
+                                 .fold(0u, |s, (&a, &b)| s + a * b);
+                self.dim.size() - gone
+            }
         }
     }
 }
@@ -1144,11 +1241,18 @@ pub struct Elements<'a, A, D> {
 
 impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
 {
+    #[inline]
     fn next(&mut self) -> Option<&'a A>
     {
         unsafe {
             self.inner.next().map(|p| to_ref(p as *const _))
         }
+    }
+
+    fn size_hint(&self) -> (uint, Option<uint>)
+    {
+        let len = self.inner.size_hint();
+        (len, Some(len))
     }
 }
 
@@ -1162,24 +1266,22 @@ pub struct ElementsMut<'a, A, D> {
 
 impl<'a, A, D: Dimension> Iterator<&'a mut A> for ElementsMut<'a, A, D>
 {
+    #[inline]
     fn next(&mut self) -> Option<&'a mut A>
     {
         unsafe {
             self.inner.next().map(|p| to_ref_mut(p))
         }
     }
-}
 
-fn stride_offset<D: Dimension>(strides: &D, index: &D) -> int
-{
-    let mut offset = 0;
-    for (&i, &s) in index.shape().iter()
-                        .zip(strides.shape().iter()) {
-        offset += i as int * s as int;
+    fn size_hint(&self) -> (uint, Option<uint>)
+    {
+        let len = self.inner.size_hint();
+        (len, Some(len))
     }
-    offset
 }
 
+// FIXME: Move to Dimension trait
 fn stride_offset_checked<D: Dimension>(dim: &D, strides: &D, index: &D) -> Option<int>
 {
     let mut offset = 0;
@@ -1201,7 +1303,7 @@ fn stride_offset_checked<D: Dimension>(dim: &D, strides: &D, index: &D) -> Optio
 // [:,0] -- first column of matrix
 
 #[deriving(Clone, PartialEq, Eq, Hash, Show)]
-/// Description of a range of an array axis.
+/// A slice, a description of a range of an array axis.
 ///
 /// Fields are `begin`, `end` and `stride`, where
 /// negative `begin` or `end` indexes are counted from the back
@@ -1211,27 +1313,28 @@ fn stride_offset_checked<D: Dimension>(dim: &D, strides: &D, index: &D) -> Optio
 ///
 /// ## Examples
 ///
-/// `Slice(0, None, 1)` is the full range of an axis.
+/// `Si(0, None, 1)` is the full range of an axis.
 /// Python equivalent is `[:]`.
 ///
-/// `Slice(a, Some(b), 2)` is every second element from `a` until `b`.
+/// `Si(a, Some(b), 2)` is every second element from `a` until `b`.
 /// Python equivalent is `[a:b:2]`.
 ///
-/// `Slice(a, None, -1)` is every element, in reverse order, from `a`
+/// `Si(a, None, -1)` is every element, in reverse order, from `a`
 /// until the end. Python equivalent is `[a::-1]`
-pub struct Slice(pub int, pub Option<int>, pub int);
+pub struct Si(pub int, pub Option<int>, pub int);
 
-/// Full range as slice.
-pub static C: Slice = Slice(0, None, 1);
+/// Slice value for the full range of an axis.
+pub static S: Si = Si(0, None, 1);
 
-fn abs_index(len: int, index: int) -> uint {
+fn abs_index(len: Ixs, index: Ixs) -> Ix {
     if index < 0 {
-        (len + index) as uint
-    } else { index as uint }
+        (len + index) as Ix
+    } else { index as Ix }
 }
 
 /// Modify dimension, strides and return data pointer offset
-fn do_slices<D: Dimension>(dim: &mut D, strides: &mut D, slices: &[Slice]) -> int
+// FIXME: Move to Dimension trait
+fn do_slices<D: Dimension>(dim: &mut D, strides: &mut D, slices: &[Si]) -> int
 {
     let mut offset = 0;
     assert!(slices.len() == dim.shape().len());
@@ -1241,7 +1344,7 @@ fn do_slices<D: Dimension>(dim: &mut D, strides: &mut D, slices: &[Slice]) -> in
     {
         let m = *dr;
         let mi = m as int;
-        let Slice(b1, opt_e1, s1) = slc;
+        let Si(b1, opt_e1, s1) = slc;
         let e1 = opt_e1.unwrap_or(mi);
 
         let b1 = abs_index(mi, b1);
