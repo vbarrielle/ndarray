@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +61,7 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>&#8203;::<a class='struct' href=''>Array</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-1436' href='../src/ndarray/src/lib.rs.html#306-317'>[src]</a></div></h1>
+        </span><a id='src-2418' href='../src/ndarray/src/lib.rs.html#308-319'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
@@ -115,7 +115,7 @@ elements of the smaller dimension array.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.from_slices' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.from_slices' class='fnname'>from_slices</a>(xs: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[&amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h4>
 <div class='docblock'><p>Create a two-dimensional array from a slice</p>
 
-<p>Fail if the slices are not all of the same length.</p>
+<p><strong>Fail</strong> if the slices are not all of the same length.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>Array</span>;
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_slices</span>([[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>],
@@ -123,10 +123,14 @@ elements of the smaller dimension array.</p>
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>shape</span>() <span class='op'>==</span> <span class='kw-2'>&amp;</span>[<span class='number'>2</span>, <span class='number'>3</span>]);
 </pre>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.from_vec_dim' class='method'><a class='stability Unmarked' title='No stability level'></a><code>unsafe fn <a href='#method.from_vec_dim' class='fnname'>from_vec_dim</a>(dim: D, v: <a class='struct' href='http://doc.rust-lang.org/master/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;A&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
-<div class='docblock'><p>Unsafe because dimension is unchecked.</p>
+<div class='docblock'><p>Create an array from a vector (with no allocation needed).</p>
+
+<p>Unsafe because dimension is unchecked, and must be correct.</p>
 </div><h4 id='method.dim' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.dim' class='fnname'>dim</a>(&amp;self) -&gt; D</code></h4>
-<h4 id='method.shape' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.shape' class='fnname'>shape</a>(&amp;self) -&gt; &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>]</a></code></h4>
-<h4 id='method.is_standard_layout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.is_standard_layout' class='fnname'>is_standard_layout</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Return the shape of the array.</p>
+</div><h4 id='method.shape' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.shape' class='fnname'>shape</a>(&amp;self) -&gt; &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>]</a></code></h4>
+<div class='docblock'><p>Return the shape of the array as a slice.</p>
+</div><h4 id='method.is_standard_layout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.is_standard_layout' class='fnname'>is_standard_layout</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Return <code>true</code> if the array data is laid out in
 contiguous “C order” where the last index is the most rapidly
 varying.</p>
@@ -142,28 +146,32 @@ Array&#39;s view.</p>
 </div><h4 id='method.slice' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.slice' class='fnname'>slice</a>(&amp;self, indexes: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Return a sliced array.</p>
 
-<p><code>indexes</code> must have one element per array axis.</p>
+<p><strong>Fail</strong> if <code>indexes</code> does not match the number of array axes.</p>
 </div><h4 id='method.islice' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.islice' class='fnname'>islice</a>(&amp;mut self, indexes: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>)</code></h4>
-<div class='docblock'><p>Like <code>slice</code>, except this array&#39;s view is mutated in place</p>
+<div class='docblock'><p>Slice the array&#39;s view in place.</p>
+
+<p><strong>Fail</strong> if <code>indexes</code> does not match the number of array axes.</p>
 </div><h4 id='method.slice_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.slice_iter' class='fnname'>slice_iter</a>&lt;'a&gt;(&amp;'a self, indexes: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h4>
-<div class='docblock'><p>Iterate over the sliced view</p>
+<div class='docblock'><p>Return an iterator over a sliced view.</p>
+
+<p><strong>Fail</strong> if <code>indexes</code> does not match the number of array axes.</p>
 </div><h4 id='method.at' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.at' class='fnname'>at</a>&lt;'a&gt;(&amp;'a self, index: D) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a A&gt;</code></h4>
 <div class='docblock'><p>Return a reference to the element at <code>index</code>, or return <code>None</code>
 if the index is out of bounds.</p>
 </div><h4 id='method.iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter' class='fnname'>iter</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Return an iterator of references to the elements of the Array</p>
 
-<p>Iterator element type is <code>&amp;&#39;a A</code></p>
+<p>Iterator element type is <code>&amp;&#39;a A</code>.</p>
 </div><h4 id='method.isubview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.isubview' class='fnname'>isubview</a>(&amp;mut self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>)</code></h4>
 <div class='docblock'><p>Collapse dimension <code>axis</code> into length one,
 and select the subview of <code>index</code> along that axis.</p>
 
-<p>Fail if <code>index</code> is past the length of the axis</p>
+<p><strong>Fail</strong> if <code>index</code> is past the length of the axis.</p>
 </div><h4 id='method.broadcast_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.broadcast_iter' class='fnname'>broadcast_iter</a>&lt;'a, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt;(&amp;'a self, dim: E) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, E&gt;&gt;</code></h4>
 <div class='docblock'><p>Act like a larger size and/or dimension Array by <em>broadcasting</em>
 into a larger shape, if possible.</p>
 
-<p>Return <code>None</code> if not compatible.</p>
+<p>Return <code>None</code> if shapes can not be broadcast together.</p>
 
 <h2 id="background" class='section-header'><a
                            href="#background">Background</a></h2>
@@ -185,27 +193,29 @@ axes that are to be repeated.</p>
 </div><h4 id='method.swap_axes' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.swap_axes' class='fnname'>swap_axes</a>(&amp;mut self, ax: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, bx: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>)</code></h4>
 <div class='docblock'><p>Swap axes <code>ax</code> and <code>bx</code>.</p>
 
-<p>Fail if the axes are out of bounds.</p>
+<p><strong>Fail</strong> if the axes are out of bounds.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/default/trait.Default.html' title='core::default::Default'>Default</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a> + <a class='trait' href='../ndarray/trait.Shrink.html' title='ndarray::Shrink'>Shrink</a>&lt;E&gt;&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.subview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.subview' class='fnname'>subview</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;</code></h4>
 <div class='docblock'><p>Select the subview <code>index</code> along <code>axis</code> and return the reduced
 dimension array.</p>
+
+<p><strong>Fail</strong> if <code>index</code> is past the length of the axis.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.at_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.at_mut' class='fnname'>at_mut</a>&lt;'a&gt;(&amp;'a mut self, index: D) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a mut A&gt;</code></h4>
 <div class='docblock'><p>Return a mutable reference to the element at <code>index</code>, or return <code>None</code>
 if the index is out of bounds.</p>
 </div><h4 id='method.iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter_mut' class='fnname'>iter_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Return an iterator of mutable references to the elements of the Array</p>
 
-<p>Iterator element type is <code>&amp;&#39;a mut A</code></p>
+<p>Iterator element type is <code>&amp;&#39;a mut A</code>.</p>
 </div><h4 id='method.slice_iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.slice_iter_mut' class='fnname'>slice_iter_mut</a>&lt;'a&gt;(&amp;'a mut self, indexes: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Return an iterator of mutable references into the sliced view
 of the array.</p>
 
-<p>Iterator element type is <code>&amp;&#39;a mut A</code></p>
+<p>Iterator element type is <code>&amp;&#39;a mut A</code>.</p>
 </div><h4 id='method.sub_iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.sub_iter_mut' class='fnname'>sub_iter_mut</a>&lt;'a&gt;(&amp;'a mut self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Select the subview <code>index</code> along <code>axis</code> and return an iterator
 of the subview.</p>
 
-<p>Iterator element type is <code>&amp;&#39;a mut A</code></p>
+<p>Iterator element type is <code>&amp;&#39;a mut A</code>.</p>
 </div><h4 id='method.raw_data_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.raw_data_mut' class='fnname'>raw_data_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; &amp;'a mut <a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a></code></h4>
 <div class='docblock'><p>Return a mutable slice of the array&#39;s backing data in memory order.</p>
 
@@ -216,15 +226,15 @@ Array&#39;s view.</p>
 <p><strong>Note:</strong> The data is uniquely held and nonaliased
 while it is mutably borrowed.</p>
 </div><h4 id='method.reshape' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.reshape' class='fnname'>reshape</a>&lt;E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt;(&amp;self, shape: E) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;</code></h4>
-<div class='docblock'><p>Transform the array into <code>shape</code>, must correspond
-to the same number of elements.</p>
+<div class='docblock'><p>Transform the array into <code>shape</code>; any other shape
+with the same number of elements is accepted.</p>
 
-<p>fail on incompatible size.</p>
+<p>Fail on incompatible size.</p>
 </div><h4 id='method.assign' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.assign' class='fnname'>assign</a>&lt;E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt;(&amp;mut self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;)</code></h4>
 <div class='docblock'><p>Perform an elementwise assigment to <code>self</code> from <code>other</code>.</p>
 
 <p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.assign_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.assign_scalar' class='fnname'>assign_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise assigment to <code>self</code> from scalar <code>x</code>.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.row_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.row_iter' class='fnname'>row_iter</a>&lt;'a&gt;(&amp;'a self, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; Stride&lt;'a, A&gt;</code></h4>
@@ -233,7 +243,7 @@ Fails if broadcasting isn&#39;t possible.</p>
 <h4 id='method.diag_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.diag_iter' class='fnname'>diag_iter</a>&lt;'a&gt;(&amp;'a self) -&gt; Stride&lt;'a, A&gt;</code></h4>
 <h4 id='method.diag' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.diag' class='fnname'>diag</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.Num.html' title='core::num::Num'>Num</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/default/trait.Default.html' title='core::default::Default'>Default</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a> + <a class='trait' href='../ndarray/trait.Shrink.html' title='ndarray::Shrink'>Shrink</a>&lt;E&gt;&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.sum' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.sum' class='fnname'>sum</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;</code></h4>
-<div class='docblock'><p>Return sum along <code>axis</code></p>
+<div class='docblock'><p>Return sum along <code>axis</code>.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::{<span class='ident'>arr0</span>, <span class='ident'>arr1</span>, <span class='ident'>arr2</span>};
 
@@ -245,13 +255,14 @@ Fails if broadcasting isn&#39;t possible.</p>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>sum</span>(<span class='number'>0</span>).<span class='ident'>sum</span>(<span class='number'>0</span>), <span class='ident'>arr0</span>(<span class='number'>10.</span>));
 </pre>
 </div><h4 id='method.mean' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mean' class='fnname'>mean</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;</code></h4>
-<div class='docblock'><p>Return mean along <code>axis</code></p>
+<div class='docblock'><p>Return mean along <code>axis</code>.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.iadd' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iadd' class='fnname'>iadd</a>&lt;E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt;(&amp;mut self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.iadd_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iadd_scalar' class='fnname'>iadd_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -259,8 +270,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.isub_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.isub_scalar' class='fnname'>isub_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -268,8 +280,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.imul_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.imul_scalar' class='fnname'>imul_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -277,8 +290,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.idiv_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.idiv_scalar' class='fnname'>idiv_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -286,8 +300,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.irem_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.irem_scalar' class='fnname'>irem_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -295,8 +310,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.ibitand_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ibitand_scalar' class='fnname'>ibitand_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -304,8 +320,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.ibitor_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ibitor_scalar' class='fnname'>ibitor_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -313,8 +330,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.ibitxor_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ibitxor_scalar' class='fnname'>ibitxor_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -322,8 +340,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.ishl_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ishl_scalar' class='fnname'>ishl_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -331,8 +350,9 @@ Fails if broadcasting isn&#39;t possible.</p>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 <em>in place</em>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.ishr_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ishr_scalar' class='fnname'>ishr_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and the scalar <code>x</code>,
 <em>in place</em>.</p>
@@ -354,69 +374,79 @@ size M x K</p>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.eq' class='method'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Return <code>true</code> if all elements of <code>self</code> and <code>other</code> are equal.</p>
 
-<p>Fail if shapes are not equal.</p>
+<p><strong>Fail</strong> if shapes are not equal.</p>
 </div><h4 id='method.ne' class='method'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.bool.html'>bool</a></code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.assert_receiver_is_total_eq' class='method'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#tymethod.assert_receiver_is_total_eq' class='fnname'>assert_receiver_is_total_eq</a>(&amp;self)</code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.add' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.add' class='fnname'>add</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.sub' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.sub' class='fnname'>sub</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.mul' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.mul' class='fnname'>mul</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.div' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.div' class='fnname'>div</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Rem.html' title='core::ops::Rem'>Rem</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Rem.html' title='core::ops::Rem'>Rem</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.rem' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.rem' class='fnname'>rem</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitAnd.html' title='core::ops::BitAnd'>BitAnd</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitAnd.html' title='core::ops::BitAnd'>BitAnd</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.bitand' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.bitand' class='fnname'>bitand</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitOr.html' title='core::ops::BitOr'>BitOr</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitOr.html' title='core::ops::BitOr'>BitOr</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.bitor' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.bitor' class='fnname'>bitor</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitXor.html' title='core::ops::BitXor'>BitXor</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.BitXor.html' title='core::ops::BitXor'>BitXor</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.bitxor' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.bitxor' class='fnname'>bitxor</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Shl.html' title='core::ops::Shl'>Shl</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Shl.html' title='core::ops::Shl'>Shl</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.shl' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.shl' class='fnname'>shl</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Shr.html' title='core::ops::Shr'>Shr</a>&lt;A, A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Shr.html' title='core::ops::Shr'>Shr</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;, <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.shr' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.shr' class='fnname'>shr</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise arithmetic operation between <code>self</code> and <code>other</code>,
 and return the result.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-Fails if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Neg.html' title='core::ops::Neg'>Neg</a>&lt;A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Neg.html' title='core::ops::Neg'>Neg</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.neg' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.neg' class='fnname'>neg</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <div class='docblock'><p>Perform an elementwise negation of <code>self</code> and return the result.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Not.html' title='core::ops::Not'>Not</a>&lt;A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Not.html' title='core::ops::Not'>Not</a>&lt;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.not' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.not' class='fnname'>not</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>

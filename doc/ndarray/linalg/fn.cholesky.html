@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `arr1` fn in crate `ndarray`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, arr1">
+    <meta name="description" content="API documentation for the Rust `cholesky` fn in crate `ndarray`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, cholesky">
 
-    <title>ndarray::arr1 - Rust</title>
+    <title>ndarray::linalg::cholesky - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../main.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
     
@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn current' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a></p><div class='block fn'><h2>Functions</h2><a class='fn current' href='fn.cholesky.html'>cholesky</a><a class='fn ' href='fn.eye.html'>eye</a><a class='fn ' href='fn.least_squares.html'>least_squares</a><a class='fn ' href='fn.subst_bw.html'>subst_bw</a><a class='fn ' href='fn.subst_fw.html'>subst_fw</a></div>
     </section>
 
     <nav class="sub">
@@ -58,11 +58,25 @@ tweak rustdoc css
     </nav>
 
     <section id='main' class="content fn">
-<h1 class='fqn'><div class='in-band'>Function <a href='index.html'>ndarray</a>&#8203;::<a class='fn' href=''>arr1</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><div class='in-band'>Function <a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a>&#8203;::<a class='fn' href=''>cholesky</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-4881' href='../src/ndarray/src/lib.rs.html#904-907'>[src]</a></div></h1>
-<pre class='rust fn'>pub fn arr1&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt;(xs: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</pre><div class='docblock'><p>Return a one-dimensional array with elements from <code>xs</code>.</p>
+        </span><a id='src-178' href='../../src/ndarray/src/linalg.rs.html#91-127'>[src]</a></div></h1>
+<pre class='rust fn'>pub fn cholesky&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.Float.html' title='core::num::Float'>Float</a>&gt;(a: &amp;<a class='type' href='../../ndarray/linalg/type.Mat.html' title='ndarray::linalg::Mat'>Mat</a>&lt;A&gt;) -&gt; <a class='type' href='../../ndarray/linalg/type.Mat.html' title='ndarray::linalg::Mat'>Mat</a>&lt;A&gt;</pre><div class='docblock'><p>Factor <em>a = L L.T</em>.</p>
+
+<p><em>a</em> should be hermitian and positive definite.</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">https://en.wikipedia.org/wiki/Cholesky_decomposition</a></p>
+
+<p>“The Cholesky decomposition is mainly used for the numerical solution of
+linear equations Ax = b.</p>
+
+<p>If A is symmetric and positive definite, then we can solve Ax = b by first
+computing the Cholesky decomposition A = LL*, then solving Ly = b for y by
+forward substitution, and finally solving L*x = y for x by back
+substitution.”</p>
+
+<p>Return L.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -102,13 +116,13 @@ tweak rustdoc css
     
 
     <script>
-        window.rootPath = "../";
+        window.rootPath = "../../";
         window.currentCrate = "ndarray";
         window.playgroundUrl = "";
     </script>
-    <script src="../jquery.js"></script>
-    <script src="../main.js"></script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script async src="../../search-index.js"></script>
 </body>
 </html>
