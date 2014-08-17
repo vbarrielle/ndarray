@@ -2,9 +2,9 @@
 
 //! A few linear algebra operations on two-dimensional arrays.
 
-use std::num::{zero, one};
+use std::num::{zero, one, Zero, One};
 
-use super::{Array, Dimension, Ix};
+use super::{Array, Ix};
 
 /// Column vector.
 pub type Col<A> = Array<A, Ix>;
@@ -13,11 +13,11 @@ pub type Mat<A> = Array<A, (Ix, Ix)>;
 
 
 /// Return the identity matrix of dimension *n*.
-pub fn eye<A: Num + Clone>(n: Ix) -> Mat<A>
+pub fn eye<A: Zero + One + Clone>(n: Ix) -> Mat<A>
 {
     let mut eye = Array::zeros((n, n));
-    for i in range(0, n) {
-        eye[(i, i)] = one::<A>();
+    for a_ii in eye.diag_iter_mut() {
+        *a_ii = one::<A>();
     }
     eye
 }
@@ -55,14 +55,12 @@ pub fn least_squares<A: Float>(a: &Mat<A>, b: &Col<A>) -> Col<A>
     // => L.T x = z
     //  bw subst for x estimate
     // 
-    let (m, n) = a.dim();
-
     let mut aT = a.clone();
     aT.swap_axes(0, 1);
 
     let aT_a = aT.mat_mul(a);
-    let mut L = cholesky(&aT_a);
-    let rhs = aT.mat_mul(&b.reshape((m, 1))).reshape(n);
+    let mut L = cholesky(aT_a);
+    let rhs = aT.mat_mul_col(b);
 
     // Solve L z = aT b
     let z = subst_fw(&L, &rhs);
@@ -73,9 +71,9 @@ pub fn least_squares<A: Float>(a: &Mat<A>, b: &Col<A>) -> Col<A>
     x_lstsq
 }
 
-/// Factor *a = L L.T*.
+/// Factor *a = L L<sup>T</sup>*.
 ///
-/// *a* should be hermitian and positive definite.
+/// *a* should be a square matrix, hermitian and positive definite.
 ///
 /// https://en.wikipedia.org/wiki/Cholesky_decomposition
 ///
@@ -88,22 +86,25 @@ pub fn least_squares<A: Float>(a: &Mat<A>, b: &Col<A>) -> Col<A>
 /// substitution.”
 ///
 /// Return L.
-pub fn cholesky<A: Float>(a: &Mat<A>) -> Mat<A>
+pub fn cholesky<A: Float>(a: Mat<A>) -> Mat<A>
 {
     let z = zero::<A>();
     let (m, n) = a.dim();
     assert!(m == n);
-    let mut L = Array::<A, _>::zeros((n, n));
+    // Perform the operation in-place on `a`
+    let mut L = a;
     for i in range(0, m) {
         // Entries 0 .. i before the diagonal
         for j in range(0, i) {
+            // A = (
             // L²_1,1
             // L_2,1 L_1,1  L²_2,1 + L²_2,2
             // L_3,1 L_1,1  L_3,1 L_2,1 + L_3,2 L_2,2  L²_3,1 + L²_3,2 + L²_3,3
+            // .. )
             let mut lik_ljk_sum = z.clone();
             {
-                // L[(i, k)] for k = 0 .. j
-                // L[(j, k)] for k = 0 .. j
+                // L_ik for k = 0 .. j
+                // L_jk for k = 0 .. j
                 let Lik = L.row_iter(i);
                 let Ljk = L.row_iter(j);
                 for (&lik, &ljk) in Lik.zip(Ljk).take(j) {
@@ -111,17 +112,25 @@ pub fn cholesky<A: Float>(a: &Mat<A>) -> Mat<A>
                 }
             }
 
-            L[(i, j)] = (a[(i, j)] - lik_ljk_sum) / L[(j, j)];
+            // L_ij = A_ij - Sum(k = 1 .. j) L_ik L_jk
+            L[(i, j)] = (L[(i, j)] - lik_ljk_sum) / L[(j, j)];
         }
-        // diagonal where i == j
-        // L_j,j = Sqrt[A_j,j - Sum_k=1 to (j-1) L²_j,k ]
+
+        // Diagonal where i == j
+        // L_jj = Sqrt[ A_jj - Sum(k = 1 .. j) L_jk L_jk ]
         let j = i;
         let mut ljk_sum = z.clone();
-        // L[(j, k)] for k = 0 .. j
+        // L_jk for k = 0 .. j
         for &ljk in L.row_iter(j).take(j) {
             ljk_sum = ljk_sum + ljk * ljk;
         }
-        L[(j, j)] = (a[(j, j)] - ljk_sum).sqrt();
+        L[(j, j)] = (L[(j, j)] - ljk_sum).sqrt();
+
+        // After the diagonal
+        // L_ij = 0 for j > i
+        for j in range(i + 1, n) {
+            L[(i, j)] = z.clone();
+        }
     }
     L
 }
@@ -133,7 +142,7 @@ pub fn subst_fw<A: Num + Clone>(l: &Mat<A>, b: &Col<A>) -> Col<A>
     assert!(m == n);
     assert!(m == b.dim());
     let mut x = Vec::from_elem(m, zero::<A>());
-    for (i, bi) in b.iter().enumerate() {
+    for (i, bi) in b.indexed_iter() {
         // b_lx_sum = b[i] - Sum(for j = 0 .. i) L_ij x_j
         let mut b_lx_sum = bi.clone();
         for (lij, xj) in l.row_iter(i).zip(x.iter()).take(i) {
