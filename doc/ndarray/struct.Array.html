@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +61,7 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>&#8203;::<a class='struct' href=''>Array</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-2418' href='../src/ndarray/src/lib.rs.html#308-319'>[src]</a></div></h1>
+        </span><a id='src-2456' href='../src/ndarray/src/lib.rs.html#315-326'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
@@ -162,6 +162,10 @@ if the index is out of bounds.</p>
 <div class='docblock'><p>Return an iterator of references to the elements of the Array</p>
 
 <p>Iterator element type is <code>&amp;&#39;a A</code>.</p>
+</div><h4 id='method.indexed_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.indexed_iter' class='fnname'>indexed_iter</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='struct' href='../ndarray/struct.IndexedElements.html' title='ndarray::IndexedElements'>IndexedElements</a>&lt;'a, A, D&gt;</code></h4>
+<div class='docblock'><p>Return an iterator of references to the elements of the Array</p>
+
+<p>Iterator element type is <code>(D, &amp;&#39;a A)</code>.</p>
 </div><h4 id='method.isubview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.isubview' class='fnname'>isubview</a>(&amp;mut self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>)</code></h4>
 <div class='docblock'><p>Collapse dimension <code>axis</code> into length one,
 and select the subview of <code>index</code> along that axis.</p>
@@ -203,9 +207,13 @@ dimension array.</p>
 <div class='docblock'><p>Return a mutable reference to the element at <code>index</code>, or return <code>None</code>
 if the index is out of bounds.</p>
 </div><h4 id='method.iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter_mut' class='fnname'>iter_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
-<div class='docblock'><p>Return an iterator of mutable references to the elements of the Array</p>
+<div class='docblock'><p>Return an iterator of mutable references to the elements of the Array.</p>
 
 <p>Iterator element type is <code>&amp;&#39;a mut A</code>.</p>
+</div><h4 id='method.indexed_iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.indexed_iter_mut' class='fnname'>indexed_iter_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; <a class='struct' href='../ndarray/struct.IndexedElementsMut.html' title='ndarray::IndexedElementsMut'>IndexedElementsMut</a>&lt;'a, A, D&gt;</code></h4>
+<div class='docblock'><p>Return an iterator of indexes and mutable references to the elements of the Array.</p>
+
+<p>Iterator element type is <code>(D, &amp;&#39;a mut A)</code>.</p>
 </div><h4 id='method.slice_iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.slice_iter_mut' class='fnname'>slice_iter_mut</a>&lt;'a&gt;(&amp;'a mut self, indexes: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Return an iterator of mutable references into the sliced view
 of the array.</p>
@@ -216,6 +224,8 @@ of the array.</p>
 of the subview.</p>
 
 <p>Iterator element type is <code>&amp;&#39;a mut A</code>.</p>
+</div><h4 id='method.diag_iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.diag_iter_mut' class='fnname'>diag_iter_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; StrideMut&lt;'a, A&gt;</code></h4>
+<div class='docblock'><p>Return an iterator over the diagonal elements of the array.</p>
 </div><h4 id='method.raw_data_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.raw_data_mut' class='fnname'>raw_data_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; &amp;'a mut <a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a></code></h4>
 <div class='docblock'><p>Return a mutable slice of the array&#39;s backing data in memory order.</p>
 
@@ -229,12 +239,13 @@ while it is mutably borrowed.</p>
 <div class='docblock'><p>Transform the array into <code>shape</code>; any other shape
 with the same number of elements is accepted.</p>
 
-<p>Fail on incompatible size.</p>
+<p><strong>Fail</strong> if sizes are incompatible.</p>
 </div><h4 id='method.assign' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.assign' class='fnname'>assign</a>&lt;E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt;(&amp;mut self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;)</code></h4>
 <div class='docblock'><p>Perform an elementwise assigment to <code>self</code> from <code>other</code>.</p>
 
-<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.
-<strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
+<p>If their shapes disagree, <code>other</code> is broadcast to the shape of <code>self</code>.</p>
+
+<p><strong>Fail</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.assign_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.assign_scalar' class='fnname'>assign_scalar</a>(&amp;mut self, x: &amp;A)</code></h4>
 <div class='docblock'><p>Perform an elementwise assigment to <code>self</code> from scalar <code>x</code>.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.row_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.row_iter' class='fnname'>row_iter</a>&lt;'a&gt;(&amp;'a self, index: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>) -&gt; Stride&lt;'a, A&gt;</code></h4>
@@ -360,12 +371,21 @@ with the same number of elements is accepted.</p>
 <div class='docblock'><p>Perform an elementwise negation of <code>self</code>, <em>in place</em>.</p>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Not.html' title='core::ops::Not'>Not</a>&lt;A&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.inot' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.inot' class='fnname'>inot</a>(&amp;mut self)</code></h4>
 <div class='docblock'><p>Perform an elementwise unary not of <code>self</code>, <em>in place</em>.</p>
-</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, A: <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.Primitive.html' title='core::num::Primitive'>Primitive</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.mat_mul' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mat_mul' class='fnname'>mat_mul</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h4>
-<div class='docblock'><p>Matrix multiplication of arrays <code>self</code> and <code>other</code></p>
+</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, A: <a class='trait' href='http://doc.rust-lang.org/master/core/kinds/trait.Copy.html' title='core::kinds::Copy'>Copy</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;A, A&gt; + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;A, A&gt; + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.Zero.html' title='core::num::Zero'>Zero</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.mat_mul' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mat_mul' class='fnname'>mat_mul</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</code></h4>
+<div class='docblock'><p>Perform matrix multiplication of rectangular arrays <code>self</code> and <code>other</code>.</p>
 
 <p>The array sizes must agree in the way that
-<code>self</code> is M x N  and <code>other</code> is N x K, the result then being
-size M x K</p>
+if <code>self</code> is <em>M</em> x <em>N</em>, then <code>other</code> is <em>N</em> x <em>K</em>.</p>
+
+<p>Return a result array with shape <em>M</em> x <em>K</em>.</p>
+</div><h4 id='method.mat_mul_col' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mat_mul_col' class='fnname'>mat_mul_col</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h4>
+<div class='docblock'><p>Perform the matrix multiplication of the rectangular array <code>self</code> and
+column vector <code>other</code>.</p>
+
+<p>The array sizes must agree in the way that
+if <code>self</code> is <em>M</em> x <em>N</em>, then <code>other</code> is <em>N</em>.</p>
+
+<p>Return a result array with shape <em>M</em>.</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, D: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.clone' class='method'><a class='stability Unstable' title='Unstable'></a><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h4>
 <h4 id='method.clone_from' class='method'><a class='stability Experimental' title='Experimental: this function is mostly unused'></a><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, A, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Index.html' title='core::ops::Index'>Index</a>&lt;D, A&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.index' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.index' class='fnname'>index</a>(&amp;self, index: &amp;D) -&gt; &amp;A</code></h4>

@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct current' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct current' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.Shrink.html'>Shrink</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +61,7 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>&#8203;::<a class='struct' href=''>ElementsMut</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-11413' href='../src/ndarray/src/lib.rs.html#1275-1278'>[src]</a></div></h1>
+        </span><a id='src-11847' href='../src/ndarray/src/lib.rs.html#1400-1403'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct ElementsMut&lt;'a, A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>An iterator over the elements of an array.</p>
@@ -97,6 +97,8 @@ tweak rustdoc css
 <h4 id='method.position' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#tymethod.position' class='fnname'>position</a>(&amp;mut self, predicate: |A| -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>&gt;</code></h4>
 <h4 id='method.max_by' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#tymethod.max_by' class='fnname'>max_by</a>&lt;B: <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.Ord.html' title='core::cmp::Ord'>Ord</a>&gt;(&amp;mut self, f: |&amp;A| -&gt; B) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;A&gt;</code></h4>
 <h4 id='method.min_by' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#tymethod.min_by' class='fnname'>min_by</a>&lt;B: <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.Ord.html' title='core::cmp::Ord'>Ord</a>&gt;(&amp;mut self, f: |&amp;A| -&gt; B) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;A&gt;</code></h4>
+</div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, A&gt; <a class='trait' href='http://doc.rust-lang.org/master/core/iter/trait.DoubleEndedIterator.html' title='core::iter::DoubleEndedIterator'>DoubleEndedIterator</a>&lt;&amp;'a mut A&gt; for <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h3><div class='impl-methods'><h4 id='method.next_back' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.next_back' class='fnname'>next_back</a>(&amp;mut self) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a mut A&gt;</code></h4>
+<h4 id='method.rev' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#tymethod.rev' class='fnname'>rev</a>(self) -&gt; <a class='struct' href='http://doc.rust-lang.org/master/core/iter/struct.Rev.html' title='core::iter::Rev'>Rev</a>&lt;Self&gt;</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
