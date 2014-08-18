@@ -1773,6 +1773,22 @@ tweak rustdoc css
 <span id='1714'>1714</span>
 <span id='1715'>1715</span>
 <span id='1716'>1716</span>
+<span id='1717'>1717</span>
+<span id='1718'>1718</span>
+<span id='1719'>1719</span>
+<span id='1720'>1720</span>
+<span id='1721'>1721</span>
+<span id='1722'>1722</span>
+<span id='1723'>1723</span>
+<span id='1724'>1724</span>
+<span id='1725'>1725</span>
+<span id='1726'>1726</span>
+<span id='1727'>1727</span>
+<span id='1728'>1728</span>
+<span id='1729'>1729</span>
+<span id='1730'>1730</span>
+<span id='1731'>1731</span>
+<span id='1732'>1732</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>default_type_params</span>)]</span> <span class='comment'>/* Hash&lt;S&gt; */</span>
@@ -1784,6 +1800,8 @@ tweak rustdoc css
 <span class='doccomment'>//!</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>itertools</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>complex</span>)]</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span>;
 
 <span class='kw'>use</span> <span class='ident'>itertools</span>::<span class='ident'>ItertoolsClonable</span>;
 <span class='kw'>use</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>itertools</span>;
@@ -2132,15 +2150,24 @@ tweak rustdoc css
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>make_unique</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>
+    <span class='kw'>fn</span> <span class='ident'>make_unique</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>)
     {
+        <span class='kw'>if</span> <span class='ident'>std</span>::<span class='ident'>rc</span>::<span class='ident'>is_unique</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>) {
+            <span class='kw'>return</span>
+        }
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>size</span>() <span class='op'>&lt;=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='op'>/</span> <span class='number'>2</span> {
+            <span class='kw'>unsafe</span> {
+                <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>(<span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>clone</span>(),
+                                            <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>clones</span>().<span class='ident'>collect</span>());
+            }
+            <span class='kw'>return</span>;
+        }
         <span class='kw'>let</span> <span class='ident'>our_off</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='ident'>int</span>)
             <span class='op'>/</span> <span class='ident'>mem</span>::<span class='ident'>size_of</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>() <span class='kw'>as</span> <span class='ident'>int</span>;
         <span class='kw'>let</span> <span class='ident'>rvec</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>make_unique</span>();
         <span class='kw'>unsafe</span> {
             <span class='self'>self</span>.<span class='ident'>ptr</span> <span class='op'>=</span> <span class='ident'>rvec</span>.<span class='ident'>as_mut_ptr</span>().<span class='ident'>offset</span>(<span class='ident'>our_off</span>);
         }
-        <span class='ident'>rvec</span>
     }
 }
 
@@ -2427,14 +2454,65 @@ tweak rustdoc css
         <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape_mut</span>().<span class='ident'>swap</span>(<span class='ident'>ax</span>, <span class='ident'>bx</span>);
         <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape_mut</span>().<span class='ident'>swap</span>(<span class='ident'>ax</span>, <span class='ident'>bx</span>);
     }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter1d</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>from</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>dim</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
+        <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
+        <span class='kw'>let</span> <span class='ident'>off</span> <span class='op'>=</span> <span class='ident'>stride_offset_checked</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>dim</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>strides</span>, <span class='ident'>from</span>).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>ptr</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
+            <span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>off</span>)
+        };
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>stride_new</span>(<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>dim</span>, <span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>int</span>)
+        }
+    }
+
+    <span class='comment'>// Return (length, stride) for diagonal</span>
+    <span class='kw'>fn</span> <span class='ident'>diag_params</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>int</span>)
+    {
+        <span class='comment'>/* empty shape has len 1 */</span>
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>clones</span>().<span class='ident'>min</span>().<span class='ident'>unwrap_or</span>(<span class='number'>1</span>);
+        <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
+                        .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='kw'>as</span> <span class='ident'>int</span>)
+                        .<span class='ident'>fold</span>(<span class='number'>0i</span>, <span class='op'>|</span><span class='ident'>s</span>, <span class='ident'>a</span><span class='op'>|</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>a</span>);
+        <span class='kw'>return</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>)
+    }
+
+    <span class='doccomment'>/// Return an iterator over the diagonal elements of the array.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>len</span>, <span class='ident'>stride</span>)
+        }
+    }
+
+    <span class='doccomment'>/// Return the diagonal as a one-dimensional array.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
+        <span class='ident'>Array</span> {
+            <span class='ident'>data</span>: <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>clone</span>(),
+            <span class='ident'>ptr</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
+            <span class='ident'>dim</span>: <span class='ident'>len</span>,
+            <span class='ident'>strides</span>: <span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>Ix</span>,
+        }
+    }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Default</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
-    <span class='doccomment'>/// Select the subview `index` along `axis` and return the reduced</span>
+    <span class='doccomment'>/// Select the subview `index` along `axis` and return a reduced</span>
     <span class='doccomment'>/// dimension array.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// **Fail** if `index` is past the length of the axis.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use ndarray::{arr1, arr2};</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = arr2::&lt;f32&gt;([[1., 2.],</span>
+    <span class='doccomment'>///                      [3., 4.]]);</span>
+    <span class='doccomment'>/// assert_eq!(a.subview(0, 0), arr1([1., 2.]));</span>
+    <span class='doccomment'>/// assert_eq!(a.subview(1, 1), arr1([2., 4.]));</span>
+    <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>subview</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
@@ -2507,6 +2585,8 @@ tweak rustdoc css
     <span class='doccomment'>/// of the array.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Iterator element type is `&amp;&#39;a mut A`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `indexes` does not match the number of array axes.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>slice_iter_mut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>indexes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Si</span>]) <span class='op'>-&gt;</span> <span class='ident'>ElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>();
@@ -2522,6 +2602,8 @@ tweak rustdoc css
     <span class='doccomment'>/// of the subview.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Iterator element type is `&amp;&#39;a mut A`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `axis` or `index` is out of bounds.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sub_iter_mut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>)
         <span class='op'>-&gt;</span> <span class='ident'>ElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
     {
@@ -2549,7 +2631,7 @@ tweak rustdoc css
     <span class='doccomment'>/// while it is mutably borrowed.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>raw_data_mut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> [<span class='ident'>A</span>]
     {
-        <span class='self'>self</span>.<span class='ident'>make_unique</span>().<span class='ident'>as_mut_slice</span>()
+        <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>make_unique</span>().<span class='ident'>as_mut_slice</span>()
     }
 
 
@@ -2621,100 +2703,13 @@ tweak rustdoc css
 
 <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>stride_new</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>A</span>, <span class='ident'>len</span>: <span class='ident'>uint</span>, <span class='ident'>stride</span>: <span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
 {
-    <span class='kw'>let</span> <span class='ident'>begin</span>;
-    <span class='kw'>let</span> <span class='ident'>end</span>;
-    <span class='kw'>if</span> <span class='ident'>len</span> <span class='op'>!=</span> <span class='number'>0</span> {
-        <span class='ident'>begin</span> <span class='op'>=</span> <span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _;
-        <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>begin</span>.<span class='ident'>offset</span>((<span class='ident'>len</span> <span class='op'>-</span> <span class='number'>1</span>) <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>stride</span>);
-    } <span class='kw'>else</span> {
-        <span class='ident'>begin</span> <span class='op'>=</span> <span class='ident'>RawPtr</span>::<span class='ident'>null</span>();
-        <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>RawPtr</span>::<span class='ident'>null</span>();
-    }
-    <span class='ident'>it</span>::<span class='ident'>Stride</span>::<span class='ident'>from_ptrs</span>(<span class='ident'>begin</span>, <span class='ident'>end</span>, <span class='ident'>stride</span>)
+    <span class='ident'>it</span>::<span class='ident'>Stride</span>::<span class='ident'>from_ptr_len</span>(<span class='ident'>ptr</span>, <span class='ident'>len</span>, <span class='ident'>stride</span>)
 }
 
 <span class='comment'>// NOTE: lifetime</span>
 <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>stride_mut</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>A</span>, <span class='ident'>len</span>: <span class='ident'>uint</span>, <span class='ident'>stride</span>: <span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>StrideMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
 {
-    <span class='kw'>let</span> <span class='ident'>begin</span>;
-    <span class='kw'>let</span> <span class='ident'>end</span>;
-    <span class='kw'>if</span> <span class='ident'>len</span> <span class='op'>!=</span> <span class='number'>0</span> {
-        <span class='ident'>begin</span> <span class='op'>=</span> <span class='ident'>ptr</span>;
-        <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>begin</span>.<span class='ident'>offset</span>((<span class='ident'>len</span> <span class='op'>-</span> <span class='number'>1</span>) <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>stride</span>);
-    } <span class='kw'>else</span> {
-        <span class='ident'>begin</span> <span class='op'>=</span> <span class='ident'>RawPtr</span>::<span class='ident'>null</span>();
-        <span class='ident'>end</span> <span class='op'>=</span> <span class='ident'>RawPtr</span>::<span class='ident'>null</span>();
-    }
-    <span class='ident'>it</span>::<span class='ident'>StrideMut</span>::<span class='ident'>from_ptrs</span>(<span class='ident'>begin</span>, <span class='ident'>end</span>, <span class='ident'>stride</span>)
-}
-
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
-{
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>row_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
-    {
-        <span class='kw'>let</span> (<span class='ident'>m</span>, <span class='ident'>n</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>;
-        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>;
-        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> (<span class='ident'>sr</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>sc</span> <span class='kw'>as</span> <span class='ident'>int</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>m</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>sr</span> <span class='op'>*</span> <span class='ident'>index</span> <span class='kw'>as</span> <span class='ident'>int</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>A</span>, <span class='ident'>n</span>, <span class='ident'>sc</span>)
-        }
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>col_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
-    {
-        <span class='kw'>let</span> (<span class='ident'>m</span>, <span class='ident'>n</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>;
-        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>;
-        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> (<span class='ident'>sr</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>sc</span> <span class='kw'>as</span> <span class='ident'>int</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>n</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>sc</span> <span class='op'>*</span> <span class='ident'>index</span> <span class='kw'>as</span> <span class='ident'>int</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>A</span>, <span class='ident'>m</span>, <span class='ident'>sr</span>)
-        }
-    }
-}
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
-{
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter1d</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>, <span class='ident'>from</span>: <span class='kw-2'>&amp;</span><span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>dim</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
-        <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
-        <span class='kw'>let</span> <span class='ident'>off</span> <span class='op'>=</span> <span class='ident'>stride_offset_checked</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>dim</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>strides</span>, <span class='ident'>from</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>ptr</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
-            <span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>off</span>)
-        };
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>stride_new</span>(<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>dim</span>, <span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>int</span>)
-        }
-    }
-
-    <span class='comment'>// Return (length, stride) for diagonal</span>
-    <span class='kw'>fn</span> <span class='ident'>diag_params</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>int</span>)
-    {
-        <span class='comment'>/* empty shape has len 1 */</span>
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>clones</span>().<span class='ident'>min</span>().<span class='ident'>unwrap_or</span>(<span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>stride</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()
-                        .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='kw'>as</span> <span class='ident'>int</span>)
-                        .<span class='ident'>fold</span>(<span class='number'>0i</span>, <span class='op'>|</span><span class='ident'>s</span>, <span class='ident'>a</span><span class='op'>|</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>a</span>);
-        <span class='kw'>return</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>)
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _, <span class='ident'>len</span>, <span class='ident'>stride</span>)
-        }
-    }
-
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>diag</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>stride</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>diag_params</span>();
-        <span class='ident'>Array</span> {
-            <span class='ident'>data</span>: <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>clone</span>(),
-            <span class='ident'>ptr</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
-            <span class='ident'>dim</span>: <span class='ident'>len</span>,
-            <span class='ident'>strides</span>: <span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>Ix</span>,
-        }
-    }
+    <span class='ident'>it</span>::<span class='ident'>StrideMut</span>::<span class='ident'>from_ptr_len</span>(<span class='ident'>ptr</span>, <span class='ident'>len</span>, <span class='ident'>stride</span>)
 }
 
 <span class='doccomment'>/// Return a zero-dimensional array with the element `x`.</span>
@@ -2739,7 +2734,7 @@ tweak rustdoc css
     <span class='ident'>Array</span>::<span class='ident'>from_slices</span>(<span class='ident'>xs</span>)
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Num</span>,
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>linalg</span>::<span class='ident'>Field</span>,
      <span class='ident'>E</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Default</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span> <span class='op'>+</span> <span class='ident'>Shrink</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;&gt;</span>
     <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
@@ -2755,6 +2750,8 @@ tweak rustdoc css
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// assert_eq!(a.sum(0).sum(0), arr0(10.));</span>
     <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `axis` is out of bounds.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
@@ -2766,6 +2763,8 @@ tweak rustdoc css
     }
 
     <span class='doccomment'>/// Return mean along `axis`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `axis` is out of bounds.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mean</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
@@ -2782,74 +2781,188 @@ tweak rustdoc css
     }
 }
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
+{
+    <span class='doccomment'>/// Return an iterator over the elements of row `index`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `index` is out of bounds.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>row_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> (<span class='ident'>m</span>, <span class='ident'>n</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>;
+        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>;
+        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> (<span class='ident'>sr</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>sc</span> <span class='kw'>as</span> <span class='ident'>int</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>m</span>);
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>sr</span> <span class='op'>*</span> <span class='ident'>index</span> <span class='kw'>as</span> <span class='ident'>int</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>A</span>, <span class='ident'>n</span>, <span class='ident'>sc</span>)
+        }
+    }
+
+    <span class='doccomment'>/// Return an iterator over the elements of column `index`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if `index` is out of bounds.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>col_iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>index</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>it</span>::<span class='ident'>Stride</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> (<span class='ident'>m</span>, <span class='ident'>n</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>;
+        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>strides</span>;
+        <span class='kw'>let</span> (<span class='ident'>sr</span>, <span class='ident'>sc</span>) <span class='op'>=</span> (<span class='ident'>sr</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>sc</span> <span class='kw'>as</span> <span class='ident'>int</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>n</span>);
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>stride_new</span>(<span class='self'>self</span>.<span class='ident'>ptr</span>.<span class='ident'>offset</span>(<span class='ident'>sc</span> <span class='op'>*</span> <span class='ident'>index</span> <span class='kw'>as</span> <span class='ident'>int</span>) <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>A</span>, <span class='ident'>m</span>, <span class='ident'>sr</span>)
+        }
+    }
+}
+
+
+<span class='comment'>// Matrix multiplication only defined for simple types to</span>
+<span class='comment'>// avoid trouble with failing + and *, and destructors</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>linalg</span>::<span class='ident'>Ring</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
+{
+    <span class='doccomment'>/// Perform matrix multiplication of rectangular arrays `self` and `other`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The array sizes must agree in the way that</span>
+    <span class='doccomment'>/// if `self` is *M* × *N*, then `other` is *N* × *K*.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Return a result array with shape *M* × *K*.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if sizes are incompatible.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use ndarray::arr2;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = arr2::&lt;f32&gt;([[1., 2.],</span>
+    <span class='doccomment'>///                      [0., 1.]]);</span>
+    <span class='doccomment'>/// let b = arr2::&lt;f32&gt;([[1., 2.],</span>
+    <span class='doccomment'>///                      [2., 3.]]);</span>
+    <span class='doccomment'>/// assert_eq!(a.mat_mul(&amp;b), arr2([[5., 8.],</span>
+    <span class='doccomment'>///                                 [2., 3.]]));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mat_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> ((<span class='ident'>m</span>, <span class='ident'>a</span>), (<span class='ident'>b</span>, <span class='ident'>n</span>)) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>dim</span>, <span class='ident'>other</span>.<span class='ident'>dim</span>);
+        <span class='kw'>let</span> (<span class='ident'>self_columns</span>, <span class='ident'>other_rows</span>) <span class='op'>=</span> (<span class='ident'>a</span>, <span class='ident'>b</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>self_columns</span> <span class='op'>==</span> <span class='ident'>other_rows</span>);
+
+        <span class='comment'>// Avoid initializing the memory in vec -- set it during iteration</span>
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res_elems</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>m</span> <span class='op'>*</span> <span class='ident'>n</span>);
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>res_elems</span>.<span class='ident'>set_len</span>(<span class='ident'>m</span> <span class='op'>*</span> <span class='ident'>n</span>);
+        }
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>res_elems</span>.<span class='ident'>mut_iter</span>() {
+            <span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>row_iter</span>(<span class='ident'>i</span>);
+            <span class='kw'>let</span> <span class='ident'>col</span> <span class='op'>=</span> <span class='ident'>other</span>.<span class='ident'>col_iter</span>(<span class='ident'>j</span>);
+            <span class='kw'>let</span> <span class='ident'>dot</span> <span class='op'>=</span> <span class='ident'>row</span>.<span class='ident'>zip</span>(<span class='ident'>col</span>).<span class='ident'>fold</span>(<span class='ident'>num</span>::<span class='ident'>zero</span>(), <span class='op'>|</span><span class='ident'>s</span>: <span class='ident'>A</span>, (<span class='ident'>x</span>, <span class='ident'>y</span>)<span class='op'>|</span> {
+                    <span class='ident'>s</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='op'>*</span><span class='ident'>y</span>
+                });
+            <span class='kw'>unsafe</span> {
+                <span class='ident'>std</span>::<span class='ident'>ptr</span>::<span class='ident'>write</span>(<span class='ident'>rr</span>, <span class='ident'>dot</span>);
+            }
+            <span class='ident'>j</span> <span class='op'>+=</span> <span class='number'>1</span>;
+            <span class='kw'>if</span> <span class='ident'>j</span> <span class='op'>==</span> <span class='ident'>n</span> {
+                <span class='ident'>j</span> <span class='op'>=</span> <span class='number'>0</span>;
+                <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
+            }
+        }
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>((<span class='ident'>m</span>, <span class='ident'>n</span>), <span class='ident'>res_elems</span>)
+        }
+    }
+
+    <span class='doccomment'>/// Perform the matrix multiplication of the rectangular array `self` and</span>
+    <span class='doccomment'>/// column vector `other`.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The array sizes must agree in the way that</span>
+    <span class='doccomment'>/// if `self` is *M* × *N*, then `other` is *N*.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Return a result array with shape *M*.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Fail** if sizes are incompatible.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mat_mul_col</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> ((<span class='ident'>m</span>, <span class='ident'>a</span>), <span class='ident'>n</span>) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>dim</span>, <span class='ident'>other</span>.<span class='ident'>dim</span>);
+        <span class='kw'>let</span> (<span class='ident'>self_columns</span>, <span class='ident'>other_rows</span>) <span class='op'>=</span> (<span class='ident'>a</span>, <span class='ident'>n</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>self_columns</span> <span class='op'>==</span> <span class='ident'>other_rows</span>);
+
+        <span class='comment'>// Avoid initializing the memory in vec -- set it during iteration</span>
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res_elems</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>m</span>);
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>res_elems</span>.<span class='ident'>set_len</span>(<span class='ident'>m</span>);
+        }
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='kw'>let</span> <span class='ident'>col_itr</span> <span class='op'>=</span> <span class='ident'>other</span>.<span class='ident'>iter</span>();
+        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>res_elems</span>.<span class='ident'>mut_iter</span>() {
+            <span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>row_iter</span>(<span class='ident'>i</span>);
+            <span class='kw'>let</span> <span class='ident'>col</span> <span class='op'>=</span> <span class='ident'>col_itr</span>.<span class='ident'>clone</span>();
+            <span class='kw'>let</span> <span class='ident'>dot</span> <span class='op'>=</span> <span class='ident'>row</span>.<span class='ident'>zip</span>(<span class='ident'>col</span>).<span class='ident'>fold</span>(<span class='ident'>num</span>::<span class='ident'>zero</span>(), <span class='op'>|</span><span class='ident'>s</span>: <span class='ident'>A</span>, (<span class='ident'>x</span>, <span class='ident'>y</span>)<span class='op'>|</span> {
+                    <span class='ident'>s</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='op'>*</span><span class='ident'>y</span>
+                });
+            <span class='kw'>unsafe</span> {
+                <span class='ident'>std</span>::<span class='ident'>ptr</span>::<span class='ident'>write</span>(<span class='ident'>rr</span>, <span class='ident'>dot</span>);
+            }
+            <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
+        }
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>(<span class='ident'>m</span>, <span class='ident'>res_elems</span>)
+        }
+    }
+}
+
+
+
 <span class='kw'>fn</span> <span class='ident'>format_array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='ident'>view</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>,
                                  <span class='ident'>format</span>: <span class='op'>|</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>, <span class='kw-2'>&amp;</span><span class='ident'>A</span><span class='op'>|</span> <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>)
                                 <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>
 {
-    <span class='kw'>if</span> <span class='ident'>f</span>.<span class='ident'>width</span>.<span class='ident'>is_none</span>() {
+    <span class='kw'>let</span> <span class='ident'>sz</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>len</span>();
+    <span class='kw'>if</span> <span class='ident'>sz</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='ident'>f</span>.<span class='ident'>width</span>.<span class='ident'>is_none</span>() {
         <span class='ident'>f</span>.<span class='ident'>width</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='number'>4</span>)
     }
-    <span class='kw'>match</span> <span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>() {
-        [] <span class='op'>=&gt;</span> {
-            <span class='kw'>return</span> <span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>view</span>.<span class='ident'>iter</span>().<span class='ident'>next</span>().<span class='ident'>unwrap</span>());
-        }
-        [_] <span class='op'>=&gt;</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[&quot;</span>));
-            <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>view</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
-                <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;, &quot;</span>));
-                }
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>elt</span>));
-            }
-            <span class='kw'>return</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>);
-        }
-        _ <span class='op'>=&gt;</span> <span class='comment'>/* fallthrough */</span> {}
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>last_index</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>first_index</span>();
+    <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>sz</span>) {
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[&quot;</span>));
     }
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slices</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>len</span>(), <span class='ident'>S</span>);
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>2</span>);
-    <span class='kw'>let</span> <span class='ident'>n_loops</span> <span class='op'>=</span> <span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span>;
-    <span class='kw'>let</span> <span class='ident'>row_width</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>()[<span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>];
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>fixed</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='ident'>n_loops</span>, <span class='number'>0u</span>);
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>first</span> <span class='op'>=</span> <span class='boolval'>true</span>;
-    <span class='kw'>loop</span> {
-        <span class='comment'>/* Use fixed indices to make a slice*/</span>
-        <span class='kw'>for</span> (<span class='ident'>fidx</span>, <span class='ident'>slc</span>) <span class='kw'>in</span> <span class='ident'>fixed</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>slices</span>.<span class='ident'>mut_iter</span>()) {
-            <span class='op'>*</span><span class='ident'>slc</span> <span class='op'>=</span> <span class='ident'>Si</span>(<span class='op'>*</span><span class='ident'>fidx</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='prelude-val'>Some</span>(<span class='op'>*</span><span class='ident'>fidx</span> <span class='kw'>as</span> <span class='ident'>int</span> <span class='op'>+</span> <span class='number'>1</span>), <span class='number'>1</span>);
-        }
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>first</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;\n&quot;</span>));
-        }
-        <span class='comment'>/* Print out this view */</span>
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>view</span>.<span class='ident'>slice_iter</span>(<span class='ident'>slices</span>.<span class='ident'>as_slice</span>()).<span class='ident'>enumerate</span>() {
-            <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>%</span> <span class='ident'>row_width</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;, &quot;</span>));
-            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;\n [&quot;</span>));
-            } <span class='kw'>else</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[[&quot;</span>));
-            }
-            <span class='comment'>//try!(write!(f, &quot;{:4}&quot;, elt));</span>
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>elt</span>));
-            <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>!=</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> (<span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>) <span class='op'>%</span> <span class='ident'>row_width</span> <span class='op'>==</span> <span class='number'>0</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>));
-            }
-        }
-        <span class='ident'>first</span> <span class='op'>=</span> <span class='boolval'>false</span>;
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>));
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>done</span> <span class='op'>=</span> <span class='boolval'>true</span>;
-        <span class='kw'>for</span> (<span class='ident'>fidx</span>, <span class='kw-2'>&amp;</span><span class='ident'>dim</span>) <span class='kw'>in</span> <span class='ident'>fixed</span>.<span class='ident'>mut_iter</span>().<span class='ident'>zip</span>(<span class='ident'>view</span>.<span class='ident'>dim</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>fidx</span> <span class='op'>+=</span> <span class='number'>1</span>;
-            <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>fidx</span> <span class='op'>==</span> <span class='ident'>dim</span> {
-                <span class='op'>*</span><span class='ident'>fidx</span> <span class='op'>=</span> <span class='number'>0</span>;
-                <span class='kw'>continue</span>;
-            } <span class='kw'>else</span> {
-                <span class='ident'>done</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+    <span class='comment'>// Simply use the indexed iterator, and take the index wraparounds</span>
+    <span class='comment'>// as cues for when to add []&#39;s and how many to add.</span>
+    <span class='kw'>for</span> (<span class='ident'>index</span>, <span class='ident'>elt</span>) <span class='kw'>in</span> <span class='ident'>view</span>.<span class='ident'>indexed_iter</span>() {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>update_index</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+        <span class='kw'>for</span> (<span class='ident'>i</span>, (<span class='ident'>a</span>, <span class='ident'>b</span>)) <span class='kw'>in</span> <span class='ident'>index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>().<span class='ident'>take</span>(<span class='ident'>sz</span><span class='op'>-</span><span class='number'>1</span>)
+                        .<span class='ident'>zip</span>(<span class='ident'>last_index</span>.<span class='ident'>shape</span>().<span class='ident'>iter</span>())
+                        .<span class='ident'>enumerate</span>()
+        {
+            <span class='kw'>if</span> <span class='ident'>a</span> <span class='op'>!=</span> <span class='ident'>b</span> {
+                <span class='comment'>// New row.</span>
+                <span class='comment'>// # of [&#39;s needed</span>
+                <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>sz</span> <span class='op'>-</span> <span class='ident'>i</span> <span class='op'>-</span> <span class='number'>1</span>;
+                <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>n</span>) {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>));
+                }
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;,\n&quot;</span>));
+                <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>sz</span> <span class='op'>-</span> <span class='ident'>n</span>) {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot; &quot;</span>));
+                }
+                <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>n</span>) {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;[&quot;</span>));
+                }
+                <span class='ident'>first</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+                <span class='ident'>update_index</span> <span class='op'>=</span> <span class='boolval'>true</span>;
                 <span class='kw'>break</span>;
             }
         }
-        <span class='kw'>if</span> <span class='ident'>done</span> {
-            <span class='kw'>break</span>
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>first</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;, &quot;</span>));
         }
+        <span class='ident'>first</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>format</span>(<span class='ident'>f</span>, <span class='ident'>elt</span>));
+
+        <span class='kw'>if</span> <span class='ident'>update_index</span> {
+            <span class='ident'>last_index</span> <span class='op'>=</span> <span class='ident'>index</span>;
+        }
+    }
+    <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>sz</span>) {
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;]&quot;</span>));
     }
     <span class='prelude-val'>Ok</span>(())
 }
@@ -3328,7 +3441,7 @@ tweak rustdoc css
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// `Si(a, None, -1)` is every element, in reverse order, from `a`</span>
 <span class='doccomment'>/// until the end. Python equivalent is `[a::-1]`</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Si</span>(<span class='kw'>pub</span> <span class='ident'>int</span>, <span class='kw'>pub</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>int</span><span class='op'>&gt;</span>, <span class='kw'>pub</span> <span class='ident'>int</span>);
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Si</span>(<span class='kw'>pub</span> <span class='ident'>Ixs</span>, <span class='kw'>pub</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Ixs</span><span class='op'>&gt;</span>, <span class='kw'>pub</span> <span class='ident'>Ixs</span>);
 
 <span class='doccomment'>/// Slice value for the full range of an axis.</span>
 <span class='kw'>pub</span> <span class='kw'>static</span> <span class='ident'>S</span>: <span class='ident'>Si</span> <span class='op'>=</span> <span class='ident'>Si</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>);
@@ -3390,90 +3503,9 @@ tweak rustdoc css
     <span class='ident'>offset</span>
 }
 
-
-<span class='comment'>// Matrix multiplication only defined for simple types to</span>
-<span class='comment'>// avoid trouble with failing + and *, and destructors</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>num</span>::<span class='ident'>Zero</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>FromIterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>
 {
-    <span class='doccomment'>/// Perform matrix multiplication of rectangular arrays `self` and `other`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The array sizes must agree in the way that</span>
-    <span class='doccomment'>/// if `self` is *M* x *N*, then `other` is *N* x *K*.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Return a result array with shape *M* x *K*.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mat_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
-    {
-        <span class='kw'>let</span> ((<span class='ident'>m</span>, <span class='ident'>a</span>), (<span class='ident'>b</span>, <span class='ident'>n</span>)) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>dim</span>, <span class='ident'>other</span>.<span class='ident'>dim</span>);
-        <span class='kw'>let</span> (<span class='ident'>self_columns</span>, <span class='ident'>other_rows</span>) <span class='op'>=</span> (<span class='ident'>a</span>, <span class='ident'>b</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>self_columns</span> <span class='op'>==</span> <span class='ident'>other_rows</span>);
-
-        <span class='comment'>// Avoid initializing the memory in vec -- set it during iteration</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res_elems</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>m</span> <span class='op'>*</span> <span class='ident'>n</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>res_elems</span>.<span class='ident'>set_len</span>(<span class='ident'>m</span> <span class='op'>*</span> <span class='ident'>n</span>);
-        }
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>res_elems</span>.<span class='ident'>mut_iter</span>() {
-            <span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>row_iter</span>(<span class='ident'>i</span>);
-            <span class='kw'>let</span> <span class='ident'>col</span> <span class='op'>=</span> <span class='ident'>other</span>.<span class='ident'>col_iter</span>(<span class='ident'>j</span>);
-            <span class='kw'>let</span> <span class='ident'>dot</span> <span class='op'>=</span> <span class='ident'>row</span>.<span class='ident'>zip</span>(<span class='ident'>col</span>).<span class='ident'>fold</span>(<span class='ident'>num</span>::<span class='ident'>zero</span>(), <span class='op'>|</span><span class='ident'>s</span>: <span class='ident'>A</span>, (<span class='ident'>x</span>, <span class='ident'>y</span>)<span class='op'>|</span> {
-                    <span class='ident'>s</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='op'>*</span><span class='ident'>y</span>
-                });
-            <span class='kw'>unsafe</span> {
-                <span class='ident'>std</span>::<span class='ident'>ptr</span>::<span class='ident'>write</span>(<span class='ident'>rr</span>, <span class='ident'>dot</span>);
-            }
-            <span class='ident'>j</span> <span class='op'>+=</span> <span class='number'>1</span>;
-            <span class='kw'>if</span> <span class='ident'>j</span> <span class='op'>==</span> <span class='ident'>n</span> {
-                <span class='ident'>j</span> <span class='op'>=</span> <span class='number'>0</span>;
-                <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
-            }
-        }
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>((<span class='ident'>m</span>, <span class='ident'>n</span>), <span class='ident'>res_elems</span>)
-        }
-    }
-
-    <span class='doccomment'>/// Perform the matrix multiplication of the rectangular array `self` and</span>
-    <span class='doccomment'>/// column vector `other`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The array sizes must agree in the way that</span>
-    <span class='doccomment'>/// if `self` is *M* x *N*, then `other` is *N*.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Return a result array with shape *M*.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mat_mul_col</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>
-    {
-        <span class='kw'>let</span> ((<span class='ident'>m</span>, <span class='ident'>a</span>), <span class='ident'>n</span>) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>dim</span>, <span class='ident'>other</span>.<span class='ident'>dim</span>);
-        <span class='kw'>let</span> (<span class='ident'>self_columns</span>, <span class='ident'>other_rows</span>) <span class='op'>=</span> (<span class='ident'>a</span>, <span class='ident'>n</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>self_columns</span> <span class='op'>==</span> <span class='ident'>other_rows</span>);
-
-        <span class='comment'>// Avoid initializing the memory in vec -- set it during iteration</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res_elems</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>::<span class='ident'>with_capacity</span>(<span class='ident'>m</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>res_elems</span>.<span class='ident'>set_len</span>(<span class='ident'>m</span>);
-        }
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='kw'>let</span> <span class='ident'>col_itr</span> <span class='op'>=</span> <span class='ident'>other</span>.<span class='ident'>iter</span>();
-        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>res_elems</span>.<span class='ident'>mut_iter</span>() {
-            <span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>row_iter</span>(<span class='ident'>i</span>);
-            <span class='kw'>let</span> <span class='ident'>col</span> <span class='op'>=</span> <span class='ident'>col_itr</span>.<span class='ident'>clone</span>();
-            <span class='kw'>let</span> <span class='ident'>dot</span> <span class='op'>=</span> <span class='ident'>row</span>.<span class='ident'>zip</span>(<span class='ident'>col</span>).<span class='ident'>fold</span>(<span class='ident'>num</span>::<span class='ident'>zero</span>(), <span class='op'>|</span><span class='ident'>s</span>: <span class='ident'>A</span>, (<span class='ident'>x</span>, <span class='ident'>y</span>)<span class='op'>|</span> {
-                    <span class='ident'>s</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='op'>*</span><span class='ident'>y</span>
-                });
-            <span class='kw'>unsafe</span> {
-                <span class='ident'>std</span>::<span class='ident'>ptr</span>::<span class='ident'>write</span>(<span class='ident'>rr</span>, <span class='ident'>dot</span>);
-            }
-            <span class='ident'>i</span> <span class='op'>+=</span> <span class='number'>1</span>;
-        }
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>(<span class='ident'>m</span>, <span class='ident'>res_elems</span>)
-        }
-    }
-}
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span> <span class='ident'>FromIterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>uint</span><span class='op'>&gt;</span>
-{
-    <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>uint</span><span class='op'>&gt;</span>
+    <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span>
     {
         <span class='ident'>Array</span>::<span class='ident'>from_iter</span>(<span class='ident'>it</span>)
     }

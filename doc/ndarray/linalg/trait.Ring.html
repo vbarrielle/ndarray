@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `eye` fn in crate `ndarray`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, eye">
+    <meta name="description" content="API documentation for the Rust `Ring` trait in crate `ndarray`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Ring">
 
-    <title>ndarray::linalg::eye - Rust</title>
+    <title>ndarray::linalg::Ring - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.AddGroup.html'>AddGroup</a><a class='trait ' href='trait.ComplexField.html'>ComplexField</a><a class='trait ' href='trait.Field.html'>Field</a><a class='trait ' href='trait.Ring.html'>Ring</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.cholesky.html'>cholesky</a><a class='fn current' href='fn.eye.html'>eye</a><a class='fn ' href='fn.least_squares.html'>least_squares</a><a class='fn ' href='fn.subst_bw.html'>subst_bw</a><a class='fn ' href='fn.subst_fw.html'>subst_fw</a></div>
+        <p class='location'><a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.AddGroup.html'>AddGroup</a><a class='trait ' href='trait.ComplexField.html'>ComplexField</a><a class='trait ' href='trait.Field.html'>Field</a><a class='trait current' href='trait.Ring.html'>Ring</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.cholesky.html'>cholesky</a><a class='fn ' href='fn.eye.html'>eye</a><a class='fn ' href='fn.least_squares.html'>least_squares</a><a class='fn ' href='fn.subst_bw.html'>subst_bw</a><a class='fn ' href='fn.subst_fw.html'>subst_fw</a></div>
     </section>
 
     <nav class="sub">
@@ -57,13 +57,19 @@ tweak rustdoc css
         </form>
     </nav>
 
-    <section id='main' class="content fn">
-<h1 class='fqn'><div class='in-band'>Function <a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a>&#8203;::<a class='fn' href=''>eye</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content trait">
+<h1 class='fqn'><div class='in-band'>Trait <a href='../index.html'>ndarray</a>&#8203;::<a href='index.html'>linalg</a>&#8203;::<a class='trait' href=''>Ring</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-163' href='../../src/ndarray/src/linalg.rs.html#61-68'>[src]</a></div></h1>
-<pre class='rust fn'>pub fn eye&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.Zero.html' title='core::num::Zero'>Zero</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.One.html' title='core::num::One'>One</a>&gt;(n: <a class='type' href='../../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>) -&gt; <a class='type' href='../../ndarray/linalg/type.Mat.html' title='ndarray::linalg::Mat'>Mat</a>&lt;A&gt;</pre><div class='docblock'><p>Return the identity matrix of dimension <em>n</em>.</p>
-</div></section>
+        </span><a id='src-71' href='../../src/ndarray/src/linalg.rs.html#21'>[src]</a></div></h1>
+<pre class='rust trait'>pub trait Ring: <a class='trait' href='../../ndarray/linalg/trait.AddGroup.html' title='ndarray::linalg::AddGroup'>AddGroup</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.One.html' title='core::num::One'>One</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;Self, Self&gt; { }</pre><div class='docblock'><p>Trait union for a commutative ring with 1.</p>
+</div>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='../../ndarray/linalg/trait.AddGroup.html' title='ndarray::linalg::AddGroup'>AddGroup</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/num/trait.One.html' title='core::num::One'>One</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;A, A&gt;&gt; <a class='trait' href='../../ndarray/linalg/trait.Ring.html' title='ndarray::linalg::Ring'>Ring</a> for A</code></li>
+</ul><script type="text/javascript" async
+                              src="../../implementors/ndarray/linalg/trait.Ring.js">
+                      </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
