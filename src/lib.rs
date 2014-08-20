@@ -12,7 +12,7 @@ extern crate itertools;
 extern crate num;
 
 use itertools::ItertoolsClonable;
-use it = itertools;
+use itertools as it;
 
 use std::fmt;
 use std::hash;
@@ -117,6 +117,21 @@ pub trait Dimension : Clone + Eq {
         offset
     }
 
+    /// Return stride offset for this dimension and index.
+    fn stride_offset_checked(&self, strides: &Self, index: &Self) -> Option<int>
+    {
+        let mut offset = 0;
+        for ((&d, &i), &s) in self.shape().iter()
+                                .zip(index.shape().iter())
+                                .zip(strides.shape().iter())
+        {
+            if i >= d {
+                return None;
+            }
+            offset += i as int * s as int;
+        }
+        Some(offset)
+    }
 }
 
 impl Dimension for () {
@@ -142,9 +157,19 @@ impl Dimension for Ix {
 
     /// Self is an index, return the stride offset
     #[inline]
-    fn stride_offset(index: &Ix, strides: &Ix) -> int
+    fn stride_offset(index: &Ix, stride: &Ix) -> int
     {
-        *index as int * (*strides) as int
+        *index as int * (*stride) as int
+    }
+
+    /// Return stride offset for this dimension and index.
+    fn stride_offset_checked(&self, stride: &Ix, index: &Ix) -> Option<int>
+    {
+        if *index < *self {
+            Some(*index as int * *stride as int)
+        } else {
+            None
+        }
     }
 }
 
@@ -175,6 +200,19 @@ impl Dimension for (Ix, Ix) {
         let (i, j) = *index;
         let (s, t) = *strides;
         (i as int * s as int) + (j as int * t as int)
+    }
+
+    /// Return stride offset for this dimension and index.
+    fn stride_offset_checked(&self, strides: &(Ix, Ix), index: &(Ix, Ix)) -> Option<int>
+    {
+        let (m, n) = *self;
+        let (i, j) = *index;
+        let (s, t) = *strides;
+        if i < m && j < n {
+            Some((i as int * s as int) + (j as int * t as int))
+        } else {
+            None
+        }
     }
 }
 
@@ -357,26 +395,6 @@ impl<A: Clone, D: Dimension> Array<A, D>
             Array::from_vec_dim(dim, v)
         }
     }
-
-    fn make_unique<'a>(&'a mut self)
-    {
-        if std::rc::is_unique(&self.data) {
-            return
-        }
-        if self.dim.size() <= self.data.len() / 2 {
-            unsafe {
-                *self = Array::from_vec_dim(self.dim.clone(),
-                                            self.iter().clones().collect());
-            }
-            return;
-        }
-        let our_off = (self.ptr as int - self.data.as_ptr() as int)
-            / mem::size_of::<A>() as int;
-        let rvec = self.data.make_unique();
-        unsafe {
-            self.ptr = rvec.as_mut_ptr().offset(our_off);
-        }
-    }
 }
 
 impl<A> Array<A, Ix>
@@ -531,10 +549,36 @@ impl<A, D: Dimension> Array<A, D>
     /// Return a reference to the element at `index`, or return `None`
     /// if the index is out of bounds.
     pub fn at<'a>(&'a self, index: D) -> Option<&'a A> {
-        stride_offset_checked(&self.dim, &self.strides, &index)
+        self.dim.stride_offset_checked(&self.strides, &index)
             .map(|offset| unsafe {
                 to_ref(self.ptr.offset(offset) as *const _)
             })
+    }
+
+    /// Perform *unchecked* array indexing.
+    ///
+    /// Return a reference to the element at `index`.
+    ///
+    /// **Note:** only unchecked for non-debug builds of ndarray.
+    #[inline]
+    pub unsafe fn uchk_at<'a>(&'a self, index: D) -> &'a A {
+        debug_assert!(self.dim.stride_offset_checked(&self.strides, &index).is_some());
+        let off = Dimension::stride_offset(&index, &self.strides);
+        to_ref(self.ptr.offset(off) as *const _)
+    }
+
+    /// Perform *unchecked* array indexing.
+    ///
+    /// Return a mutable reference to the element at `index`.
+    ///
+    /// **Note:** Only unchecked for non-debug builds of ndarray.<br>
+    /// **Note:** The array must be uniquely held when mutating it.
+    #[inline]
+    pub unsafe fn uchk_at_mut<'a>(&'a mut self, index: D) -> &'a mut A {
+        debug_assert!(std::rc::is_unique(&self.data));
+        debug_assert!(self.dim.stride_offset_checked(&self.strides, &index).is_some());
+        let off = Dimension::stride_offset(&index, &self.strides);
+        to_ref_mut(self.ptr.offset(off))
     }
 
     /// Return a protoiterator
@@ -666,7 +710,7 @@ impl<A, D: Dimension> Array<A, D>
     pub fn iter1d<'b>(&'b self, axis: uint, from: &D) -> it::Stride<'b, A> {
         let dim = self.dim.shape()[axis];
         let stride = self.strides.shape()[axis];
-        let off = stride_offset_checked(&self.dim, &self.strides, from).unwrap();
+        let off = self.dim.stride_offset_checked(&self.strides, from).unwrap();
         let ptr = unsafe {
             self.ptr.offset(off)
         };
@@ -761,11 +805,34 @@ impl<'a, A, D: Dimension> Index<D, A> for Array<A, D>
 
 impl<A: Clone, D: Dimension> Array<A, D>
 {
+    /// Make the Array unshared.
+    ///
+    /// This method is mostly only useful with unsafe code.
+    pub fn ensure_unique(&mut self)
+    {
+        if std::rc::is_unique(&self.data) {
+            return
+        }
+        if self.dim.size() <= self.data.len() / 2 {
+            unsafe {
+                *self = Array::from_vec_dim(self.dim.clone(),
+                                            self.iter().clones().collect());
+            }
+            return;
+        }
+        let our_off = (self.ptr as int - self.data.as_ptr() as int)
+            / mem::size_of::<A>() as int;
+        let rvec = self.data.make_unique();
+        unsafe {
+            self.ptr = rvec.as_mut_ptr().offset(our_off);
+        }
+    }
+
     /// Return a mutable reference to the element at `index`, or return `None`
     /// if the index is out of bounds.
     pub fn at_mut<'a>(&'a mut self, index: D) -> Option<&'a mut A> {
-        self.make_unique();
-        stride_offset_checked(&self.dim, &self.strides, &index)
+        self.ensure_unique();
+        self.dim.stride_offset_checked(&self.strides, &index)
             .map(|offset| unsafe {
                 to_ref_mut(self.ptr.offset(offset))
             })
@@ -776,7 +843,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// Iterator element type is `&'a mut A`.
     pub fn iter_mut<'a>(&'a mut self) -> ElementsMut<'a, A, D>
     {
-        self.make_unique();
+        self.ensure_unique();
         ElementsMut { inner: self.base_iter(), nocopy: kinds::marker::NoCopy }
     }
 
@@ -785,7 +852,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// Iterator element type is `(D, &'a mut A)`.
     pub fn indexed_iter_mut<'a>(&'a mut self) -> IndexedElementsMut<'a, A, D>
     {
-        self.make_unique();
+        self.ensure_unique();
         IndexedElementsMut { inner: self.base_iter(), nocopy: kinds::marker::NoCopy }
     }
 
@@ -822,7 +889,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
 
     /// Return an iterator over the diagonal elements of the array.
     pub fn diag_iter_mut<'a>(&'a mut self) -> it::StrideMut<'a, A> {
-        self.make_unique();
+        self.ensure_unique();
         let (len, stride) = self.diag_params();
         unsafe {
             stride_mut(self.ptr, len, stride)
@@ -1059,12 +1126,10 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
         let mut i = 0;
         let mut j = 0;
         for rr in res_elems.mut_iter() {
-            let row = self.row_iter(i);
-            let col = other.col_iter(j);
-            let dot = row.zip(col).fold(num::zero(), |s: A, (x, y)| {
-                    s + *x * *y
-                });
             unsafe {
+                let dot = range(0, a).fold(num::zero::<A>(),
+                    |s, k| s + *self.uchk_at((i, k)) * *other.uchk_at((k, j))
+                );
                 std::ptr::write(rr, dot);
             }
             j += 1;
@@ -1099,14 +1164,11 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
             res_elems.set_len(m);
         }
         let mut i = 0;
-        let col_itr = other.iter();
         for rr in res_elems.mut_iter() {
-            let row = self.row_iter(i);
-            let col = col_itr.clone();
-            let dot = row.zip(col).fold(num::zero(), |s: A, (x, y)| {
-                    s + *x * *y
-                });
             unsafe {
+                let dot = range(0, a).fold(num::zero::<A>(),
+                    |s, k| s + *self.uchk_at((i, k)) * *other.uchk_at(k)
+                );
                 std::ptr::write(rr, dot);
             }
             i += 1;
@@ -1608,23 +1670,6 @@ impl<D: Dimension> Iterator<D> for Indexes<D>
         (l, Some(l))
     }
 }
-
-// FIXME: Move to Dimension trait
-fn stride_offset_checked<D: Dimension>(dim: &D, strides: &D, index: &D) -> Option<int>
-{
-    let mut offset = 0;
-    for ((&d, &i), &s) in dim.shape().iter()
-                            .zip(index.shape().iter())
-                            .zip(strides.shape().iter())
-    {
-        if i >= d {
-            return None;
-        }
-        offset += i as int * s as int;
-    }
-    Some(offset)
-}
-
 
 // [a:b:s] syntax for example [:3], [::-1]
 // [0,:] -- first row of matrix
