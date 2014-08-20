@@ -58,10 +58,10 @@ tweak rustdoc css
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>&#8203;::<a class='struct' href=''>Array</a>&#8203;</div><div class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Array</a><wbr></div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-2638' href='../src/ndarray/src/lib.rs.html#317-328'>[src]</a></div></h1>
+        </span><a id='src-2931' href='../src/ndarray/src/lib.rs.html#355-366'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
@@ -158,6 +158,19 @@ Array&#39;s view.</p>
 </div><h4 id='method.at' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.at' class='fnname'>at</a>&lt;'a&gt;(&amp;'a self, index: D) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a A&gt;</code></h4>
 <div class='docblock'><p>Return a reference to the element at <code>index</code>, or return <code>None</code>
 if the index is out of bounds.</p>
+</div><h4 id='method.uchk_at' class='method'><a class='stability Unmarked' title='No stability level'></a><code>unsafe fn <a href='#method.uchk_at' class='fnname'>uchk_at</a>&lt;'a&gt;(&amp;'a self, index: D) -&gt; &amp;'a A</code></h4>
+<div class='docblock'><p>Perform <em>unchecked</em> array indexing.</p>
+
+<p>Return a reference to the element at <code>index</code>.</p>
+
+<p><strong>Note:</strong> only unchecked for non-debug builds of ndarray.</p>
+</div><h4 id='method.uchk_at_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>unsafe fn <a href='#method.uchk_at_mut' class='fnname'>uchk_at_mut</a>&lt;'a&gt;(&amp;'a mut self, index: D) -&gt; &amp;'a mut A</code></h4>
+<div class='docblock'><p>Perform <em>unchecked</em> array indexing.</p>
+
+<p>Return a mutable reference to the element at <code>index</code>.</p>
+
+<p><strong>Note:</strong> Only unchecked for non-debug builds of ndarray.<br>
+<strong>Note:</strong> The array must be uniquely held when mutating it.</p>
 </div><h4 id='method.iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter' class='fnname'>iter</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h4>
 <div class='docblock'><p>Return an iterator of references to the elements of the Array</p>
 
@@ -216,7 +229,11 @@ dimension array.</p>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>subview</span>(<span class='number'>0</span>, <span class='number'>0</span>), <span class='ident'>arr1</span>([<span class='number'>1.</span>, <span class='number'>2.</span>]));
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>subview</span>(<span class='number'>1</span>, <span class='number'>1</span>), <span class='ident'>arr1</span>([<span class='number'>2.</span>, <span class='number'>4.</span>]));
 </pre>
-</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.at_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.at_mut' class='fnname'>at_mut</a>&lt;'a&gt;(&amp;'a mut self, index: D) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a mut A&gt;</code></h4>
+</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.ensure_unique' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.ensure_unique' class='fnname'>ensure_unique</a>(&amp;mut self)</code></h4>
+<div class='docblock'><p>Make the Array unshared.</p>
+
+<p>This method is mostly only useful with unsafe code.</p>
+</div><h4 id='method.at_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.at_mut' class='fnname'>at_mut</a>&lt;'a&gt;(&amp;'a mut self, index: D) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a mut A&gt;</code></h4>
 <div class='docblock'><p>Return a mutable reference to the element at <code>index</code>, or return <code>None</code>
 if the index is out of bounds.</p>
 </div><h4 id='method.iter_mut' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.iter_mut' class='fnname'>iter_mut</a>&lt;'a&gt;(&amp;'a mut self) -&gt; <a class='struct' href='../ndarray/struct.ElementsMut.html' title='ndarray::ElementsMut'>ElementsMut</a>&lt;'a, A, D&gt;</code></h4>
