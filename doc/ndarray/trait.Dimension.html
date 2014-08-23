@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +61,7 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Trait <a href='index.html'>ndarray</a>::<wbr><a class='trait' href=''>Dimension</a><wbr></div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-1189' href='../src/ndarray/src/dimension.rs.html#7-115'>[src]</a></div></h1>
+        </span><a id='src-1346' href='../src/ndarray/src/dimension.rs.html#29-190'>[src]</a></div></h1>
 <pre class='rust trait'>pub trait Dimension: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/master/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> {
     fn <a href='#tymethod.ndim' class='fnname'>ndim</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>;
 
@@ -73,6 +73,7 @@ tweak rustdoc css
     fn <a href='#method.next_for' class='fnname'>next_for</a>(&amp;self, index: Self) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt; { ... }
     fn <a href='#method.stride_offset' class='fnname'>stride_offset</a>(index: &amp;Self, strides: &amp;Self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a> { ... }
     fn <a href='#method.stride_offset_checked' class='fnname'>stride_offset_checked</a>(&amp;self, strides: &amp;Self, index: &amp;Self) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a>&gt; { ... }
+    fn <a href='#method.do_slices' class='fnname'>do_slices</a>(dim: &amp;mut Self, strides: &amp;mut Self, slices: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a> { ... }
 }</pre><div class='docblock'><p>Trait for the shape and index types of arrays.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
@@ -84,6 +85,10 @@ tweak rustdoc css
 or None if there are no more.</p>
 </div><h3 id='method.stride_offset' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.stride_offset' class='fnname'>stride_offset</a>(index: &amp;Self, strides: &amp;Self) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a></code></h3><div class='docblock'><p>Return stride offset for index.</p>
 </div><h3 id='method.stride_offset_checked' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.stride_offset_checked' class='fnname'>stride_offset_checked</a>(&amp;self, strides: &amp;Self, index: &amp;Self) -&gt; <a class='type' href='http://doc.rust-lang.org/master/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a>&gt;</code></h3><div class='docblock'><p>Return stride offset for this dimension and index.</p>
+</div><h3 id='method.do_slices' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.do_slices' class='fnname'>do_slices</a>(dim: &amp;mut Self, strides: &amp;mut Self, slices: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[<a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a>]</a>) -&gt; <a href='http://doc.rust-lang.org/master/std/primitive.int.html'>int</a></code></h3><div class='docblock'><p>Modify dimension, strides and return data pointer offset</p>
+
+<p><strong>Fail</strong> if <code>slices</code> does not correspond to the number of axes,
+if any stride is 0, or if any index is out of bounds.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

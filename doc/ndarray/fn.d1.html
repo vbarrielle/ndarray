@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `Col` type in crate `ndarray`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, Col">
+    <meta name="description" content="API documentation for the Rust `d1` fn in crate `ndarray`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, d1">
 
-    <title>ndarray::linalg::Col - Rust</title>
+    <title>ndarray::d1 - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
 
     
     
@@ -43,7 +43,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='../index.html'>ndarray</a>::<wbr><a href='index.html'>linalg</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.ComplexField.html'>ComplexField</a><a class='trait ' href='trait.Field.html'>Field</a><a class='trait ' href='trait.Ring.html'>Ring</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.cholesky.html'>cholesky</a><a class='fn ' href='fn.eye.html'>eye</a><a class='fn ' href='fn.least_squares.html'>least_squares</a><a class='fn ' href='fn.subst_bw.html'>subst_bw</a><a class='fn ' href='fn.subst_fw.html'>subst_fw</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn current' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
     </section>
 
     <nav class="sub">
@@ -57,12 +57,13 @@ tweak rustdoc css
         </form>
     </nav>
 
-    <section id='main' class="content type">
-<h1 class='fqn'><div class='in-band'><a href='../index.html'>ndarray</a>::<wbr><a href='index.html'>linalg</a>::<wbr><a class='type' href=''>Col</a><wbr></div><div class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content fn">
+<h1 class='fqn'><div class='in-band'>Function <a href='index.html'>ndarray</a>::<wbr><a class='fn' href=''>d1</a><wbr></div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-36' href='../../src/ndarray/src/linalg.rs.html#12'>[src]</a></div></h1>
-<pre class='rust typedef'>type Col&lt;A&gt; = <a class='struct' href='../../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;;</pre><div class='docblock'><p>Column vector.</p>
+        </span><a id='src-3414' href='../src/ndarray/src/dimension.rs.html#370'>[src]</a></div></h1>
+<pre class='rust fn'>pub fn d1(a: <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>) -&gt; <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a></pre><div class='docblock'><p>Construct one-dimensional array shape. Helper function to use where
+integer literal inference isn&#39;t working.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -102,13 +103,13 @@ tweak rustdoc css
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../";
         window.currentCrate = "ndarray";
         window.playgroundUrl = "";
     </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script async src="../search-index.js"></script>
 </body>
 </html>
