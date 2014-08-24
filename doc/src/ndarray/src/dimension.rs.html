@@ -510,6 +510,8 @@ tweak rustdoc css
 <span id='451'>451</span>
 <span id='452'>452</span>
 <span id='453'>453</span>
+<span id='454'>454</span>
+<span id='455'>455</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>;
@@ -525,11 +527,13 @@ tweak rustdoc css
     (<span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>int</span>) <span class='op'>*</span> ((<span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>Ixs</span>) <span class='kw'>as</span> <span class='ident'>int</span>)
 }
 
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stride_as_int</span>(<span class='ident'>stride</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> <span class='ident'>int</span>
+<span class='comment'>/*
+#[inline]
+pub fn stride_as_int(stride: Ix) -&gt; int
 {
-    (<span class='ident'>stride</span> <span class='kw'>as</span> <span class='ident'>Ixs</span>) <span class='kw'>as</span> <span class='ident'>int</span>
+    (stride as Ixs) as int
 }
+*/</span>
 
 <span class='doccomment'>/// Specialization of `std::iter::range` to use array indices.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
