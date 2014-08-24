@@ -7,15 +7,9 @@
 //! n-dimensional numerical container similar to numpy's ndarray.
 //!
 
-extern crate itertools;
 #[cfg(not(nocomplex))]
 extern crate libnum = "num";
 
-use itertools::ItertoolsClonable;
-use itertools as it;
-
-use std::fmt;
-use std::hash;
 use std::kinds;
 use std::mem;
 use std::num;
@@ -24,10 +18,17 @@ pub use dimension::{Dimension, RemoveAxis, Si, S};
 pub use dimension::{d1, d2, d3, d4};
 pub use dimension::ixrange;
 use dimension::stride_offset;
-use dimension::stride_as_int;
+
+pub use indexes::Indexes;
+
+use iterators::Baseiter;
 
 pub mod linalg;
+mod arraytraits;
+mod arrayformat;
 mod dimension;
+mod indexes;
+mod iterators;
 
 // NOTE: In theory, the whole library should compile
 // and pass tests even if you change Ix and Ixs.
@@ -85,12 +86,12 @@ unsafe fn to_ref_mut<A>(ptr: *mut A) -> &'static mut A {
 /// ```
 /// use ndarray::arr2;
 ///
-/// let a = arr2::<f32>([[1., 2.],
-///                      [3., 4.]]);
+/// let a = arr2::<f32>([[1., 1.],
+///                      [1., 2.]]);
 /// let b = arr2::<f32>([[0., 1.]]);
 ///
-/// let c = arr2::<f32>([[1., 3.],
-///                      [3., 5.]]);
+/// let c = arr2::<f32>([[1., 2.],
+///                      [1., 3.]]);
 /// // We can add because the shapes are compatible even if not equal.
 /// assert!(
 ///     c == a + b
@@ -164,6 +165,7 @@ impl<A, D: Dimension> Array<A, D>
     ///
     /// Unsafe because dimension is unchecked, and must be correct.
     pub unsafe fn from_vec_dim(dim: D, mut v: Vec<A>) -> Array<A, D> {
+        debug_assert!(dim.size() == v.len());
         Array {
             ptr: v.as_mut_ptr(),
             data: std::rc::Rc::new(v),
@@ -273,14 +275,11 @@ impl<A, D: Dimension> Array<A, D>
     }
 
     /// Return a protoiterator
+    #[inline]
     fn base_iter<'a>(&'a self) -> Baseiter<'a, A, D>
     {
-        Baseiter {
-            ptr: self.ptr,
-            dim: self.dim.clone(),
-            strides: self.strides.clone(),
-            index: self.dim.first_index(),
-            life: kinds::marker::ContravariantLifetime,
+        unsafe {
+            Baseiter::new(self.ptr, self.dim.clone(), self.strides.clone())
         }
     }
 
@@ -379,14 +378,12 @@ impl<A, D: Dimension> Array<A, D>
                 Some(st) => st,
                 None => return None,
             };
-        let base = Baseiter {
-            ptr: self.ptr,
-            strides: broadcast_strides,
-            index: dim.first_index(),
-            dim: dim,
-            life: kinds::marker::ContravariantLifetime,
-        };
-        Some(Elements{inner: base})
+        Some(Elements {
+            inner:
+            unsafe {
+                Baseiter::new(self.ptr, dim, broadcast_strides)
+            }
+        })
     }
 
     #[inline(never)]
@@ -403,41 +400,44 @@ impl<A, D: Dimension> Array<A, D>
     /// Swap axes `ax` and `bx`.
     ///
     /// **Fail** if the axes are out of bounds.
+    ///
+    /// ```
+    /// use ndarray::arr2;
+    ///
+    /// let mut a = arr2::<f32>([[1., 2., 3.]]);
+    /// a.swap_axes(0, 1);
+    /// assert!(
+    ///     a == arr2([[1.], [2.], [3.]])
+    /// );
+    /// ```
     pub fn swap_axes(&mut self, ax: uint, bx: uint)
     {
         self.dim.slice_mut().swap(ax, bx);
         self.strides.slice_mut().swap(ax, bx);
     }
 
-    /// One-dimensional iterator along `axis`, starting at `from`.
-    pub fn iter1d<'b>(&'b self, axis: uint, from: &D) -> it::Stride<'b, A> {
-        let dim = self.dim.slice()[axis];
-        let stride = self.strides.slice()[axis];
-        let off = self.dim.stride_offset_checked(&self.strides, from).unwrap();
-        let ptr = unsafe {
-            self.ptr.offset(off)
-        };
-        unsafe {
-            stride_new(ptr as *const _, dim as uint, stride_as_int(stride))
-        }
-    }
-
     // Return (length, stride) for diagonal
-    fn diag_params(&self) -> (uint, int)
+    fn diag_params(&self) -> (Ix, Ixs)
     {
         /* empty shape has len 1 */
-        let len = self.dim.slice().iter().clones().min().unwrap_or(1);
+        let len = self.dim.slice().iter().map(|x| *x).min().unwrap_or(1);
         let stride = self.strides.slice().iter()
-                        .map(|x| *x)
-                        .fold(0i, |sum, s| sum + stride_as_int(s));
-        return (len as uint, stride)
+                        .map(|x| *x as Ixs)
+                        .fold(0, |sum, s| sum + s);
+        return (len, stride)
     }
 
     /// Return an iterator over the diagonal elements of the array.
-    pub fn diag_iter<'a>(&'a self) -> it::Stride<'a, A> {
+    ///
+    /// The diagonal is simply the sequence indexed by *(0, 0, .., 0)*,
+    /// *(1, 1, ..., 1)* etc as long as all axes have elements.
+    pub fn diag_iter<'a>(&'a self) -> Elements<'a, A, Ix>
+    {
         let (len, stride) = self.diag_params();
         unsafe {
-            stride_new(self.ptr as *const _, len, stride)
+            Elements { inner:
+                Baseiter::new(self.ptr, len, stride as Ix)
+            }
         }
     }
 
@@ -447,8 +447,34 @@ impl<A, D: Dimension> Array<A, D>
         Array {
             data: self.data.clone(),
             ptr: self.ptr,
-            dim: len as Ix,
+            dim: len,
             strides: stride as Ix,
+        }
+    }
+
+    /// Apply `f` elementwise and return a new array with
+    /// the results.
+    ///
+    /// Return an array with the same shape as *self*.
+    ///
+    /// ```
+    /// use ndarray::arr2;
+    ///
+    /// let a = arr2::<f32>([[1., 2.],
+    ///                      [3., 4.]]);
+    /// assert!(
+    ///     a.map(|x| (x / 2.) as int)
+    ///     == arr2([[0, 1], [1, 2]])
+    /// );
+    /// ```
+    pub fn map<B>(&self, f: |&A| -> B) -> Array<B, D>
+    {
+        let mut res = Vec::<B>::with_capacity(self.dim.size());
+        for elt in self.iter() {
+            res.push(f(elt))
+        }
+        unsafe {
+            Array::from_vec_dim(self.dim.clone(), res)
         }
     }
 }
@@ -484,29 +510,6 @@ impl<A, D: RemoveAxis<E>, E: Dimension> Array<A, D>
             strides: res.strides.remove_axis(axis),
         }
     }
-
-    /*
-    pub fn sub_iter<'a>(&'a self, axis: uint, index: uint) -> Elements<'a, A, E>
-    {
-        let mut it = self.iter();
-        do_sub(&mut it.dim, &mut it.ptr, &it.strides, axis, index);
-        Elements {
-            ptr: it.ptr,
-            dim: it.dim.remove_axis(axis),
-            strides: it.strides.remove_axis(axis),
-            index: Some(Default::default()),
-            life: it.life,
-        }
-    }
-    */
-}
-
-impl<'a, A, D: Dimension> Index<D, A> for Array<A, D>
-{
-    #[inline]
-    fn index(&self, index: &D) -> &A {
-        self.at(index.clone()).unwrap()
-    }
 }
 
 impl<A: Clone, D: Dimension> Array<A, D>
@@ -522,7 +525,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
         if self.dim.size() <= self.data.len() / 2 {
             unsafe {
                 *self = Array::from_vec_dim(self.dim.clone(),
-                                            self.iter().clones().collect());
+                                            self.iter().map(|x| x.clone()).collect());
             }
             return;
         }
@@ -594,11 +597,15 @@ impl<A: Clone, D: Dimension> Array<A, D>
     }
 
     /// Return an iterator over the diagonal elements of the array.
-    pub fn diag_iter_mut<'a>(&'a mut self) -> it::StrideMut<'a, A> {
+    pub fn diag_iter_mut<'a>(&'a mut self) -> ElementsMut<'a, A, Ix>
+    {
         self.ensure_unique();
         let (len, stride) = self.diag_params();
         unsafe {
-            stride_mut(self.ptr, len, stride)
+            ElementsMut { inner:
+                Baseiter::new(self.ptr, len, stride as Ix),
+                nocopy: kinds::marker::NoCopy,
+            }
         }
     }
 
@@ -676,25 +683,6 @@ impl<A: Clone, D: Dimension> Array<A, D>
     }
 }
 
-impl<'a, A: Clone, D: Dimension> IndexMut<D, A> for Array<A, D>
-{
-    #[inline]
-    fn index_mut(&mut self, index: &D) -> &mut A {
-        self.at_mut(index.clone()).unwrap()
-    }
-}
-
-unsafe fn stride_new<A>(ptr: *const A, len: uint, stride: int) -> it::Stride<'static, A>
-{
-    it::Stride::from_ptr_len(ptr, len, stride)
-}
-
-// NOTE: lifetime
-unsafe fn stride_mut<A>(ptr: *mut A, len: uint, stride: int) -> it::StrideMut<'static, A>
-{
-    it::StrideMut::from_ptr_len(ptr, len, stride)
-}
-
 /// Return a zero-dimensional array with the element `x`.
 pub fn arr0<A>(x: A) -> Array<A, ()>
 {
@@ -724,14 +712,14 @@ pub fn arr1<A: Clone>(xs: &[A]) -> Array<A, Ix>
 /// ```
 pub fn arr2<A: Clone>(xs: &[&[A]]) -> Array<A, (Ix, Ix)>
 {
+    let (m, n) = (xs.len() as Ix, xs.get(0).map_or(0, |snd| snd.len() as Ix));
+    let dim = (m, n);
+    let mut result = Vec::<A>::with_capacity(dim.size());
+    for &snd in xs.iter() {
+        assert!(snd.len() as Ix == n);
+        result.extend(snd.iter().map(|x| x.clone()))
+    }
     unsafe {
-        let (m, n) = (xs.len() as Ix, xs.get(0).map_or(0, |snd| snd.len() as Ix));
-        let dim = (m, n);
-        let mut result = Vec::<A>::with_capacity(dim.size());
-        for &snd in xs.iter() {
-            assert!(snd.len() as Ix == n);
-            result.extend(snd.iter().clones())
-        }
         Array::from_vec_dim(dim, result)
     }
 }
@@ -790,34 +778,43 @@ impl<A: Clone + linalg::Field,
     }
 }
 
+macro_rules! simple_assert(
+    ($e: expr) => (
+        if !($e) {
+            fail!(concat!("assertion failed: ", stringify!($e)))
+        }
+    );
+)
+
 impl<A> Array<A, (Ix, Ix)>
 {
     /// Return an iterator over the elements of row `index`.
     ///
     /// **Fail** if `index` is out of bounds.
-    pub fn row_iter<'a>(&'a self, index: Ix) -> it::Stride<'a, A>
+    pub fn row_iter<'a>(&'a self, index: Ix) -> Elements<'a, A, Ix>
     {
         let (m, n) = self.dim;
         let (sr, sc) = self.strides;
-        //let (sr, sc) = (stride_as_int(sr), stride_as_int(sc));
-        assert!(index < m);
+        simple_assert!(index < m);
         unsafe {
-            stride_new(self.ptr.offset(stride_offset(index, sr)) as *const A,
-                       n as uint, stride_as_int(sc))
+            Elements { inner:
+                Baseiter::new(self.ptr.offset(stride_offset(index, sr)), n, sc)
+            }
         }
     }
 
     /// Return an iterator over the elements of column `index`.
     ///
     /// **Fail** if `index` is out of bounds.
-    pub fn col_iter<'a>(&'a self, index: Ix) -> it::Stride<'a, A>
+    pub fn col_iter<'a>(&'a self, index: Ix) -> Elements<'a, A, Ix>
     {
         let (m, n) = self.dim;
         let (sr, sc) = self.strides;
-        assert!(index < n);
+        simple_assert!(index < n);
         unsafe {
-            stride_new(self.ptr.offset(stride_offset(index, sc)) as *const A,
-                       m as uint, stride_as_int(sr))
+            Elements { inner:
+                Baseiter::new(self.ptr.offset(stride_offset(index, sc)), m, sr)
+            }
         }
     }
 }
@@ -918,124 +915,20 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
 }
 
 
-
-fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
-                                 format: |&mut fmt::Formatter, &A| -> fmt::Result)
-                                -> fmt::Result
+impl<A: Signed + PartialOrd, D: Dimension> Array<A, D>
 {
-    let sz = view.dim.slice().len();
-    if sz > 0 && f.width.is_none() {
-        f.width = Some(4)
-    }
-    // None will be an empty iter.
-    let mut last_index = match view.dim.first_index() {
-        None => view.dim.clone(),
-        Some(ix) => ix,
-    };
-    for _ in range(0, sz) {
-        try!(write!(f, "["));
-    }
-    let mut first = true;
-    // Simply use the indexed iterator, and take the index wraparounds
-    // as cues for when to add []'s and how many to add.
-    for (index, elt) in view.indexed_iter() {
-        let mut update_index = false;
-        for (i, (a, b)) in index.slice().iter().take(sz-1)
-                        .zip(last_index.slice().iter())
-                        .enumerate()
-        {
-            if a != b {
-                // New row.
-                // # of ['s needed
-                let n = sz - i - 1;
-                for _ in range(0, n) {
-                    try!(write!(f, "]"));
-                }
-                try!(write!(f, ","));
-                if f.flags & (1u << (fmt::rt::FlagAlternate as uint)) == 0 {
-                    try!(write!(f, "\n"));
-                }
-                for _ in range(0, sz - n) {
-                    try!(write!(f, " "));
-                }
-                for _ in range(0, n) {
-                    try!(write!(f, "["));
-                }
-                first = true;
-                update_index = true;
-                break;
-            }
-        }
-        if !first {
-            try!(write!(f, ", "));
-        }
-        first = false;
-        try!(format(f, elt));
-
-        if update_index {
-            last_index = index;
-        }
-    }
-    for _ in range(0, sz) {
-        try!(write!(f, "]"));
-    }
-    Ok(())
-}
-
-// NOTE: We can impl other fmt traits here
-impl<'a, A: fmt::Show, D: Dimension> fmt::Show for Array<A, D>
-{
-    /// Format the array using `Show` and apply the formatting parameters used
-    /// to each element.
-    ///
-    /// The array is shown in multiline style, unless the alternate form 
-    /// is used -- i.e. `{:#}`.
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        format_array(self, f, |f, elt| elt.fmt(f))
+    /// Return `true` if the arrays' elementwise differences are all within
+    /// the given absolute tolerance.<br>
+    /// Return `false` otherwise, or if the shapes disagree.
+    pub fn allclose(&self, other: &Array<A, D>, tol: A) -> bool
+    {
+        self.shape() == other.shape() &&
+        self.iter().zip(other.iter()).all(|(x, y)| (*x - *y).abs() <= tol)
     }
 }
 
-impl<'a, A: fmt::LowerExp, D: Dimension> fmt::LowerExp for Array<A, D>
-{
-    /// Format the array using `LowerExp` and apply the formatting parameters used
-    /// to each element.
-    ///
-    /// The array is shown in multiline style, unless the alternate form
-    /// is used -- i.e. `{:#e}`.
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        format_array(self, f, |f, elt| elt.fmt(f))
-    }
-}
-
-impl<'a, A: fmt::UpperExp, D: Dimension> fmt::UpperExp for Array<A, D>
-{
-    /// Format the array using `UpperExp` and apply the formatting parameters used
-    /// to each element.
-    ///
-    /// The array is shown in multiline style, unless the alternate form
-    /// is used -- i.e. `{:#E}`.
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        format_array(self, f, |f, elt| elt.fmt(f))
-    }
-}
 
 // Array OPERATORS
-
-impl<A: PartialEq, D: Dimension>
-PartialEq for Array<A, D>
-{
-    /// Return `true` if all elements of `self` and `other` are equal.
-    ///
-    /// **Fail** if shapes are not equal.
-    fn eq(&self, other: &Array<A, D>) -> bool
-    {
-        assert!(self.shape() == other.shape());
-        self.iter().zip(other.iter()).all(|(a, b)| a == b)
-    }
-}
-
-impl<A: Eq, D: Dimension>
-Eq for Array<A, D> {}
 
 macro_rules! impl_binary_op(
     ($trt:ident, $mth:ident, $imethod:ident, $imth_scalar:ident) => (
@@ -1163,160 +1056,11 @@ Not<Array<A, D>> for Array<A, D>
     }
 }
 
-/// Base for array iterators
-///
-/// Iterator element type is `&'a A`.
-struct Baseiter<'a, A, D> {
-    ptr: *mut A,
-    dim: D,
-    strides: D,
-    index: Option<D>,
-    life: kinds::marker::ContravariantLifetime<'a>,
-}
-
-impl<'a, A, D: Dimension> Baseiter<'a, A, D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<*mut A>
-    {
-        let index = match self.index {
-            None => return None,
-            Some(ref ix) => ix.clone(),
-        };
-        let offset = Dimension::stride_offset(&index, &self.strides);
-        self.index = self.dim.next_for(index);
-        unsafe {
-            Some(self.ptr.offset(offset))
-        }
-    }
-
-    fn size_hint(&self) -> uint
-    {
-        match self.index {
-            None => 0,
-            Some(ref ix) => {
-                let gone = self.dim.default_strides().slice().iter()
-                            .zip(ix.slice().iter())
-                                 .fold(0u, |s, (&a, &b)| s + a as uint * b as uint);
-                self.dim.size() - gone
-            }
-        }
-    }
-}
-
-impl<'a, A> Baseiter<'a, A, Ix>
-{
-    #[inline]
-    fn next_back(&mut self) -> Option<*mut A>
-    {
-        let index = match self.index {
-            None => return None,
-            Some(ref ix) => ix.clone(),
-        };
-        self.dim -= 1;
-        let offset = Dimension::stride_offset(&self.dim, &self.strides);
-        if index == self.dim {
-            self.index = None;
-        }
-
-        unsafe {
-            Some(self.ptr.offset(offset))
-        }
-    }
-}
-
-impl<'a, A, D: Clone> Clone for Baseiter<'a, A, D>
-{
-    fn clone(&self) -> Baseiter<'a, A, D>
-    {
-        Baseiter {
-            ptr: self.ptr,
-            dim: self.dim.clone(),
-            strides: self.strides.clone(),
-            index: self.index.clone(),
-            life: self.life
-        }
-    }
-}
-
 /// An iterator over the elements of an array.
 ///
 /// Iterator element type is `&'a A`.
 pub struct Elements<'a, A, D> {
     inner: Baseiter<'a, A, D>,
-}
-
-impl<'a, A, D: Clone> Clone for Elements<'a, A, D>
-{
-    fn clone(&self) -> Elements<'a, A, D> { Elements{inner: self.inner.clone()} }
-}
-
-impl<'a, A, D: Dimension> Iterator<&'a A> for Elements<'a, A, D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<&'a A>
-    {
-        unsafe {
-            self.inner.next().map(|p| to_ref(p as *const _))
-        }
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>)
-    {
-        let len = self.inner.size_hint();
-        (len, Some(len))
-    }
-}
-
-impl<'a, A> DoubleEndedIterator<&'a A> for Elements<'a, A, Ix>
-{
-    #[inline]
-    fn next_back(&mut self) -> Option<&'a A>
-    {
-        unsafe {
-            self.inner.next_back().map(|p| to_ref(p as *const _))
-        }
-    }
-}
-
-impl<'a, A> ExactSize<&'a A> for Elements<'a, A, Ix> { }
-
-/// An iterator over the indexes and elements of an array.
-///
-/// Iterator element type is `(D, &'a A)`.
-pub struct IndexedElements<'a, A, D> {
-    inner: Baseiter<'a, A, D>,
-}
-
-impl<'a, A, D: Clone> Clone for IndexedElements<'a, A, D>
-{
-    fn clone(&self) -> IndexedElements<'a, A, D> {
-        IndexedElements{inner: self.inner.clone()}
-    }
-}
-
-impl<'a, A, D: Dimension> Iterator<(D, &'a A)> for IndexedElements<'a, A, D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<(D, &'a A)>
-    {
-        let index = match self.inner.index {
-            None => return None,
-            Some(ref ix) => ix.clone()
-        };
-        unsafe {
-            match self.inner.next() {
-                None => None,
-                Some(p) => Some((index, to_ref(p as *const _)))
-            }
-        }
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>)
-    {
-        let len = self.inner.size_hint();
-        (len, Some(len))
-    }
 }
 
 /// An iterator over the elements of an array.
@@ -1327,32 +1071,11 @@ pub struct ElementsMut<'a, A, D> {
     nocopy: kinds::marker::NoCopy,
 }
 
-impl<'a, A, D: Dimension> Iterator<&'a mut A> for ElementsMut<'a, A, D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<&'a mut A>
-    {
-        unsafe {
-            self.inner.next().map(|p| to_ref_mut(p))
-        }
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>)
-    {
-        let len = self.inner.size_hint();
-        (len, Some(len))
-    }
-}
-
-impl<'a, A> DoubleEndedIterator<&'a mut A> for ElementsMut<'a, A, Ix>
-{
-    #[inline]
-    fn next_back(&mut self) -> Option<&'a mut A>
-    {
-        unsafe {
-            self.inner.next_back().map(|p| to_ref_mut(p))
-        }
-    }
+/// An iterator over the indexes and elements of an array.
+///
+/// Iterator element type is `(D, &'a A)`.
+pub struct IndexedElements<'a, A, D> {
+    inner: Baseiter<'a, A, D>,
 }
 
 /// An iterator over the indexes and elements of an array.
@@ -1361,98 +1084,4 @@ impl<'a, A> DoubleEndedIterator<&'a mut A> for ElementsMut<'a, A, Ix>
 pub struct IndexedElementsMut<'a, A, D> {
     inner: Baseiter<'a, A, D>,
     nocopy: kinds::marker::NoCopy,
-}
-
-impl<'a, A, D: Dimension> Iterator<(D, &'a mut A)> for IndexedElementsMut<'a, A, D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<(D, &'a mut A)>
-    {
-        let index = match self.inner.index {
-            None => return None,
-            Some(ref ix) => ix.clone()
-        };
-        unsafe {
-            match self.inner.next() {
-                None => None,
-                Some(p) => Some((index, to_ref_mut(p)))
-            }
-        }
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>)
-    {
-        let len = self.inner.size_hint();
-        (len, Some(len))
-    }
-}
-
-/// An iterator of the indexes of an array shape.
-///
-/// Iterator element type is `D`.
-#[deriving(Clone)]
-pub struct Indexes<D> {
-    dim: D,
-    index: Option<D>,
-}
-
-impl<D: Dimension> Indexes<D>
-{
-    /// Create an iterator over the array shape `dim`.
-    pub fn new(dim: D) -> Indexes<D>
-    {
-        Indexes {
-            index: dim.first_index(),
-            dim: dim,
-        }
-    }
-}
-
-
-impl<D: Dimension> Iterator<D> for Indexes<D>
-{
-    #[inline]
-    fn next(&mut self) -> Option<D>
-    {
-        let index = match self.index {
-            None => return None,
-            Some(ref ix) => ix.clone(),
-        };
-        self.index = self.dim.next_for(index.clone());
-        Some(index)
-    }
-
-    fn size_hint(&self) -> (uint, Option<uint>)
-    {
-        let l = match self.index {
-            None => 0,
-            Some(ref ix) => {
-                let gone = self.dim.default_strides().slice().iter()
-                            .zip(ix.slice().iter())
-                                 .fold(0u, |s, (&a, &b)| s + a as uint * b as uint);
-                self.dim.size() - gone
-            }
-        };
-        (l, Some(l))
-    }
-}
-
-impl<A> FromIterator<A> for Array<A, Ix>
-{
-    fn from_iter<I: Iterator<A>>(it: I) -> Array<A, Ix>
-    {
-        Array::from_iter(it)
-    }
-}
-
-impl<S: hash::Writer, A: hash::Hash<S>, D: Dimension>
-hash::Hash<S> for Array<A, D>
-{
-    fn hash(&self, state: &mut S)
-    {
-        self.shape().hash(state);
-        for elt in self.iter() {
-            elt.hash(state)
-        }
-    }
 }
