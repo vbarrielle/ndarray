@@ -35,6 +35,17 @@ fn bench_std_iter_1d(bench: &mut test::Bencher)
 }
 
 #[bench]
+fn bench_std_iter_1d_raw(bench: &mut test::Bencher)
+{
+    let a = arr1::<f32>([1., 2., 2.,
+                         3., 4., 4.,
+                         3., 4., 4.,
+                         3., 4., 4.,
+                         5., 6., 6.]);
+    bench.iter(|| for elt in a.raw_data().iter() { black_box(elt) })
+}
+
+#[bench]
 fn bench_std_iter_2d(bench: &mut test::Bencher)
 {
     let a = arr2::<f32>([[1., 2., 2.],
@@ -43,6 +54,18 @@ fn bench_std_iter_2d(bench: &mut test::Bencher)
                          [3., 4., 4.],
                          [5., 6., 6.]]);
     bench.iter(|| for elt in a.iter() { black_box(elt) })
+}
+
+#[bench]
+fn assign_scalar_2d(bench: &mut test::Bencher)
+{
+    let mut a = arr2::<f32>([[1., 2., 2.],
+                         [3., 4., 4.],
+                         [3., 4., 4.],
+                         [3., 4., 4.],
+                         [5., 6., 6.]]);
+    a.swap_axes(0, 1);
+    bench.iter(|| a.assign_scalar(&3.))
 }
 
 #[bench]

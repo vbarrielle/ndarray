@@ -9,6 +9,7 @@
 
 #[cfg(not(nocomplex))]
 extern crate libnum = "num";
+extern crate serialize;
 
 use std::kinds;
 use std::mem;
@@ -16,10 +17,10 @@ use std::num;
 
 pub use dimension::{Dimension, RemoveAxis, Si, S};
 pub use dimension::{d1, d2, d3, d4};
-pub use dimension::ixrange;
 use dimension::stride_offset;
 
 pub use indexes::Indexes;
+pub use indexes::ixrange;
 
 use iterators::Baseiter;
 
@@ -677,7 +678,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// Perform an elementwise assigment to `self` from scalar `x`.
     pub fn assign_scalar(&mut self, x: &A)
     {
-        for elt in self.iter_mut() {
+        for elt in self.raw_data_mut().mut_iter() {
             *elt = x.clone();
         }
     }
