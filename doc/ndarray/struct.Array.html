@@ -61,7 +61,7 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Array</a><wbr></div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-7869' href='../src/ndarray/src/lib.rs.html#102-113'>[src]</a></div></h1>
+        </span><a id='src-7241' href='../src/ndarray/src/lib.rs.html#102-113'>[src]</a></div></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
@@ -104,12 +104,12 @@ elements of the smaller dimension array.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>1.</span>],
-                     [<span class='number'>1.</span>, <span class='number'>2.</span>]]);
-<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>0.</span>, <span class='number'>1.</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>1.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>]]);
+<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>0.</span>, <span class='number'>1.</span>]]);
 
-<span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>1.</span>, <span class='number'>3.</span>]]);
+<span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>3.</span>]]);
 <span class='comment'>// We can add because the shapes are compatible even if not equal.</span>
 <span class='macro'>assert</span><span class='macro'>!</span>(
     <span class='ident'>c</span> <span class='op'>==</span> <span class='ident'>a</span> <span class='op'>+</span> <span class='ident'>b</span>
@@ -215,10 +215,10 @@ axes that are to be repeated.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
-<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>]]);
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>]]);
 <span class='ident'>a</span>.<span class='ident'>swap_axes</span>(<span class='number'>0</span>, <span class='number'>1</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(
-    <span class='ident'>a</span> <span class='op'>==</span> <span class='ident'>arr2</span>([[<span class='number'>1.</span>], [<span class='number'>2.</span>], [<span class='number'>3.</span>]])
+    <span class='ident'>a</span> <span class='op'>==</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>], <span class='kw-2'>&amp;</span>[<span class='number'>2.</span>], <span class='kw-2'>&amp;</span>[<span class='number'>3.</span>]])
 );
 </pre>
 </div><h4 id='method.diag_iter' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.diag_iter' class='fnname'>diag_iter</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h4>
@@ -236,11 +236,11 @@ the results.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>3.</span>, <span class='number'>4.</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>3.</span>, <span class='number'>4.</span>]]);
 <span class='macro'>assert</span><span class='macro'>!</span>(
     <span class='ident'>a</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> (<span class='ident'>x</span> <span class='op'>/</span> <span class='number'>2.</span>) <span class='kw'>as</span> <span class='ident'>int</span>)
-    <span class='op'>==</span> <span class='ident'>arr2</span>([[<span class='number'>0</span>, <span class='number'>1</span>], [<span class='number'>1</span>, <span class='number'>2</span>]])
+    <span class='op'>==</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>0</span>, <span class='number'>1</span>], <span class='kw-2'>&amp;</span>[<span class='number'>1</span>, <span class='number'>2</span>]])
 );
 </pre>
 </div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&lt;E&gt;, E: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-methods'><h4 id='method.subview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.subview' class='fnname'>subview</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/master/std/primitive.uint.html'>uint</a>, index: <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E&gt;</code></h4>
@@ -251,8 +251,8 @@ array with that axis removed.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::{<span class='ident'>arr1</span>, <span class='ident'>arr2</span>};
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>3.</span>, <span class='number'>4.</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>3.</span>, <span class='number'>4.</span>]]);
 
 <span class='macro'>assert</span><span class='macro'>!</span>(
     <span class='ident'>a</span>.<span class='ident'>subview</span>(<span class='number'>0</span>, <span class='number'>0</span>) <span class='op'>==</span> <span class='ident'>arr1</span>([<span class='number'>1.</span>, <span class='number'>2.</span>]) <span class='op'>&amp;&amp;</span>
@@ -322,8 +322,8 @@ with the same number of elements is accepted.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::{<span class='ident'>arr0</span>, <span class='ident'>arr1</span>, <span class='ident'>arr2</span>};
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>3.</span>, <span class='number'>4.</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>3.</span>, <span class='number'>4.</span>]]);
 <span class='macro'>assert</span><span class='macro'>!</span>(
     <span class='ident'>a</span>.<span class='ident'>sum</span>(<span class='number'>0</span>) <span class='op'>==</span> <span class='ident'>arr1</span>([<span class='number'>4.</span>, <span class='number'>6.</span>]) <span class='op'>&amp;&amp;</span>
     <span class='ident'>a</span>.<span class='ident'>sum</span>(<span class='number'>1</span>) <span class='op'>==</span> <span class='ident'>arr1</span>([<span class='number'>3.</span>, <span class='number'>7.</span>]) <span class='op'>&amp;&amp;</span>
@@ -357,14 +357,14 @@ if <code>self</code> is <em>M</em> × <em>N</em>, then <code>other</code> is <em
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>0.</span>, <span class='number'>1.</span>]]);
-<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>([[<span class='number'>1.</span>, <span class='number'>2.</span>],
-                     [<span class='number'>2.</span>, <span class='number'>3.</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>0.</span>, <span class='number'>1.</span>]]);
+<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>arr2</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>],
+                      <span class='kw-2'>&amp;</span>[<span class='number'>2.</span>, <span class='number'>3.</span>]]);
 
 <span class='macro'>assert</span><span class='macro'>!</span>(
-    <span class='ident'>a</span>.<span class='ident'>mat_mul</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>) <span class='op'>==</span> <span class='ident'>arr2</span>([[<span class='number'>5.</span>, <span class='number'>8.</span>],
-                           [<span class='number'>2.</span>, <span class='number'>3.</span>]])
+    <span class='ident'>a</span>.<span class='ident'>mat_mul</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>) <span class='op'>==</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>5.</span>, <span class='number'>8.</span>],
+                            <span class='kw-2'>&amp;</span>[<span class='number'>2.</span>, <span class='number'>3.</span>]])
 );
 </pre>
 </div><h4 id='method.mat_mul_col' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mat_mul_col' class='fnname'>mat_mul_col</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h4>

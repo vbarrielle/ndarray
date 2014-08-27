@@ -61,15 +61,15 @@ tweak rustdoc css
 <h1 class='fqn'><div class='in-band'>Function <a href='index.html'>ndarray</a>::<wbr><a class='fn' href=''>arr2</a><wbr></div><div class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-10115' href='../src/ndarray/src/lib.rs.html#714-726'>[src]</a></div></h1>
+        </span><a id='src-9235' href='../src/ndarray/src/lib.rs.html#714-726'>[src]</a></div></h1>
 <pre class='rust fn'>pub fn arr2&lt;A: <a class='trait' href='http://doc.rust-lang.org/master/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt;(xs: &amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[&amp;<a href='http://doc.rust-lang.org/master/std/primitive.slice.html'>[A]</a>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/master/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</pre><div class='docblock'><p>Return a two-dimensional array with elements from <code>xs</code>.</p>
 
 <p><strong>Fail</strong> if the slices are not all of the same length.</p>
 <pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
-<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>([[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>],
-              [<span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6i</span>]]);
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>],
+               <span class='kw-2'>&amp;</span>[<span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6i</span>]]);
 <span class='macro'>assert</span><span class='macro'>!</span>(
     <span class='ident'>a</span>.<span class='ident'>shape</span>() <span class='op'>==</span> <span class='kw-2'>&amp;</span>[<span class='number'>2</span>, <span class='number'>3</span>]
 );
