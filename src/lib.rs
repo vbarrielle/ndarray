@@ -8,7 +8,7 @@
 //!
 
 #[cfg(not(nocomplex))]
-extern crate libnum = "num";
+extern crate "num" as libnum;
 extern crate serialize;
 
 use std::kinds;
@@ -468,7 +468,7 @@ impl<A, D: Dimension> Array<A, D>
     ///     == arr2(&[&[0, 1], &[1, 2]])
     /// );
     /// ```
-    pub fn map<B>(&self, f: |&A| -> B) -> Array<B, D>
+    pub fn map<'a, B>(&'a self, f: |&'a A| -> B) -> Array<B, D>
     {
         let mut res = Vec::<B>::with_capacity(self.dim.size());
         for elt in self.iter() {
