@@ -1,5 +1,6 @@
 #![feature(macro_rules)]
 #![feature(default_type_params)] /* Hash<S> */
+#![feature(slicing_syntax)]
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
 
@@ -13,7 +14,7 @@ extern crate serialize;
 
 use std::kinds;
 use std::mem;
-use std::num;
+use std::num::Float;
 
 pub use dimension::{Dimension, RemoveAxis, Si, S};
 pub use dimension::{d1, d2, d3, d4};
@@ -124,12 +125,12 @@ impl<A, D: Clone> Clone for Array<A, D>
     }
 }
 
-impl<A: Clone + num::Zero, D: Dimension> Array<A, D>
+impl<A: Clone + libnum::Zero, D: Dimension> Array<A, D>
 {
     /// Construct an Array with zeros.
     pub fn zeros(dim: D) -> Array<A, D>
     {
-        Array::from_elem(dim, num::zero())
+        Array::from_elem(dim, libnum::zero())
     }
 }
 
@@ -157,7 +158,15 @@ impl<A> Array<A, Ix>
     pub fn from_iter<I: Iterator<A>>(mut it: I) -> Array<A, Ix> {
         Array::from_vec(it.collect())
     }
+}
 
+impl Array<f32, Ix>
+{
+    /// Create a one-dimensional Array from interval `[begin, end)`
+    pub fn range(begin: f32, end: f32) -> Array<f32, Ix>
+    {
+        Array::from_iter(std::iter::count(begin, 1.0).take_while(|&x| x < end))
+    }
 }
 
 impl<A, D: Dimension> Array<A, D>
@@ -203,7 +212,7 @@ impl<A, D: Dimension> Array<A, D>
     /// Array's view.
     pub fn raw_data<'a>(&'a self) -> &'a [A]
     {
-        self.data.as_slice()
+        (*self.data)[]
     }
 
     /// Return a sliced array.
@@ -349,7 +358,7 @@ impl<A, D: Dimension> Array<A, D>
             }
 
             {
-                let mut new_stride_iter = new_stride.slice_mut().mut_iter().rev();
+                let mut new_stride_iter = new_stride.slice_mut().iter_mut().rev();
                 for ((er, es), dr) in from.slice().iter().rev()
                                         .zip(stride.slice().iter().rev())
                                         .zip(new_stride_iter.by_ref())
@@ -393,8 +402,8 @@ impl<A, D: Dimension> Array<A, D>
     {
         match self.broadcast_iter(dim.clone()) {
             Some(it) => it,
-            None => fail!("Could not broadcast array from shape {} into: {}",
-                          self.shape(), dim.slice())
+            None => panic!("Could not broadcast array from shape {} into: {}",
+                           self.shape(), dim.slice())
         }
     }
 
@@ -464,7 +473,7 @@ impl<A, D: Dimension> Array<A, D>
     /// let a = arr2::<f32>(&[&[1., 2.],
     ///                       &[3., 4.]]);
     /// assert!(
-    ///     a.map(|x| (x / 2.) as int)
+    ///     a.map(|&x| (x / 2.) as int)
     ///     == arr2(&[&[0, 1], &[1, 2]])
     /// );
     /// ```
@@ -494,8 +503,8 @@ impl<A, D: RemoveAxis<E>, E: Dimension> Array<A, D>
     ///                       &[3., 4.]]);
     ///
     /// assert!(
-    ///     a.subview(0, 0) == arr1([1., 2.]) &&
-    ///     a.subview(1, 1) == arr1([2., 4.])
+    ///     a.subview(0, 0) == arr1(&[1., 2.]) &&
+    ///     a.subview(1, 1) == arr1(&[2., 4.])
     /// );
     /// ```
     pub fn subview(&self, axis: uint, index: Ix) -> Array<A, E>
@@ -632,12 +641,12 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// ```
     /// use ndarray::{arr1, d2};
     ///
-    /// arr1::<f32>([1., 2., 3., 4.]).reshape(d2(2, 2));
+    /// arr1::<f32>(&[1., 2., 3., 4.]).reshape(d2(2, 2));
     /// ```
     pub fn reshape<E: Dimension>(&self, shape: E) -> Array<A, E> {
         if shape.size() != self.dim.size() {
-            fail!("Incompatible sizes in reshape, attempted from: {}, to: {}",
-                  self.dim.slice(), shape.slice())
+            panic!("Incompatible sizes in reshape, attempted from: {}, to: {}",
+                   self.dim.slice(), shape.slice())
         }
         // Check if contiguous, if not => copy all, else just adapt strides
         if self.is_standard_layout() {
@@ -678,7 +687,7 @@ impl<A: Clone, D: Dimension> Array<A, D>
     /// Perform an elementwise assigment to `self` from scalar `x`.
     pub fn assign_scalar(&mut self, x: &A)
     {
-        for elt in self.raw_data_mut().mut_iter() {
+        for elt in self.raw_data_mut().iter_mut() {
             *elt = x.clone();
         }
     }
@@ -737,8 +746,8 @@ impl<A: Clone + Add<A, A>,
     /// let a = arr2::<f32>(&[&[1., 2.],
     ///                       &[3., 4.]]);
     /// assert!(
-    ///     a.sum(0) == arr1([4., 6.]) &&
-    ///     a.sum(1) == arr1([3., 7.]) &&
+    ///     a.sum(0) == arr1(&[4., 6.]) &&
+    ///     a.sum(1) == arr1(&[3., 7.]) &&
     ///
     ///     a.sum(0).sum(0) == arr0(10.)
     /// );
@@ -767,9 +776,9 @@ impl<A: Clone + linalg::Field,
     {
         let n = self.shape()[axis];
         let mut sum = self.sum(axis);
-        let one = num::one::<A>();
+        let one = libnum::one::<A>();
         let mut cnt = one.clone();
-        for i in range(1, n) {
+        for _ in range(1, n) {
             cnt = cnt + one;
         }
         for elt in sum.iter_mut() {
@@ -782,7 +791,7 @@ impl<A: Clone + linalg::Field,
 macro_rules! simple_assert(
     ($e: expr) => (
         if !($e) {
-            fail!(concat!("assertion failed: ", stringify!($e)))
+            panic!(concat!("assertion failed: ", stringify!($e)))
         }
     );
 )
@@ -861,9 +870,9 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
         }
         let mut i = 0;
         let mut j = 0;
-        for rr in res_elems.mut_iter() {
+        for rr in res_elems.iter_mut() {
             unsafe {
-                let dot = range(0, a).fold(num::zero::<A>(),
+                let dot = range(0, a).fold(libnum::zero::<A>(),
                     |s, k| s + *self.uchk_at((i, k)) * *other.uchk_at((k, j))
                 );
                 std::ptr::write(rr, dot);
@@ -900,9 +909,9 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
             res_elems.set_len(m as uint);
         }
         let mut i = 0;
-        for rr in res_elems.mut_iter() {
+        for rr in res_elems.iter_mut() {
             unsafe {
-                let dot = range(0, a).fold(num::zero::<A>(),
+                let dot = range(0, a).fold(libnum::zero::<A>(),
                     |s, k| s + *self.uchk_at((i, k)) * *other.uchk_at(k)
                 );
                 std::ptr::write(rr, dot);
@@ -916,7 +925,7 @@ impl<'a, A: Copy + linalg::Ring> Array<A, (Ix, Ix)>
 }
 
 
-impl<A: Signed + PartialOrd, D: Dimension> Array<A, D>
+impl<A: Float + PartialOrd, D: Dimension> Array<A, D>
 {
     /// Return `true` if the arrays' elementwise differences are all within
     /// the given absolute tolerance.<br>
