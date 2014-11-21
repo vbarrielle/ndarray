@@ -87,7 +87,7 @@ or None if there are no more.</p>
 </div><h3 id='method.stride_offset_checked' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.stride_offset_checked' class='fnname'>stride_offset_checked</a>(&amp;self, strides: &amp;Self, index: &amp;Self) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.int.html'>int</a>&gt;</code></h3><div class='docblock'><p>Return stride offset for this dimension and index.</p>
 </div><h3 id='method.do_slices' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.do_slices' class='fnname'>do_slices</a>(dim: &amp;mut Self, strides: &amp;mut Self, slices: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='struct' href='../ndarray/struct.Si.html' title='ndarray::Si'>Si</a><a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.int.html'>int</a></code></h3><div class='docblock'><p>Modify dimension, strides and return data pointer offset</p>
 
-<p><strong>Fail</strong> if <code>slices</code> does not correspond to the number of axes,
+<p><strong>Panics</strong> if <code>slices</code> does not correspond to the number of axes,
 if any stride is 0, or if any index is out of bounds.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
