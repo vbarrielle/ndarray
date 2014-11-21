@@ -504,9 +504,11 @@ tweak rustdoc css
 <span id='445'>445</span>
 <span id='446'>446</span>
 <span id='447'>447</span>
+<span id='448'>448</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>SignedInt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>raw</span>;
 
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Ix</span>, <span class='ident'>Ixs</span>};
@@ -556,7 +558,7 @@ pub fn stride_as_int(stride: Ix) -&gt; int
         <span class='comment'>// Shape (a, b, c) =&gt; Give strides (b * c, c, 1)</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>strides</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>strides</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>().<span class='ident'>rev</span>();
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>strides</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>().<span class='ident'>rev</span>();
             <span class='comment'>// Set first element to 1</span>
             <span class='kw'>for</span> <span class='ident'>rs</span> <span class='kw'>in</span> <span class='ident'>it</span> {
                 <span class='op'>*</span><span class='ident'>rs</span> <span class='op'>=</span> <span class='number'>1</span>;
@@ -580,7 +582,7 @@ pub fn stride_as_int(stride: Ix) -&gt; int
             }
         }
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
-        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>index</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>() {
+        <span class='kw'>for</span> <span class='ident'>rr</span> <span class='kw'>in</span> <span class='ident'>index</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>() {
             <span class='op'>*</span><span class='ident'>rr</span> <span class='op'>=</span> <span class='number'>0</span>;
         }
         <span class='prelude-val'>Some</span>(<span class='ident'>index</span>)
@@ -594,7 +596,7 @@ pub fn stride_as_int(stride: Ix) -&gt; int
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='ident'>index</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>done</span> <span class='op'>=</span> <span class='boolval'>false</span>;
         <span class='kw'>for</span> (<span class='kw-2'>&amp;</span><span class='ident'>dim</span>, <span class='ident'>ix</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>slice</span>().<span class='ident'>iter</span>().<span class='ident'>rev</span>()
-                            .<span class='ident'>zip</span>(<span class='ident'>index</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>().<span class='ident'>rev</span>())
+                            .<span class='ident'>zip</span>(<span class='ident'>index</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>().<span class='ident'>rev</span>())
         {
             <span class='op'>*</span><span class='ident'>ix</span> <span class='op'>+=</span> <span class='number'>1</span>;
             <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>ix</span> <span class='op'>==</span> <span class='ident'>dim</span> {
@@ -644,8 +646,8 @@ pub fn stride_as_int(stride: Ix) -&gt; int
     {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>offset</span> <span class='op'>=</span> <span class='number'>0</span>;
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slices</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='ident'>dim</span>.<span class='ident'>slice</span>().<span class='ident'>len</span>());
-        <span class='kw'>for</span> ((<span class='ident'>dr</span>, <span class='ident'>sr</span>), <span class='kw-2'>&amp;</span><span class='ident'>slc</span>) <span class='kw'>in</span> <span class='ident'>dim</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>()
-                                .<span class='ident'>zip</span>(<span class='ident'>strides</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>())
+        <span class='kw'>for</span> ((<span class='ident'>dr</span>, <span class='ident'>sr</span>), <span class='kw-2'>&amp;</span><span class='ident'>slc</span>) <span class='kw'>in</span> <span class='ident'>dim</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>()
+                                .<span class='ident'>zip</span>(<span class='ident'>strides</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>())
                                 .<span class='ident'>zip</span>(<span class='ident'>slices</span>.<span class='ident'>iter</span>())
         {
             <span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>dr</span>;
@@ -861,7 +863,7 @@ pub fn stride_as_int(stride: Ix) -&gt; int
 <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
 {
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> { <span class='self'>self</span>.<span class='ident'>len</span>() }
-    <span class='kw'>fn</span> <span class='ident'>slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span>[<span class='ident'>Ix</span>] { <span class='self'>self</span>.<span class='ident'>as_slice</span>() }
+    <span class='kw'>fn</span> <span class='ident'>slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span>[<span class='ident'>Ix</span>] { <span class='self'>self</span>[] }
     <span class='kw'>fn</span> <span class='ident'>slice_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>Ix</span>] { <span class='self'>self</span>.<span class='ident'>as_mut_slice</span>() }
 }
 
@@ -892,11 +894,11 @@ pub fn stride_as_int(stride: Ix) -&gt; int
     (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span>:<span class='ident'>ident</span> $(,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>more</span>:<span class='ident'>ident</span>)<span class='op'>*</span>) <span class='op'>=&gt;</span> (
 <span class='kw'>impl</span> <span class='ident'>RemoveAxis</span><span class='op'>&lt;</span>($(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>more</span>),<span class='op'>*</span>)<span class='op'>&gt;</span> <span class='kw'>for</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span> $(,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>more</span>)<span class='op'>*</span>)
 {
-    <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unnecessary_parens</span>)]</span>
+    <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>unused_parens</span>)]</span>
     <span class='kw'>fn</span> <span class='ident'>remove_axis</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> ($(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>more</span>),<span class='op'>*</span>) {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tup</span> <span class='op'>=</span> ($(<span class='number'>0</span> <span class='kw'>as</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>more</span>),<span class='op'>*</span>);
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>tup</span>.<span class='ident'>slice_mut</span>().<span class='ident'>mut_iter</span>();
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>it</span> <span class='op'>=</span> <span class='ident'>tup</span>.<span class='ident'>slice_mut</span>().<span class='ident'>iter_mut</span>();
             <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='kw-2'>&amp;</span><span class='ident'>d</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>slice</span>().<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
                 <span class='kw'>if</span> <span class='ident'>i</span> <span class='op'>==</span> <span class='ident'>axis</span> {
                     <span class='kw'>continue</span>;

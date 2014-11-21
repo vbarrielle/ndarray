@@ -555,7 +555,7 @@
         // `rustdoc::html::item_type::ItemType` type in Rust.
         var itemTypes = ["mod",
                          "struct",
-                         "type",
+                         "enum",
                          "fn",
                          "type",
                          "static",
@@ -569,7 +569,9 @@
                          "ffi",
                          "ffs",
                          "macro",
-                         "primitive"];
+                         "primitive",
+                         "associatedtype",
+                         "constant"];
 
         function itemTypeFromName(typename) {
             for (var i = 0; i < itemTypes.length; ++i) {
@@ -762,7 +764,7 @@
 
         $(".method").each(function() {
            if ($(this).next().is(".docblock")) {
-               $(this).children().first().after(toggle[0]);
+               $(this).children().first().after(toggle.clone());
            }
         });
 
