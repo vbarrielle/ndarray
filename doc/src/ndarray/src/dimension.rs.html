@@ -507,7 +507,6 @@ tweak rustdoc css
 <span id='448'>448</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>SignedInt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>raw</span>;
 
@@ -681,7 +680,8 @@ pub fn stride_as_int(stride: Ix) -&gt; int
 
             <span class='kw'>let</span> <span class='ident'>s_prim</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>s1</span>;
 
-            <span class='kw'>let</span> (<span class='ident'>d</span>, <span class='ident'>r</span>) <span class='op'>=</span> <span class='ident'>num</span>::<span class='ident'>div_rem</span>(<span class='ident'>m</span>, <span class='ident'>s1</span>.<span class='ident'>abs</span>() <span class='kw'>as</span> <span class='ident'>Ix</span>);
+            <span class='kw'>let</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>m</span> <span class='op'>/</span> <span class='ident'>s1</span>.<span class='ident'>abs</span>() <span class='kw'>as</span> <span class='ident'>Ix</span>;
+            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>m</span> <span class='op'>%</span> <span class='ident'>s1</span>.<span class='ident'>abs</span>() <span class='kw'>as</span> <span class='ident'>Ix</span>;
             <span class='kw'>let</span> <span class='ident'>m_prim</span> <span class='op'>=</span> <span class='ident'>d</span> <span class='op'>+</span> <span class='kw'>if</span> <span class='ident'>r</span> <span class='op'>&gt;</span> <span class='number'>0</span> { <span class='number'>1</span> } <span class='kw'>else</span> { <span class='number'>0</span> };
 
             <span class='comment'>// Update dimension and stride coordinate</span>

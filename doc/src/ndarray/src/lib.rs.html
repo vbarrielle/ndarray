@@ -1149,11 +1149,6 @@ tweak rustdoc css
 <span id='1090'>1090</span>
 <span id='1091'>1091</span>
 <span id='1092'>1092</span>
-<span id='1093'>1093</span>
-<span id='1094'>1094</span>
-<span id='1095'>1095</span>
-<span id='1096'>1096</span>
-<span id='1097'>1097</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>default_type_params</span>)]</span> <span class='comment'>/* Hash&lt;S&gt; */</span>
@@ -1231,11 +1226,6 @@ tweak rustdoc css
 <span class='doccomment'>/// Arrays use `u32` for indexing, represented by the types `Ix` and `Ixs`</span>
 <span class='doccomment'>/// (signed).</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// Where dimension is generic, integer literals don&#39;t infer properly to the</span>
-<span class='doccomment'>/// `Ix` type. For these cases, mostly `Array::zeros(dim)` and `.reshape(dim)`,</span>
-<span class='doccomment'>/// you can use the convenience functions `d1(x)`, `d2(x, y)`,</span>
-<span class='doccomment'>/// `d3(x, y, z)` and `d4(x, y, z, w)`.</span>
-<span class='doccomment'>///</span>
 <span class='doccomment'>/// ## Broadcasting</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Arrays support limited *broadcasting*, where arithmetic operations with</span>
@@ -1312,7 +1302,7 @@ tweak rustdoc css
     }
 
     <span class='doccomment'>/// Create a one-dimensional array from an iterator.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>mut</span> <span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
         <span class='ident'>Array</span>::<span class='ident'>from_vec</span>(<span class='ident'>it</span>.<span class='ident'>collect</span>())
     }
 }
@@ -1796,9 +1786,9 @@ tweak rustdoc css
     <span class='doccomment'>/// **Panics** if sizes are incompatible.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use ndarray::{arr1, d2};</span>
+    <span class='doccomment'>/// use ndarray::arr1;</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// arr1::&lt;f32&gt;(&amp;[1., 2., 3., 4.]).reshape(d2(2, 2));</span>
+    <span class='doccomment'>/// arr1::&lt;f32&gt;(&amp;[1., 2., 3., 4.]).reshape((2, 2));</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reshape</span><span class='op'>&lt;</span><span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>shape</span>: <span class='ident'>E</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='ident'>shape</span>.<span class='ident'>size</span>() <span class='op'>!=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>size</span>() {
