@@ -31,6 +31,7 @@ mod arrayformat;
 mod dimension;
 mod indexes;
 mod iterators;
+mod macros;
 
 // NOTE: In theory, the whole library should compile
 // and pass tests even if you change Ix and Ixs.
@@ -712,7 +713,7 @@ pub fn arr1<A: Clone>(xs: &[A]) -> Array<A, Ix>
 /// let a = arr2(&[&[1, 2, 3],
 ///                &[4, 5, 6i]]);
 /// assert!(
-///     a.shape() == &[2, 3]
+///     a.shape() == [2, 3]
 /// );
 /// ```
 pub fn arr2<A: Clone>(xs: &[&[A]]) -> Array<A, (Ix, Ix)>
