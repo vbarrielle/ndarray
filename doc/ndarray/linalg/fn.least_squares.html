@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -61,7 +56,7 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Function <a href='../index.html'>ndarray</a>::<wbr><a href='index.html'>linalg</a>::<wbr><a class='fn' href=''>least_squares</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-275' href='../../src/ndarray/src/linalg.rs.html#83-133'>[src]</a></span></h1>
+        </span><a id='src-275' href='../../src/ndarray/linalg.rs.html#83-133'>[src]</a></span></h1>
 <pre class='rust fn'>pub fn least_squares&lt;A: <a class='trait' href='../../ndarray/linalg/trait.ComplexField.html' title='ndarray::linalg::ComplexField'>ComplexField</a>&gt;(a: &amp;<a class='type' href='../../ndarray/linalg/type.Mat.html' title='ndarray::linalg::Mat'>Mat</a>&lt;A&gt;, b: &amp;<a class='type' href='../../ndarray/linalg/type.Col.html' title='ndarray::linalg::Col'>Col</a>&lt;A&gt;) -&gt; <a class='type' href='../../ndarray/linalg/type.Col.html' title='ndarray::linalg::Col'>Col</a>&lt;A&gt;</pre><div class='docblock'><p>Solve <em>a x = b</em> with linear least squares approximation.</p>
 
 <p>It is used to find the best fit for an overdetermined system,

@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -61,7 +56,7 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>ndarray</a><wbr></span><span class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-0' href='../src/ndarray/src/lib.rs.html#1-1092'>[src]</a></span></h1>
+        </span><a id='src-0' href='../src/ndarray/lib.rs.html#1-1093'>[src]</a></span></h1>
 <div class='docblock'><p>The <strong>ndarray</strong> crate provides the <a href="./struct.Array.html"><strong>Array</strong></a> type, an
 n-dimensional numerical container similar to numpy&#39;s ndarray.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
@@ -70,6 +65,14 @@ n-dimensional numerical container similar to numpy&#39;s ndarray.</p>
                         <td><a class='stability Unmarked' title='No stability level'></a><a class='mod' href='linalg/index.html'
                                title='ndarray::linalg'>linalg</a></td>
                         <td class='docblock short'><p>A few linear algebra operations on two-dimensional arrays.</p>
+</td>
+                    </tr>
+                </table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='macro' href='macro.matrix!.html'
+                               title='ndarray::matrix!'>matrix!</a></td>
+                        <td class='docblock short'><p>Create a 2D matrix</p>
 </td>
                     </tr>
                 </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
@@ -170,7 +173,7 @@ removing one axis from <em>Self</em> gives smaller dimension <em>E</em>.</p>
                     </tr>
                 
                     <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.d1.html'
+                        <td><a class='stability Deprecated' title='Deprecated: No longer needed, inference is good enough.'></a><a class='fn' href='fn.d1.html'
                                title='ndarray::d1'>d1</a></td>
                         <td class='docblock short'><p>Construct one-dimensional array shape. Helper function to use where
 integer literal inference isn&#39;t working.</p>
@@ -178,7 +181,7 @@ integer literal inference isn&#39;t working.</p>
                     </tr>
                 
                     <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.d2.html'
+                        <td><a class='stability Deprecated' title='Deprecated: No longer needed, inference is good enough.'></a><a class='fn' href='fn.d2.html'
                                title='ndarray::d2'>d2</a></td>
                         <td class='docblock short'><p>Construct two-dimensional array shape. Helper function to use where
 integer literal inference isn&#39;t working.</p>
@@ -186,7 +189,7 @@ integer literal inference isn&#39;t working.</p>
                     </tr>
                 
                     <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.d3.html'
+                        <td><a class='stability Deprecated' title='Deprecated: No longer needed, inference is good enough.'></a><a class='fn' href='fn.d3.html'
                                title='ndarray::d3'>d3</a></td>
                         <td class='docblock short'><p>Construct three-dimensional array shape. Helper function to use where
 integer literal inference isn&#39;t working.</p>
@@ -194,7 +197,7 @@ integer literal inference isn&#39;t working.</p>
                     </tr>
                 
                     <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.d4.html'
+                        <td><a class='stability Deprecated' title='Deprecated: No longer needed, inference is good enough.'></a><a class='fn' href='fn.d4.html'
                                title='ndarray::d4'>d4</a></td>
                         <td class='docblock short'><p>Construct four-dimensional array shape. Helper function to use where
 integer literal inference isn&#39;t working.</p>

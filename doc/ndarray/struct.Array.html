@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -43,7 +38,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div><div class='block macro'><h2>Macros</h2><a class='macro ' href='macro.matrix!.html'>matrix!</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +56,7 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Array</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-7418' href='../src/ndarray/src/lib.rs.html#98-109'>[src]</a></span></h1>
+        </span><a id='src-7420' href='../src/ndarray/lib.rs.html#99-110'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
@@ -487,7 +482,7 @@ Return <code>false</code> otherwise, or if the shapes disagree.</p>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Return <code>true</code> if the array shapes and all elements of <code>self</code> and
 <code>other</code> are equal. Return <code>false</code> otherwise.</p>
-</div><h4 id='method.ne' class='tymethod'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Self) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h4 id='method.ne' class='tymethod'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Rhs) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.assert_receiver_is_total_eq' class='tymethod'><a class='stability Unstable' title='Unstable: Definition may change slightly after trait reform'></a><code>fn <a href='#tymethod.assert_receiver_is_total_eq' class='fnname'>assert_receiver_is_total_eq</a>(&amp;self)</code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/iter/trait.FromIterator.html' title='core::iter::FromIterator'>FromIterator</a>&lt;A&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h3><div class='impl-items'><h4 id='method.from_iter' class='method'><a class='stability Unstable' title='Unstable: may be replaced by a more general conversion trait'></a><code>fn <a href='#method.from_iter' class='fnname'>from_iter</a>&lt;I: <a class='trait' href='http://doc.rust-lang.org/nightly/core/iter/trait.Iterator.html' title='core::iter::Iterator'>Iterator</a>&lt;A&gt;&gt;(it: I) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>&gt;</code></h4>
 </div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;S: <a class='trait' href='http://doc.rust-lang.org/nightly/collections/hash/trait.Writer.html' title='collections::hash::Writer'>Writer</a>, A: <a class='trait' href='http://doc.rust-lang.org/nightly/collections/hash/trait.Hash.html' title='collections::hash::Hash'>Hash</a>&lt;S&gt;, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/collections/hash/trait.Hash.html' title='collections::hash::Hash'>Hash</a>&lt;S&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.hash' class='method'><a class='stability Experimental' title='Experimental'></a><code>fn <a href='#method.hash' class='fnname'>hash</a>(&amp;self, state: &amp;mut S)</code></h4>

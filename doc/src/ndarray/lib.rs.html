@@ -9,7 +9,7 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
     
@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -1149,6 +1144,7 @@ tweak rustdoc css
 <span id='1090'>1090</span>
 <span id='1091'>1091</span>
 <span id='1092'>1092</span>
+<span id='1093'>1093</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>default_type_params</span>)]</span> <span class='comment'>/* Hash&lt;S&gt; */</span>
@@ -1183,6 +1179,7 @@ tweak rustdoc css
 <span class='kw'>mod</span> <span class='ident'>dimension</span>;
 <span class='kw'>mod</span> <span class='ident'>indexes</span>;
 <span class='kw'>mod</span> <span class='ident'>iterators</span>;
+<span class='kw'>mod</span> <span class='ident'>macros</span>;
 
 <span class='comment'>// NOTE: In theory, the whole library should compile</span>
 <span class='comment'>// and pass tests even if you change Ix and Ixs.</span>
@@ -1864,7 +1861,7 @@ tweak rustdoc css
 <span class='doccomment'>/// let a = arr2(&amp;[&amp;[1, 2, 3],</span>
 <span class='doccomment'>///                &amp;[4, 5, 6i]]);</span>
 <span class='doccomment'>/// assert!(</span>
-<span class='doccomment'>///     a.shape() == &amp;[2, 3]</span>
+<span class='doccomment'>///     a.shape() == [2, 3]</span>
 <span class='doccomment'>/// );</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>arr2</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span>(<span class='ident'>xs</span>: <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span>[<span class='ident'>A</span>]]) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>)<span class='op'>&gt;</span>
@@ -2282,13 +2279,13 @@ tweak rustdoc css
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "ndarray";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script async src="../../search-index.js"></script>
 </body>
 </html>

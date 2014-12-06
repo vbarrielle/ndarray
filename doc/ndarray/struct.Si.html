@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -43,7 +38,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct current' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct current' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.d1.html'>d1</a><a class='fn ' href='fn.d2.html'>d2</a><a class='fn ' href='fn.d3.html'>d3</a><a class='fn ' href='fn.d4.html'>d4</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div><div class='block macro'><h2>Macros</h2><a class='macro ' href='macro.matrix!.html'>matrix!</a></div>
     </section>
 
     <nav class="sub">
@@ -61,7 +56,7 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Si</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-5857' href='../src/ndarray/src/dimension.rs.html#444'>[src]</a></span></h1>
+        </span><a id='src-5857' href='../src/ndarray/dimension.rs.html#448'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Si(pub <a class='type' href='../ndarray/type.Ixs.html' title='ndarray::Ixs'>Ixs</a>, pub <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../ndarray/type.Ixs.html' title='ndarray::Ixs'>Ixs</a>&gt;, pub <a class='type' href='../ndarray/type.Ixs.html' title='ndarray::Ixs'>Ixs</a>);</pre><div class='docblock'><p>A slice, a description of a range of an array axis.</p>
 
 <p>Fields are <code>begin</code>, <code>end</code> and <code>stride</code>, where

@@ -9,7 +9,7 @@
 
     <title>dimension.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
     
@@ -17,16 +17,11 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.method {
-    padding-left: 1em;
-}
 .collapse-toggle {
     display: none;
 }
 
-.stability {
-    display: none;
-}
+.stability.Unmarked { visibility: hidden }
 </style>
 
 
@@ -505,6 +500,10 @@ tweak rustdoc css
 <span id='446'>446</span>
 <span id='447'>447</span>
 <span id='448'>448</span>
+<span id='449'>449</span>
+<span id='450'>450</span>
+<span id='451'>451</span>
+<span id='452'>452</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>SignedInt</span>;
@@ -870,18 +869,22 @@ pub fn stride_as_int(stride: Ix) -&gt; int
 <span class='doccomment'>/// Construct one-dimensional array shape. Helper function to use where</span>
 <span class='doccomment'>/// integer literal inference isn&#39;t working.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='attribute'>#[<span class='ident'>deprecated</span><span class='op'>=</span><span class='string'>&quot;No longer needed, inference is good enough.&quot;</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>d1</span>(<span class='ident'>a</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> <span class='ident'>Ix</span> { <span class='ident'>a</span> }
 <span class='doccomment'>/// Construct two-dimensional array shape. Helper function to use where</span>
 <span class='doccomment'>/// integer literal inference isn&#39;t working.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='attribute'>#[<span class='ident'>deprecated</span><span class='op'>=</span><span class='string'>&quot;No longer needed, inference is good enough.&quot;</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>d2</span>(<span class='ident'>a</span>: <span class='ident'>Ix</span>, <span class='ident'>b</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { (<span class='ident'>a</span>, <span class='ident'>b</span>) }
 <span class='doccomment'>/// Construct three-dimensional array shape. Helper function to use where</span>
 <span class='doccomment'>/// integer literal inference isn&#39;t working.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='attribute'>#[<span class='ident'>deprecated</span><span class='op'>=</span><span class='string'>&quot;No longer needed, inference is good enough.&quot;</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>d3</span>(<span class='ident'>a</span>: <span class='ident'>Ix</span>, <span class='ident'>b</span>: <span class='ident'>Ix</span>, <span class='ident'>c</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { (<span class='ident'>a</span>, <span class='ident'>b</span>, <span class='ident'>c</span>) }
 <span class='doccomment'>/// Construct four-dimensional array shape. Helper function to use where</span>
 <span class='doccomment'>/// integer literal inference isn&#39;t working.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='attribute'>#[<span class='ident'>deprecated</span><span class='op'>=</span><span class='string'>&quot;No longer needed, inference is good enough.&quot;</span>]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>d4</span>(<span class='ident'>a</span>: <span class='ident'>Ix</span>, <span class='ident'>b</span>: <span class='ident'>Ix</span>, <span class='ident'>c</span>: <span class='ident'>Ix</span>, <span class='ident'>d</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { (<span class='ident'>a</span>, <span class='ident'>b</span>, <span class='ident'>c</span>, <span class='ident'>d</span>) }
 
 <span class='doccomment'>/// Helper trait to define a larger-than relation for array shapes:</span>
@@ -994,13 +997,13 @@ pub fn stride_as_int(stride: Ix) -&gt; int
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../";
         window.currentCrate = "ndarray";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script async src="../../search-index.js"></script>
 </body>
 </html>
