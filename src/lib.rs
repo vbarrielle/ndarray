@@ -761,7 +761,7 @@ impl<A: Clone + Add<A, A>,
     }
 }
 
-impl<A: Clone + linalg::Field,
+impl<A: Copy + linalg::Field,
      D: RemoveAxis<E>, E: Dimension>
     Array<A, D>
 {
@@ -773,7 +773,7 @@ impl<A: Clone + linalg::Field,
         let n = self.shape()[axis];
         let mut sum = self.sum(axis);
         let one = libnum::one::<A>();
-        let mut cnt = one.clone();
+        let mut cnt = one;
         for _ in range(1, n) {
             cnt = cnt + one;
         }
@@ -784,14 +784,6 @@ impl<A: Clone + linalg::Field,
     }
 }
 
-macro_rules! simple_assert(
-    ($e: expr) => (
-        if !($e) {
-            panic!(concat!("assertion failed: ", stringify!($e)))
-        }
-    );
-)
-
 impl<A> Array<A, (Ix, Ix)>
 {
     /// Return an iterator over the elements of row `index`.
@@ -801,7 +793,7 @@ impl<A> Array<A, (Ix, Ix)>
     {
         let (m, n) = self.dim;
         let (sr, sc) = self.strides;
-        simple_assert!(index < m);
+        assert!(index < m);
         unsafe {
             Elements { inner:
                 Baseiter::new(self.ptr.offset(stride_offset(index, sr)), n, sc)
@@ -816,7 +808,7 @@ impl<A> Array<A, (Ix, Ix)>
     {
         let (m, n) = self.dim;
         let (sr, sc) = self.strides;
-        simple_assert!(index < n);
+        assert!(index < n);
         unsafe {
             Elements { inner:
                 Baseiter::new(self.ptr.offset(stride_offset(index, sc)), m, sr)
@@ -938,8 +930,7 @@ impl<A: Float + PartialOrd, D: Dimension> Array<A, D>
 
 macro_rules! impl_binary_op(
     ($trt:ident, $mth:ident, $imethod:ident, $imth_scalar:ident) => (
-impl<A: Clone + $trt<A, A>, D: Dimension>
-Array<A, D>
+impl<A, D> Array<A, D> where A: Clone + $trt<A, A>, D: Dimension
 {
     /// Perform an elementwise arithmetic operation between `self` and `other`,
     /// *in place*.
@@ -952,12 +943,12 @@ Array<A, D>
         if self.dim.ndim() == other.dim.ndim() &&
             self.shape() == other.shape() {
             for (x, y) in self.iter_mut().zip(other.iter()) {
-                *x = (*x). $mth (y);
+                *x = (x.clone()). $mth (y.clone());
             }
         } else {
             let other_iter = other.broadcast_iter_unwrap(self.dim());
             for (x, y) in self.iter_mut().zip(other_iter) {
-                *x = (*x). $mth (y);
+                *x = (x.clone()). $mth (y.clone());
             }
         }
     }
@@ -967,13 +958,13 @@ Array<A, D>
     pub fn $imth_scalar (&mut self, x: &A)
     {
         for elt in self.iter_mut() {
-            *elt = elt. $mth (x);
+            *elt = elt.clone(). $mth (x.clone());
         }
     }
 }
 
-impl<A: $trt<A, A>, D: Dimension, E: Dimension>
-$trt<Array<A, E>, Array<A, D>> for Array<A, D>
+impl<'a, A, D, E> $trt<Array<A, E>, Array<A, D>> for Array<A, D>
+where A: Clone + $trt<A, A>, D: Dimension, E: Dimension
 {
     /// Perform an elementwise arithmetic operation between `self` and `other`,
     /// and return the result.
@@ -981,18 +972,44 @@ $trt<Array<A, E>, Array<A, D>> for Array<A, D>
     /// If their shapes disagree, `other` is broadcast to the shape of `self`.
     ///
     /// **Panics** if broadcasting isn't possible.
-    fn $mth (&self, other: &Array<A, E>) -> Array<A, D>
+    fn $mth (mut self, other: Array<A, E>) -> Array<A, D>
+    {
+        // FIXME: Can we co-broadcast arrays here? And how?
+        if self.shape() == other.shape() {
+            for (x, y) in self.iter_mut().zip(other.iter()) {
+                *x = x.clone(). $mth (y.clone());
+            }
+        } else {
+            let other_iter = other.broadcast_iter_unwrap(self.dim());
+            for (x, y) in self.iter_mut().zip(other_iter) {
+                *x = x.clone(). $mth (y.clone());
+            }
+        }
+        self
+    }
+}
+
+impl<'a, A: Clone + $trt<A, A>, D: Dimension, E: Dimension>
+$trt<&'a Array<A, E>, Array<A, D>> for &'a Array<A, D>
+{
+    /// Perform an elementwise arithmetic operation between `self` and `other`,
+    /// and return the result.
+    ///
+    /// If their shapes disagree, `other` is broadcast to the shape of `self`.
+    ///
+    /// **Panics** if broadcasting isn't possible.
+    fn $mth (self, other: &'a Array<A, E>) -> Array<A, D>
     {
         // FIXME: Can we co-broadcast arrays here? And how?
         let mut result = Vec::<A>::with_capacity(self.dim.size());
         if self.shape() == other.shape() {
             for (x, y) in self.iter().zip(other.iter()) {
-                result.push((*x). $mth (y));
+                result.push((x.clone()). $mth (y.clone()));
             }
         } else {
             let other_iter = other.broadcast_iter_unwrap(self.dim());
             for (x, y) in self.iter().zip(other_iter) {
-                result.push((*x). $mth (y));
+                result.push((x.clone()). $mth (y.clone()));
             }
         }
         unsafe {
@@ -1001,18 +1018,18 @@ $trt<Array<A, E>, Array<A, D>> for Array<A, D>
     }
 }
     );
-)
+);
 
-impl_binary_op!(Add, add, iadd, iadd_scalar)
-impl_binary_op!(Sub, sub, isub, isub_scalar)
-impl_binary_op!(Mul, mul, imul, imul_scalar)
-impl_binary_op!(Div, div, idiv, idiv_scalar)
-impl_binary_op!(Rem, rem, irem, irem_scalar)
-impl_binary_op!(BitAnd, bitand, ibitand, ibitand_scalar)
-impl_binary_op!(BitOr, bitor, ibitor, ibitor_scalar)
-impl_binary_op!(BitXor, bitxor, ibitxor, ibitxor_scalar)
-impl_binary_op!(Shl, shl, ishl, ishl_scalar)
-impl_binary_op!(Shr, shr, ishr, ishr_scalar)
+impl_binary_op!(Add, add, iadd, iadd_scalar);
+impl_binary_op!(Sub, sub, isub, isub_scalar);
+impl_binary_op!(Mul, mul, imul, imul_scalar);
+impl_binary_op!(Div, div, idiv, idiv_scalar);
+impl_binary_op!(Rem, rem, irem, irem_scalar);
+impl_binary_op!(BitAnd, bitand, ibitand, ibitand_scalar);
+impl_binary_op!(BitOr, bitor, ibitor, ibitor_scalar);
+impl_binary_op!(BitXor, bitxor, ibitxor, ibitxor_scalar);
+impl_binary_op!(Shl, shl, ishl, ishl_scalar);
+impl_binary_op!(Shr, shr, ishr, ishr_scalar);
 
 impl<A: Clone + Neg<A>, D: Dimension>
 Array<A, D>
