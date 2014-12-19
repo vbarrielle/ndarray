@@ -245,11 +245,11 @@ tweak rustdoc css
         <span class='ident'>s</span>.<span class='ident'>emit_struct</span>(<span class='string'>&quot;Array&quot;</span>, <span class='number'>0</span>, <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>emit_struct_field</span>(<span class='string'>&quot;v&quot;</span>, <span class='number'>0</span>, <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
                 <span class='ident'>ARRAY_FORMAT_VERSION</span>.<span class='ident'>encode</span>(<span class='ident'>e</span>)
-            }))
+            }));
             <span class='comment'>// FIXME: Write self.dim as a slice (self.shape)</span>
             <span class='comment'>// The problem is decoding it.</span>
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>emit_struct_field</span>(<span class='string'>&quot;dim&quot;</span>, <span class='number'>1</span>,
-                                           <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>encode</span>(<span class='ident'>e</span>)))
+                                           <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>encode</span>(<span class='ident'>e</span>)));
             <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>emit_struct_field</span>(<span class='string'>&quot;data&quot;</span>, <span class='number'>2</span>, <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
                 <span class='kw'>let</span> <span class='ident'>sz</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>size</span>();
                 <span class='ident'>e</span>.<span class='ident'>emit_seq</span>(<span class='ident'>sz</span>, <span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> {
@@ -260,7 +260,7 @@ tweak rustdoc css
                     }
                     <span class='prelude-val'>Ok</span>(())
                 })
-            }))
+            }));
             <span class='prelude-val'>Ok</span>(())
         })
     }
@@ -287,7 +287,7 @@ tweak rustdoc css
                         } <span class='kw'>else</span> {
                             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>elements</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
                             <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>len</span>) {
-                                <span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>d</span>.<span class='ident'>read_seq_elt</span>::<span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>(<span class='ident'>i</span>, <span class='ident'>Decodable</span>::<span class='ident'>decode</span>)))
+                                <span class='ident'>elements</span>.<span class='ident'>push</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>d</span>.<span class='ident'>read_seq_elt</span>::<span class='op'>&lt;</span><span class='ident'>A</span>, _<span class='op'>&gt;</span>(<span class='ident'>i</span>, <span class='ident'>Decodable</span>::<span class='ident'>decode</span>)))
                             }
                             <span class='prelude-val'>Ok</span>(<span class='ident'>elements</span>)
                         }
