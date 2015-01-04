@@ -3,9 +3,11 @@
 //! A few linear algebra operations on two-dimensional arrays.
 
 use libnum::{Num, zero, one, Zero, One};
+use std::iter;
 use std::num::Float;
 #[cfg(not(nocomplex))]
 use libnum::Complex;
+use std::ops::{Add, Sub, Mul, Div};
 
 use super::{Array, Ix};
 
@@ -15,13 +17,13 @@ pub type Col<A> = Array<A, Ix>;
 pub type Mat<A> = Array<A, (Ix, Ix)>;
 
 /// Trait union for a ring with 1.
-pub trait Ring : Clone + Zero + Add<Self, Self> + Sub<Self, Self>
-    + One + Mul<Self, Self> { }
-impl<A: Clone + Zero + Add<A, A> + Sub<A, A> + One + Mul<A, A>> Ring for A { }
+pub trait Ring : Clone + Zero + Add<Output=Self> + Sub<Output=Self>
+    + One + Mul<Output=Self> { }
+impl<A: Clone + Zero + Add<Output=A> + Sub<Output=A> + One + Mul<Output=A>> Ring for A { }
 
 /// Trait union for a field.
-pub trait Field : Ring + Div<Self, Self> { }
-impl<A: Ring + Div<A, A>> Field for A { }
+pub trait Field : Ring + Div<Output=Self> { }
+impl<A: Ring + Div<Output=A>> Field for A { }
 
 /// A real or complex number.
 pub trait ComplexField : Copy + Field
@@ -202,7 +204,7 @@ pub fn subst_fw<A: Copy + Field>(l: &Mat<A>, b: &Col<A>) -> Col<A>
     let (m, n) = l.dim();
     assert!(m == n);
     assert!(m == b.dim());
-    let mut x = Vec::from_elem(m as uint, zero::<A>());
+    let mut x: Vec<_> = iter::repeat(zero::<A>()).take(m as uint).collect();
     for (i, bi) in b.indexed_iter() {
         // b_lx_sum = b[i] - Sum(for j = 0 .. i) L_ij x_j
         let mut b_lx_sum = bi.clone();
@@ -220,7 +222,7 @@ pub fn subst_bw<A: Copy + Field>(u: &Mat<A>, b: &Col<A>) -> Col<A>
     let (m, n) = u.dim();
     assert!(m == n);
     assert!(m == b.dim());
-    let mut x = Vec::from_elem(m as uint, zero::<A>());
+    let mut x: Vec<_> = iter::repeat(zero::<A>()).take(m as uint).collect();
     for i in range(0, m).rev() {
         // b_ux_sum = b[i] - Sum(for j = i .. m) U_ij x_j
         let mut b_ux_sum = b[i].clone();

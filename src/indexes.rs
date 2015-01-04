@@ -3,7 +3,7 @@ use super::{Dimension, Ix};
 /// An iterator of the indexes of an array shape.
 ///
 /// Iterator element type is `D`.
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct Indexes<D> {
     dim: D,
     index: Option<D>,
@@ -62,8 +62,9 @@ impl Indexes<()>
 }
 
 
-impl<D: Dimension> Iterator<D> for Indexes<D>
+impl<D: Dimension> Iterator for Indexes<D>
 {
+    type Item = D;
     #[inline]
     fn next(&mut self) -> Option<D>
     {
