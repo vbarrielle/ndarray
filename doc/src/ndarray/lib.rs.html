@@ -1162,7 +1162,18 @@ tweak rustdoc css
 <span id='1108'>1108</span>
 <span id='1109'>1109</span>
 <span id='1110'>1110</span>
+<span id='1111'>1111</span>
+<span id='1112'>1112</span>
+<span id='1113'>1113</span>
+<span id='1114'>1114</span>
+<span id='1115'>1115</span>
+<span id='1116'>1116</span>
+<span id='1117'>1117</span>
+<span id='1118'>1118</span>
+<span id='1119'>1119</span>
 </pre><pre class='rust '>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>associated_types</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>old_orphan_check</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>default_type_params</span>)]</span> <span class='comment'>/* Hash&lt;S&gt; */</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>slicing_syntax</span>)]</span>
@@ -1180,6 +1191,11 @@ tweak rustdoc css
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>kinds</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>Float</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Add</span>, <span class='ident'>Sub</span>, <span class='ident'>Mul</span>, <span class='ident'>Div</span>, <span class='ident'>Rem</span>, <span class='ident'>Neg</span>, <span class='ident'>Not</span>, <span class='ident'>Shr</span>, <span class='ident'>Shl</span>,
+    <span class='ident'>BitAnd</span>,
+    <span class='ident'>BitOr</span>,
+    <span class='ident'>BitXor</span>,
+};
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>dimension</span>::{<span class='ident'>Dimension</span>, <span class='ident'>RemoveAxis</span>, <span class='ident'>Si</span>, <span class='ident'>S</span>};
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>dimension</span>::{<span class='ident'>d1</span>, <span class='ident'>d2</span>, <span class='ident'>d3</span>, <span class='ident'>d4</span>};
@@ -1299,7 +1315,7 @@ tweak rustdoc css
 {
     <span class='doccomment'>/// Construct an Array with copies of `elem`.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_elem</span>(<span class='ident'>dim</span>: <span class='ident'>D</span>, <span class='ident'>elem</span>: <span class='ident'>A</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>from_elem</span>(<span class='ident'>dim</span>.<span class='ident'>size</span>(), <span class='ident'>elem</span>);
+        <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>(<span class='ident'>elem</span>).<span class='ident'>take</span>(<span class='ident'>dim</span>.<span class='ident'>size</span>()).<span class='ident'>collect</span>();
         <span class='kw'>unsafe</span> {
             <span class='ident'>Array</span>::<span class='ident'>from_vec_dim</span>(<span class='ident'>dim</span>, <span class='ident'>v</span>)
         }
@@ -1316,7 +1332,7 @@ tweak rustdoc css
     }
 
     <span class='doccomment'>/// Create a one-dimensional array from an iterator.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_iter</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>Item</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;&gt;</span>(<span class='ident'>it</span>: <span class='ident'>I</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> {
         <span class='ident'>Array</span>::<span class='ident'>from_vec</span>(<span class='ident'>it</span>.<span class='ident'>collect</span>())
     }
 }
@@ -1895,7 +1911,7 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span>,
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>,
      <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
     <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
@@ -2095,7 +2111,7 @@ tweak rustdoc css
 
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>impl_binary_op</span>(
     (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>mth</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>imethod</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>imth_scalar</span>:<span class='ident'>ident</span>) <span class='op'>=&gt;</span> (
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>
 {
     <span class='doccomment'>/// Perform an elementwise arithmetic operation between `self` and `other`,</span>
     <span class='doccomment'>/// *in place*.</span>
@@ -2128,9 +2144,10 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>, <span class='ident'>E</span><span class='op'>&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>, <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
-<span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>, <span class='ident'>E</span><span class='op'>&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span>
 {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>;
     <span class='doccomment'>/// Perform an elementwise arithmetic operation between `self` and `other`,</span>
     <span class='doccomment'>/// and return the result.</span>
     <span class='doccomment'>///</span>
@@ -2154,9 +2171,10 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;</span>, <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span>, <span class='ident'>E</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>trt</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>;
     <span class='doccomment'>/// Perform an elementwise arithmetic operation between `self` and `other`,</span>
     <span class='doccomment'>/// and return the result.</span>
     <span class='doccomment'>///</span>
@@ -2196,51 +2214,51 @@ tweak rustdoc css
 <span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>Shl</span>, <span class='ident'>shl</span>, <span class='ident'>ishl</span>, <span class='ident'>ishl_scalar</span>);
 <span class='macro'>impl_binary_op</span><span class='macro'>!</span>(<span class='ident'>Shr</span>, <span class='ident'>shr</span>, <span class='ident'>ishr</span>, <span class='ident'>ishr_scalar</span>);
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
 <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
     <span class='doccomment'>/// Perform an elementwise negation of `self`, *in place*.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ineg</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>)
     {
         <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>() {
-            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>elt</span>).<span class='ident'>neg</span>()
+            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>elt</span>.<span class='ident'>clone</span>().<span class='ident'>neg</span>()
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-<span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>Neg</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Self</span>;
     <span class='doccomment'>/// Perform an elementwise negation of `self` and return the result.</span>
-    <span class='kw'>fn</span> <span class='ident'>neg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+    <span class='kw'>fn</span> <span class='ident'>neg</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
     {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
-        <span class='ident'>res</span>.<span class='ident'>ineg</span>();
-        <span class='ident'>res</span>
+        <span class='self'>self</span>.<span class='ident'>ineg</span>();
+        <span class='self'>self</span>
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
 <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
     <span class='doccomment'>/// Perform an elementwise unary not of `self`, *in place*.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>inot</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>)
     {
         <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_mut</span>() {
-            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>elt</span>).<span class='ident'>not</span>()
+            <span class='op'>*</span><span class='ident'>elt</span> <span class='op'>=</span> <span class='ident'>elt</span>.<span class='ident'>clone</span>().<span class='ident'>not</span>()
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-<span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Not</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
+<span class='ident'>Not</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Self</span>;
     <span class='doccomment'>/// Perform an elementwise unary not of `self` and return the result.</span>
-    <span class='kw'>fn</span> <span class='ident'>not</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+    <span class='kw'>fn</span> <span class='ident'>not</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
     {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
-        <span class='ident'>res</span>.<span class='ident'>inot</span>();
-        <span class='ident'>res</span>
+        <span class='self'>self</span>.<span class='ident'>inot</span>();
+        <span class='self'>self</span>
     }
 }
 
