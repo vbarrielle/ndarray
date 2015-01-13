@@ -1,9 +1,9 @@
 use std::fmt;
 use super::{Array, Dimension};
 
-fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
-                                 format: |&mut fmt::Formatter, &A| -> fmt::Result)
-                                -> fmt::Result
+fn format_array<A, D: Dimension, F>(view: &Array<A, D>, f: &mut fmt::Formatter,
+                                    mut format: F) -> fmt::Result where
+    F: FnMut(&mut fmt::Formatter, &A) -> fmt::Result,
 {
     let sz = view.dim.slice().len();
     /* private nowadays
@@ -16,7 +16,7 @@ fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
         None => view.dim.clone(),
         Some(ix) => ix,
     };
-    for _ in range(0, sz) {
+    for _ in (0..sz) {
         try!(write!(f, "["));
     }
     let mut first = true;
@@ -32,17 +32,17 @@ fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
                 // New row.
                 // # of ['s needed
                 let n = sz - i - 1;
-                for _ in range(0, n) {
+                for _ in (0..n) {
                     try!(write!(f, "]"));
                 }
                 try!(write!(f, ","));
-                if f.flags() & (1u << (fmt::rt::FlagAlternate as uint)) == 0 {
+                if f.flags() & (1 << (fmt::rt::FlagAlternate as usize)) == 0 {
                     try!(write!(f, "\n"));
                 }
-                for _ in range(0, sz - n) {
+                for _ in (0..sz - n) {
                     try!(write!(f, " "));
                 }
-                for _ in range(0, n) {
+                for _ in (0..n) {
                     try!(write!(f, "["));
                 }
                 first = true;
@@ -60,7 +60,7 @@ fn format_array<A, D: Dimension>(view: &Array<A, D>, f: &mut fmt::Formatter,
             last_index = index;
         }
     }
-    for _ in range(0, sz) {
+    for _ in (0..sz) {
         try!(write!(f, "]"));
     }
     Ok(())
