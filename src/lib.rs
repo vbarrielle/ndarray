@@ -2,7 +2,7 @@
 #![crate_type="dylib"]
 
 //! The **ndarray** crate provides the [**Array**](./struct.Array.html) type, an
-//! n-dimensional numerical container similar to numpy's ndarray.
+//! n-dimensional container similar to numpy's ndarray.
 //!
 
 #[cfg(not(nocomplex))]
@@ -52,8 +52,9 @@ unsafe fn to_ref_mut<'a, A>(ptr: *mut A) -> &'a mut A {
 ///
 /// A reference counted array with copy-on-write mutability.
 ///
-/// The array is a container of numerical use, supporting
-/// all mathematical operators by applying them elementwise.
+/// The array can be a container of numerical use, supporting
+/// all mathematical operators by applying them elementwise -- but it can
+/// store any kind of value.
 ///
 /// The array is both a view and a shared owner of its data. Some methods,
 /// for example [*slice()*](#method.slice), merely change the view of the data,
@@ -174,6 +175,11 @@ impl<A, D> Array<A, D> where D: Dimension
             strides: dim.default_strides(),
             dim: dim
         }
+    }
+
+    pub fn len(&self) -> usize
+    {
+        self.dim.size()
     }
 
     /// Return the shape of the array.
@@ -497,8 +503,8 @@ impl<A, D> Array<A, D> where D: Dimension
     ///     a.subview(1, 1) == arr1(&[2., 4.])
     /// );
     /// ```
-    pub fn subview<EE>(&self, axis: usize, index: Ix) -> Array<A, EE> where
-        D: RemoveAxis<E=EE>, EE: Dimension
+    pub fn subview(&self, axis: usize, index: Ix) -> Array<A, <D as RemoveAxis>::Smaller> where
+        D: RemoveAxis
     {
         let mut res = self.clone();
         res.isubview(axis, index);
@@ -579,7 +585,6 @@ impl<A, D> Array<A, D> where D: Dimension
         }
         it
     }
-
 
     /// Select the subview **index** along **axis** and return an iterator
     /// of the subview.
@@ -749,9 +754,9 @@ pub fn arr2<A: Clone, V: ArrInit<A>>(xs: &[V]) -> Array<A, (Ix, Ix)>
     }
 }
 
-impl<A: Clone + Add<Output=A>,
-     D: RemoveAxis<E=E2>, E2: Dimension>
-    Array<A, D>
+impl<A, D> Array<A, D> where
+    A: Clone + Add<Output=A>,
+    D: RemoveAxis,
 {
     /// Return sum along **axis**.
     ///
@@ -769,7 +774,7 @@ impl<A: Clone + Add<Output=A>,
     /// ```
     ///
     /// **Panics** if **axis** is out of bounds.
-    pub fn sum(&self, axis: usize) -> Array<A, E2>
+    pub fn sum(&self, axis: usize) -> Array<A, <D as RemoveAxis>::Smaller>
     {
         let n = self.shape()[axis];
         let mut res = self.subview(axis, 0);
@@ -780,14 +785,14 @@ impl<A: Clone + Add<Output=A>,
     }
 }
 
-impl<A: Copy + linalg::Field,
-     D: RemoveAxis<E=E2>, E2: Dimension>
-    Array<A, D>
+impl<A, D> Array<A, D> where
+    A: Copy + linalg::Field,
+    D: RemoveAxis,
 {
     /// Return mean along **axis**.
     ///
     /// **Panics** if **axis** is out of bounds.
-    pub fn mean(&self, axis: usize) -> Array<A, E2>
+    pub fn mean(&self, axis: usize) -> Array<A, <D as RemoveAxis>::Smaller>
     {
         let n = self.shape()[axis];
         let mut sum = self.sum(axis);
@@ -1107,11 +1112,53 @@ pub struct Elements<'a, A, D> {
     inner: Baseiter<'a, A, D>,
 }
 
+impl<'a, A, D> Elements<'a, A, D> where D: Clone
+{
+    /// Return the base dimension of the array being iterated.
+    pub fn dim(&self) -> D
+    {
+        self.inner.dim.clone()
+    }
+
+    /// Return an indexed version of the iterator.
+    ///
+    /// Iterator element type is **(D, &'a A)**.
+    ///
+    /// **Note:** the indices run over the logical dimension of the iterator,
+    /// i.e. a *.slice_iter()* will yield indices relative to the slice, not the
+    /// base array.
+    pub fn indexed(self) -> IndexedElements<'a, A, D>
+    {
+        IndexedElements {
+            inner: self.inner,
+        }
+    }
+}
+
 /// An iterator over the elements of an array.
 ///
 /// Iterator element type is **&'a mut A**.
 pub struct ElementsMut<'a, A, D> {
     inner: Baseiter<'a, A, D>,
+}
+
+impl<'a, A, D> ElementsMut<'a, A, D> where D: Clone
+{
+    /// Return the base dimension of the array being iterated.
+    pub fn dim(&self) -> D
+    {
+        self.inner.dim.clone()
+    }
+
+    /// Return an indexed version of the iterator.
+    ///
+    /// Iterator element type is **(D, &'a mut A)**.
+    pub fn indexed(self) -> IndexedElementsMut<'a, A, D>
+    {
+        IndexedElementsMut{
+            inner: self.inner,
+        }
+    }
 }
 
 /// An iterator over the indexes and elements of an array.
