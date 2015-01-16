@@ -1181,12 +1181,59 @@ tweak rustdoc css
 <span id="1127">1127</span>
 <span id="1128">1128</span>
 <span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_name</span><span class='op'>=</span><span class='string'>&quot;ndarray&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span><span class='op'>=</span><span class='string'>&quot;dylib&quot;</span>]</span>
 
 <span class='doccomment'>//! The **ndarray** crate provides the [**Array**](./struct.Array.html) type, an</span>
-<span class='doccomment'>//! n-dimensional numerical container similar to numpy&#39;s ndarray.</span>
+<span class='doccomment'>//! n-dimensional container similar to numpy&#39;s ndarray.</span>
 <span class='doccomment'>//!</span>
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>nocomplex</span>))]</span>
@@ -1236,8 +1283,9 @@ tweak rustdoc css
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// A reference counted array with copy-on-write mutability.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// The array is a container of numerical use, supporting</span>
-<span class='doccomment'>/// all mathematical operators by applying them elementwise.</span>
+<span class='doccomment'>/// The array can be a container of numerical use, supporting</span>
+<span class='doccomment'>/// all mathematical operators by applying them elementwise -- but it can</span>
+<span class='doccomment'>/// store any kind of value.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// The array is both a view and a shared owner of its data. Some methods,</span>
 <span class='doccomment'>/// for example [*slice()*](#method.slice), merely change the view of the data,</span>
@@ -1358,6 +1406,11 @@ tweak rustdoc css
             <span class='ident'>strides</span>: <span class='ident'>dim</span>.<span class='ident'>default_strides</span>(),
             <span class='ident'>dim</span>: <span class='ident'>dim</span>
         }
+    }
+
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>len</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span>
+    {
+        <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>size</span>()
     }
 
     <span class='doccomment'>/// Return the shape of the array.</span>
@@ -1681,8 +1734,8 @@ tweak rustdoc css
     <span class='doccomment'>///     a.subview(1, 1) == arr1(&amp;[2., 4.])</span>
     <span class='doccomment'>/// );</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>subview</span><span class='op'>&lt;</span><span class='ident'>EE</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>, <span class='ident'>index</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>EE</span><span class='op'>&gt;</span> <span class='kw'>where</span>
-        <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>=</span><span class='ident'>EE</span><span class='op'>&gt;</span>, <span class='ident'>EE</span>: <span class='ident'>Dimension</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>subview</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>, <span class='ident'>index</span>: <span class='ident'>Ix</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='op'>&lt;</span><span class='ident'>D</span> <span class='kw'>as</span> <span class='ident'>RemoveAxis</span><span class='op'>&gt;</span>::<span class='ident'>Smaller</span><span class='op'>&gt;</span> <span class='kw'>where</span>
+        <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span>
     {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
         <span class='ident'>res</span>.<span class='ident'>isubview</span>(<span class='ident'>axis</span>, <span class='ident'>index</span>);
@@ -1763,7 +1816,6 @@ tweak rustdoc css
         }
         <span class='ident'>it</span>
     }
-
 
     <span class='doccomment'>/// Select the subview **index** along **axis** and return an iterator</span>
     <span class='doccomment'>/// of the subview.</span>
@@ -1933,9 +1985,9 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>,
-     <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>=</span><span class='ident'>E2</span><span class='op'>&gt;</span>, <span class='ident'>E2</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-    <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span>
+    <span class='ident'>A</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>A</span><span class='op'>&gt;</span>,
+    <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span>,
 {
     <span class='doccomment'>/// Return sum along **axis**.</span>
     <span class='doccomment'>///</span>
@@ -1953,7 +2005,7 @@ tweak rustdoc css
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// **Panics** if **axis** is out of bounds.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E2</span><span class='op'>&gt;</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='op'>&lt;</span><span class='ident'>D</span> <span class='kw'>as</span> <span class='ident'>RemoveAxis</span><span class='op'>&gt;</span>::<span class='ident'>Smaller</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>subview</span>(<span class='ident'>axis</span>, <span class='number'>0</span>);
@@ -1964,14 +2016,14 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>linalg</span>::<span class='ident'>Field</span>,
-     <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>=</span><span class='ident'>E2</span><span class='op'>&gt;</span>, <span class='ident'>E2</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span>
-    <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span>
+    <span class='ident'>A</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>linalg</span>::<span class='ident'>Field</span>,
+    <span class='ident'>D</span>: <span class='ident'>RemoveAxis</span>,
 {
     <span class='doccomment'>/// Return mean along **axis**.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// **Panics** if **axis** is out of bounds.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mean</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>E2</span><span class='op'>&gt;</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mean</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='op'>&lt;</span><span class='ident'>D</span> <span class='kw'>as</span> <span class='ident'>RemoveAxis</span><span class='op'>&gt;</span>::<span class='ident'>Smaller</span><span class='op'>&gt;</span>
     {
         <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>shape</span>()[<span class='ident'>axis</span>];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>sum</span>(<span class='ident'>axis</span>);
@@ -2291,11 +2343,53 @@ tweak rustdoc css
     <span class='ident'>inner</span>: <span class='ident'>Baseiter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>,
 }
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>Elements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Clone</span>
+{
+    <span class='doccomment'>/// Return the base dimension of the array being iterated.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>D</span>
+    {
+        <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>dim</span>.<span class='ident'>clone</span>()
+    }
+
+    <span class='doccomment'>/// Return an indexed version of the iterator.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Iterator element type is **(D, &amp;&#39;a A)**.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// **Note:** the indices run over the logical dimension of the iterator,</span>
+    <span class='doccomment'>/// i.e. a *.slice_iter()* will yield indices relative to the slice, not the</span>
+    <span class='doccomment'>/// base array.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>indexed</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>IndexedElements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+    {
+        <span class='ident'>IndexedElements</span> {
+            <span class='ident'>inner</span>: <span class='self'>self</span>.<span class='ident'>inner</span>,
+        }
+    }
+}
+
 <span class='doccomment'>/// An iterator over the elements of an array.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Iterator element type is **&amp;&#39;a mut A**.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {
     <span class='ident'>inner</span>: <span class='ident'>Baseiter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>,
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='ident'>ElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Clone</span>
+{
+    <span class='doccomment'>/// Return the base dimension of the array being iterated.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>D</span>
+    {
+        <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>dim</span>.<span class='ident'>clone</span>()
+    }
+
+    <span class='doccomment'>/// Return an indexed version of the iterator.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Iterator element type is **(D, &amp;&#39;a mut A)**.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>indexed</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>IndexedElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+    {
+        <span class='ident'>IndexedElementsMut</span>{
+            <span class='ident'>inner</span>: <span class='self'>self</span>.<span class='ident'>inner</span>,
+        }
+    }
 }
 
 <span class='doccomment'>/// An iterator over the indexes and elements of an array.</span>

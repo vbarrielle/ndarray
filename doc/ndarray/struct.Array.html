@@ -56,15 +56,16 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Array</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-7010' href='../src/ndarray/lib.rs.html#99-110'>[src]</a></span></h1>
+        </span><a id='src-7018' href='../src/ndarray/lib.rs.html#100-111'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Array&lt;A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
 
 <p>A reference counted array with copy-on-write mutability.</p>
 
-<p>The array is a container of numerical use, supporting
-all mathematical operators by applying them elementwise.</p>
+<p>The array can be a container of numerical use, supporting
+all mathematical operators by applying them elementwise -- but it can
+store any kind of value.</p>
 
 <p>The array is both a view and a shared owner of its data. Some methods,
 for example <a href="#method.slice"><em>slice()</em></a>, merely change the view of the data,
@@ -91,7 +92,7 @@ for example <em>slice</em> vs. <em>islice</em> and <em>add</em> vs <em>iadd</em>
 <p>Arrays support limited <em>broadcasting</em>, where arithmetic operations with
 array operands of different sizes can be carried out by repeating the
 elements of the smaller dimension array.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>1.</span>],
@@ -119,7 +120,8 @@ elements of the smaller dimension array.</p>
 <div class='docblock'><p>Create an array from a vector (with no allocation needed).</p>
 
 <p>Unsafe because dimension is unchecked, and must be correct.</p>
-</div><h4 id='method.dim' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.dim' class='fnname'>dim</a>(&amp;self) -&gt; D</code></h4>
+</div><h4 id='method.len' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.len' class='fnname'>len</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<h4 id='method.dim' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.dim' class='fnname'>dim</a>(&amp;self) -&gt; D</code></h4>
 <div class='docblock'><p>Return the shape of the array.</p>
 </div><h4 id='method.shape' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.shape' class='fnname'>shape</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a><a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></h4>
 <div class='docblock'><p>Return the shape of the array as a slice.</p>
@@ -204,7 +206,7 @@ axes that are to be repeated.</p>
 <div class='docblock'><p>Swap axes <strong>ax</strong> and <strong>bx</strong>.</p>
 
 <p><strong>Panics</strong> if the axes are out of bounds.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>]]);
@@ -225,7 +227,7 @@ axes that are to be repeated.</p>
 the results.</p>
 
 <p>Return an array with the same shape as <em>self</em>.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>2.</span>],
@@ -235,12 +237,12 @@ the results.</p>
     <span class='op'>==</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>0</span>, <span class='number'>1</span>], [<span class='number'>1</span>, <span class='number'>2</span>]])
 );
 </pre>
-</div><h4 id='method.subview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.subview' class='fnname'>subview</a>&lt;EE&gt;(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, index: <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, EE&gt; <span class='where'>where D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&lt;E=EE&gt;, EE: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a></span></code></h4>
+</div><h4 id='method.subview' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.subview' class='fnname'>subview</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, index: <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, &lt;D as <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&gt;::Smaller&gt; <span class='where'>where D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a></span></code></h4>
 <div class='docblock'><p>Select the subview <strong>index</strong> along <strong>axis</strong> and return an
 array with that axis removed.</p>
 
 <p><strong>Panics</strong> if <strong>index</strong> is past the length of the axis.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::{<span class='ident'>arr1</span>, <span class='ident'>arr2</span>};
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>2.</span>],
@@ -296,7 +298,7 @@ while it is mutably borrowed.</p>
 with the same number of elements is accepted.</p>
 
 <p><strong>Panics</strong> if sizes are incompatible.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr1</span>;
 
 <span class='ident'>arr1</span>::<span class='op'>&lt;</span><span class='ident'>f32</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>]).<span class='ident'>reshape</span>((<span class='number'>2</span>, <span class='number'>2</span>));
@@ -309,9 +311,9 @@ with the same number of elements is accepted.</p>
 <p><strong>Panics</strong> if broadcasting isn&#39;t possible.</p>
 </div><h4 id='method.assign_scalar' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.assign_scalar' class='fnname'>assign_scalar</a>(&amp;mut self, x: &amp;A) <span class='where'>where A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></h4>
 <div class='docblock'><p>Perform an elementwise assigment to <strong>self</strong> from scalar <strong>x</strong>.</p>
-</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;Output=A&gt;, D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&lt;E=E2&gt;, E2: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.sum' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.sum' class='fnname'>sum</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E2&gt;</code></h4>
+</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, D&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt; <span class='where'>where A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;Output=A&gt;, D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a></span></code></h3><div class='impl-items'><h4 id='method.sum' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.sum' class='fnname'>sum</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, &lt;D as <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&gt;::Smaller&gt;</code></h4>
 <div class='docblock'><p>Return sum along <strong>axis</strong>.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::{<span class='ident'>arr0</span>, <span class='ident'>arr1</span>, <span class='ident'>arr2</span>};
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>2.</span>],
@@ -325,7 +327,7 @@ with the same number of elements is accepted.</p>
 </pre>
 
 <p><strong>Panics</strong> if <strong>axis</strong> is out of bounds.</p>
-</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../ndarray/linalg/trait.Field.html' title='ndarray::linalg::Field'>Field</a>, D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&lt;E=E2&gt;, E2: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.mean' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mean' class='fnname'>mean</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, E2&gt;</code></h4>
+</div></div><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;A, D&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt; <span class='where'>where A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../ndarray/linalg/trait.Field.html' title='ndarray::linalg::Field'>Field</a>, D: <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a></span></code></h3><div class='impl-items'><h4 id='method.mean' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.mean' class='fnname'>mean</a>(&amp;self, axis: <a href='http://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, &lt;D as <a class='trait' href='../ndarray/trait.RemoveAxis.html' title='ndarray::RemoveAxis'>RemoveAxis</a>&gt;::Smaller&gt;</code></h4>
 <div class='docblock'><p>Return mean along <strong>axis</strong>.</p>
 
 <p><strong>Panics</strong> if <strong>axis</strong> is out of bounds.</p>
@@ -346,7 +348,7 @@ if <strong>self</strong> is <em>M</em> × <em>N</em>, then <strong>other</strong
 <p>Return a result array with shape <em>M</em> × <em>K</em>.</p>
 
 <p><strong>Panics</strong> if sizes are incompatible.</p>
-<pre class='rust '>
+<pre id='rust-example-rendered' class='rust '>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1.</span>, <span class='number'>2.</span>],
@@ -479,9 +481,15 @@ Return <strong>false</strong> otherwise, or if the shapes disagree.</p>
 <div class='docblock'><p>Perform an elementwise unary not of <strong>self</strong>, <em>in place</em>.</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><a class='stability Unstable' title='Unstable'></a><code>impl&lt;'a, A, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Index.html' title='core::ops::Index'>Index</a>&lt;D&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='assoc_type.Output' class='type'><a class='stability Unmarked' title='No stability level'></a><code>type Output = A</code></h4>
 <h4 id='method.index' class='method'><a class='stability Unstable' title='Unstable'></a><code>fn <a href='#method.index' class='fnname'>index</a>(&amp;self, index: &amp;D) -&gt; &amp;A</code></h4>
-</div><h3 class='impl'><a class='stability Unstable' title='Unstable'></a><code>impl&lt;'a, A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.IndexMut.html' title='core::ops::IndexMut'>IndexMut</a>&lt;D&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='assoc_type.Output' class='type'><a class='stability Unmarked' title='No stability level'></a><code>type Output = A</code></h4>
+<div class='docblock'><p>Access the element at <strong>index</strong>.</p>
+
+<p><strong>Panics</strong> if index is out of bounds.</p>
+</div></div><h3 class='impl'><a class='stability Unstable' title='Unstable'></a><code>impl&lt;'a, A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.IndexMut.html' title='core::ops::IndexMut'>IndexMut</a>&lt;D&gt; for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='assoc_type.Output' class='type'><a class='stability Unmarked' title='No stability level'></a><code>type Output = A</code></h4>
 <h4 id='method.index_mut' class='method'><a class='stability Unstable' title='Unstable'></a><code>fn <a href='#method.index_mut' class='fnname'>index_mut</a>(&amp;mut self, index: &amp;D) -&gt; &amp;mut A</code></h4>
-</div><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Access the element at <strong>index</strong> mutably.</p>
+
+<p><strong>Panics</strong> if index is out of bounds.</p>
+</div></div><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, D&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Return <code>true</code> if the array shapes and all elements of <code>self</code> and
 <code>other</code> are equal. Return <code>false</code> otherwise.</p>
 </div><h4 id='method.ne' class='tymethod'><a class='stability Stable' title='Stable'></a><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Rhs) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>

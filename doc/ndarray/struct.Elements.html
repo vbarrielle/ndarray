@@ -56,13 +56,23 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>ndarray</a>::<wbr><a class='struct' href=''>Elements</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-14014' href='../src/ndarray/lib.rs.html#1106-1108'>[src]</a></span></h1>
+        </span><a id='src-14030' href='../src/ndarray/lib.rs.html#1111-1113'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Elements&lt;'a, A, D&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>An iterator over the elements of an array.</p>
 
 <p>Iterator element type is <strong>&amp;&#39;a A</strong>.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl&lt;'a, A, D: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;'a, A, D&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt; <span class='where'>where D: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a></span></code></h3><div class='impl-items'><h4 id='method.dim' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.dim' class='fnname'>dim</a>(&amp;self) -&gt; D</code></h4>
+<div class='docblock'><p>Return the base dimension of the array being iterated.</p>
+</div><h4 id='method.indexed' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.indexed' class='fnname'>indexed</a>(self) -&gt; <a class='struct' href='../ndarray/struct.IndexedElements.html' title='ndarray::IndexedElements'>IndexedElements</a>&lt;'a, A, D&gt;</code></h4>
+<div class='docblock'><p>Return an indexed version of the iterator.</p>
+
+<p>Iterator element type is <strong>(D, &amp;&#39;a A)</strong>.</p>
+
+<p><strong>Note:</strong> the indices run over the logical dimension of the iterator,
+i.e. a <em>.slice_iter()</em> will yield indices relative to the slice, not the
+base array.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl&lt;'a, A, D: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h4>
 <h4 id='method.clone_from' class='tymethod'><a class='stability Unstable' title='Unstable: this function is rarely used'></a><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div><h3 class='impl'><a class='stability Stable' title='Stable'></a><code>impl&lt;'a, A, D: <a class='trait' href='../ndarray/trait.Dimension.html' title='ndarray::Dimension'>Dimension</a>&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/iter/trait.Iterator.html' title='core::iter::Iterator'>Iterator</a> for <a class='struct' href='../ndarray/struct.Elements.html' title='ndarray::Elements'>Elements</a>&lt;'a, A, D&gt;</code></h3><div class='impl-items'><h4 id='assoc_type.Item' class='type'><a class='stability Unmarked' title='No stability level'></a><code>type Item = &amp;'a A</code></h4>
 <h4 id='method.next' class='method'><a class='stability Stable' title='Stable'></a><code>fn <a href='#method.next' class='fnname'>next</a>(&amp;mut self) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'a A&gt;</code></h4>
