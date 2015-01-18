@@ -487,6 +487,17 @@ tweak rustdoc css
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>SignedInt</span>;
@@ -893,6 +904,17 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
 <span class='comment'>// 12 is the maximum number for having the Eq trait from libstd</span>
 <span class='macro'>impl_shrink_recursive</span><span class='macro'>!</span>(<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>,);
 
+<span class='kw'>impl</span> <span class='ident'>RemoveAxis</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
+{
+    <span class='kw'>type</span> <span class='ident'>Smaller</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>;
+    <span class='kw'>fn</span> <span class='ident'>remove_axis</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>axis</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
+    {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
+        <span class='ident'>res</span>.<span class='ident'>remove</span>(<span class='ident'>axis</span>);
+        <span class='ident'>res</span>
+    }
+}
+
 <span class='comment'>// [a:b:s] syntax for example [:3], [::-1]</span>
 <span class='comment'>// [0,:] -- first row of matrix</span>
 <span class='comment'>// [:,0] -- first column of matrix</span>
@@ -921,7 +943,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
 <span class='kw'>impl</span> <span class='ident'>Copy</span> <span class='kw'>for</span> <span class='ident'>Si</span> {}
 
 <span class='doccomment'>/// Slice value for the full range of an axis.</span>
-<span class='kw'>pub</span> <span class='kw'>static</span> <span class='ident'>S</span>: <span class='ident'>Si</span> <span class='op'>=</span> <span class='ident'>Si</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>);
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>S</span>: <span class='ident'>Si</span> <span class='op'>=</span> <span class='ident'>Si</span>(<span class='number'>0</span>, <span class='prelude-val'>None</span>, <span class='number'>1</span>);
 
 </pre>
 </section>
