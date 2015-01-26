@@ -17,10 +17,6 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.collapse-toggle {
-    display: none;
-}
-
 .stability.Unmarked { visibility: hidden }
 </style>
 
@@ -498,6 +494,8 @@ tweak rustdoc css
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>SignedInt</span>;
@@ -521,7 +519,9 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
 */</span>
 
 <span class='doccomment'>/// Trait for the shape and index types of arrays.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Dimension</span> : <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Eq</span> {
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// unsafe trait due to how the assumptions in the default impls work.</span>
+<span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>trait</span> <span class='ident'>Dimension</span> : <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Eq</span> {
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span>;
     <span class='kw'>fn</span> <span class='ident'>slice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>Ix</span>] {
         <span class='kw'>unsafe</span> {
@@ -710,7 +710,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
 }
 
 
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> () {
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> () {
     <span class='comment'>// empty product is 1 -&gt; size is 1</span>
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>0</span> }
@@ -718,7 +718,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
     <span class='kw'>fn</span> <span class='ident'>slice_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>Ix</span>] { <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [] }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Ix</span> {
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Ix</span> {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>1</span> }
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -755,7 +755,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>) {
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>) {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>2</span> }
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -805,7 +805,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) {
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) {
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>3</span> }
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
@@ -839,21 +839,21 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>4</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>5</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>6</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>7</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>8</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>9</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>10</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>11</span> } }
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>12</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>4</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>5</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>6</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>7</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>8</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>9</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>10</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>11</span> } }
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> (<span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>, <span class='ident'>Ix</span>) { <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>12</span> } }
 
 <span class='comment'>// Vec&lt;Ix&gt; is a &quot;dynamic&quot; index, pretty hard to use when indexing,</span>
 <span class='comment'>// and memory wasteful, but it allows an arbitrary number of dimensions.</span>
 <span class='comment'>//</span>
 <span class='comment'>// NOTE: No Shrink impl for Vec&lt;Ix&gt; yet.</span>
-<span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
+<span class='kw'>unsafe</span> <span class='kw'>impl</span> <span class='ident'>Dimension</span> <span class='kw'>for</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Ix</span><span class='op'>&gt;</span>
 {
     <span class='kw'>fn</span> <span class='ident'>ndim</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='self'>self</span>.<span class='ident'>len</span>() }
     <span class='kw'>fn</span> <span class='ident'>slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span>[<span class='ident'>Ix</span>] { <span class='kw-2'>&amp;</span><span class='self'>self</span>[] }
@@ -919,7 +919,7 @@ pub fn stride_as_int(stride: Ix) -&gt; isize
 <span class='comment'>// [0,:] -- first row of matrix</span>
 <span class='comment'>// [:,0] -- first column of matrix</span>
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Hash</span>, <span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Hash</span>, <span class='ident'>Debug</span>)]</span>
 <span class='doccomment'>/// A slice, a description of a range of an array axis.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Fields are `begin`, `end` and `stride`, where</span>

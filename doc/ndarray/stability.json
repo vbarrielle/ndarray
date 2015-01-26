@@ -1,1 +1,1 @@
-{"name":"ndarray","counts":{"deprecated":0,"experimental":0,"unstable":8,"stable":31,"frozen":0,"locked":0,"unmarked":147},"submodules":[{"name":"linalg","counts":{"deprecated":0,"experimental":0,"unstable":0,"stable":0,"frozen":0,"locked":0,"unmarked":14},"submodules":[]}]}
+{"name":"ndarray","counts":{"deprecated":0,"experimental":0,"unstable":6,"stable":33,"frozen":0,"locked":0,"unmarked":150},"submodules":[{"name":"linalg","counts":{"deprecated":0,"experimental":0,"unstable":0,"stable":0,"frozen":0,"locked":0,"unmarked":14},"submodules":[]}]}

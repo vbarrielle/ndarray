@@ -17,10 +17,6 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.collapse-toggle {
-    display: none;
-}
-
 .stability.Unmarked { visibility: hidden }
 </style>
 
@@ -38,7 +34,7 @@ tweak rustdoc css
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.ArrInit.html'>ArrInit</a><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
+        <p class='location'><a href='index.html'>ndarray</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='linalg/index.html'>linalg</a></div><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Array.html'>Array</a><a class='struct ' href='struct.Elements.html'>Elements</a><a class='struct ' href='struct.ElementsMut.html'>ElementsMut</a><a class='struct ' href='struct.IndexedElements.html'>IndexedElements</a><a class='struct ' href='struct.IndexedElementsMut.html'>IndexedElementsMut</a><a class='struct ' href='struct.Indexes.html'>Indexes</a><a class='struct ' href='struct.Si.html'>Si</a></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.ArrInit.html'>ArrInit</a><a class='trait ' href='trait.Dimension.html'>Dimension</a><a class='trait ' href='trait.RemoveAxis.html'>RemoveAxis</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.arr0.html'>arr0</a><a class='fn ' href='fn.arr1.html'>arr1</a><a class='fn ' href='fn.arr2.html'>arr2</a><a class='fn ' href='fn.arr3.html'>arr3</a><a class='fn ' href='fn.ixrange.html'>ixrange</a></div>
     </section>
 
     <nav class="sub">
@@ -56,14 +52,19 @@ tweak rustdoc css
 <h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>ndarray</a>::<wbr><a class='trait' href=''>ArrInit</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]
             </a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-8998' href='../src/ndarray/lib.rs.html#724-726'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait ArrInit&lt;T&gt; {
+        </span><a id='src-9007' href='../src/ndarray/lib.rs.html#750-753'>[src]</a></span></h1>
+<pre class='rust trait'>pub unsafe trait ArrInit&lt;T&gt; {
     fn <a href='#tymethod.as_init_slice' class='fnname'>as_init_slice</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a>;
+
+    fn <a href='#method.is_fixed_size' class='fnname'>is_fixed_size</a>() -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a> { ... }
 }</pre><div class='docblock'><p>Slice or fixed-size array used for array initialization</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
         <h3 id='tymethod.as_init_slice' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.as_init_slice' class='fnname'>as_init_slice</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a></code></h3></div>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.is_fixed_size' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#method.is_fixed_size' class='fnname'>is_fixed_size</a>() -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T]</a></code></li>
@@ -77,6 +78,13 @@ tweak rustdoc css
 <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 7]</a></code></li>
 <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 8]</a></code></li>
 <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 9]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 10]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 11]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 12]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 13]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 14]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 15]</a></code></li>
+<li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;T&gt; for <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>[T; 16]</a></code></li>
 </ul><script type="text/javascript" async
                               src="../implementors/ndarray/trait.ArrInit.js">
                       </script></section>

@@ -17,10 +17,6 @@
 tweak rustdoc css
 -->
 <style type="text/css">
-.collapse-toggle {
-    display: none;
-}
-
 .stability.Unmarked { visibility: hidden }
 </style>
 
@@ -227,9 +223,9 @@ tweak rustdoc css
 }
 
 <span class='comment'>// NOTE: We can impl other fmt traits here</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>fmt</span>::<span class='ident'>Show</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='ident'>fmt</span>::<span class='ident'>Debug</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>Array</span><span class='op'>&lt;</span><span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
 {
-    <span class='doccomment'>/// Format the array using `Show` and apply the formatting parameters used</span>
+    <span class='doccomment'>/// Format the array using `Debug` and apply the formatting parameters used</span>
     <span class='doccomment'>/// to each element.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The array is shown in multiline style, unless the alternate form </span>
