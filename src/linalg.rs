@@ -3,7 +3,6 @@
 //! A few linear algebra operations on two-dimensional arrays.
 
 use libnum::{Num, zero, one, Zero, One};
-use std::iter;
 use std::num::Float;
 #[cfg(not(nocomplex))]
 use libnum::Complex;
@@ -32,7 +31,7 @@ pub trait ComplexField : Copy + Field
     fn conjugate(self) -> Self { self }
     fn sqrt_real(self) -> Self;
     #[inline]
-    fn is_complex(_mark: Option<Self>) -> bool { false }
+    fn is_complex() -> bool { false }
 }
 
 impl ComplexField for f32
@@ -54,7 +53,7 @@ impl<A: Num + Float> ComplexField for Complex<A>
     fn conjugate(self) -> Complex<A> { self.conj() }
     fn sqrt_real(self) -> Complex<A> { Complex::new(self.re.sqrt(), zero()) }
     #[inline]
-    fn is_complex(_mark: Option<Complex<A>>) -> bool { true }
+    fn is_complex() -> bool { true }
 }
 
 /// Return the identity matrix of dimension *n*.
@@ -102,7 +101,7 @@ pub fn least_squares<A: ComplexField>(a: &Mat<A>, b: &Col<A>) -> Col<A>
     // 
     let mut aT = a.clone();
     aT.swap_axes(0, 1);
-    if ComplexField::is_complex(None::<A>) {
+    if <A as ComplexField>::is_complex() {
         // conjugate transpose
         for elt in aT.iter_mut() {
             *elt = elt.conjugate();
@@ -117,7 +116,7 @@ pub fn least_squares<A: ComplexField>(a: &Mat<A>, b: &Col<A>) -> Col<A>
     let z = subst_fw(&L, &rhs);
 
     // Solve L.T x = z
-    if ComplexField::is_complex(None::<A>) {
+    if <A as ComplexField>::is_complex() {
         // conjugate transpose
         // only elements below the diagonal have imag part
         let (m, _) = L.dim();
@@ -164,7 +163,7 @@ pub fn cholesky<A: ComplexField>(a: Mat<A>) -> Mat<A>
             // L_2,1 L_1,1  L²_2,1 + L²_2,2
             // L_3,1 L_1,1  L_3,1 L_2,1 + L_3,2 L_2,2  L²_3,1 + L²_3,2 + L²_3,3
             // .. )
-            let mut lik_ljk_sum = z.clone();
+            let mut lik_ljk_sum = z;
             {
                 // L_ik for k = 0 .. j
                 // L_jk for k = 0 .. j
@@ -182,7 +181,7 @@ pub fn cholesky<A: ComplexField>(a: Mat<A>) -> Mat<A>
         // Diagonal where i == j
         // L_jj = Sqrt[ A_jj - Sum(k = 1 .. j) L_jk L_jk ]
         let j = i;
-        let mut ljk_sum = z.clone();
+        let mut ljk_sum = z;
         // L_jk for k = 0 .. j
         for &ljk in L.row_iter(j).take(j as usize) {
             ljk_sum = ljk_sum + ljk * ljk.conjugate();
@@ -192,10 +191,19 @@ pub fn cholesky<A: ComplexField>(a: Mat<A>) -> Mat<A>
         // After the diagonal
         // L_ij = 0 for j > i
         for j in (i + 1..n) {
-            L[(i, j)] = z.clone();
+            L[(i, j)] = z;
         }
     }
     L
+}
+
+fn vec_elem<A: Copy>(elt: A, n: usize) -> Vec<A>
+{
+    let mut v = Vec::with_capacity(n);
+    for _ in (0..n) {
+        v.push(elt);
+    }
+    v
 }
 
 /// Solve *L x = b* where *L* is a lower triangular matrix.
@@ -204,14 +212,14 @@ pub fn subst_fw<A: Copy + Field>(l: &Mat<A>, b: &Col<A>) -> Col<A>
     let (m, n) = l.dim();
     assert!(m == n);
     assert!(m == b.dim());
-    let mut x: Vec<_> = iter::repeat(zero::<A>()).take(m as usize).collect();
+    let mut x = vec_elem(zero::<A>(), m as usize);
     for (i, bi) in b.indexed_iter() {
         // b_lx_sum = b[i] - Sum(for j = 0 .. i) L_ij x_j
-        let mut b_lx_sum = bi.clone();
+        let mut b_lx_sum = *bi;
         for (lij, xj) in l.row_iter(i).zip(x.iter()).take(i as usize) {
             b_lx_sum = b_lx_sum - (*lij) * (*xj)
         }
-        x.as_mut_slice()[i as usize] = b_lx_sum / l[(i, i)];
+        x[i as usize] = b_lx_sum / l[(i, i)];
     }
     Array::from_vec(x)
 }
@@ -222,14 +230,14 @@ pub fn subst_bw<A: Copy + Field>(u: &Mat<A>, b: &Col<A>) -> Col<A>
     let (m, n) = u.dim();
     assert!(m == n);
     assert!(m == b.dim());
-    let mut x: Vec<_> = iter::repeat(zero::<A>()).take(m as usize).collect();
+    let mut x = vec_elem(zero::<A>(), m as usize);
     for i in (0..m).rev() {
         // b_ux_sum = b[i] - Sum(for j = i .. m) U_ij x_j
-        let mut b_ux_sum = b[i].clone();
+        let mut b_ux_sum = b[i];
         for (uij, xj) in u.row_iter(i).rev().zip(x.iter().rev()).take((m - i - 1) as usize) {
             b_ux_sum = b_ux_sum - (*uij) * (*xj);
         }
-        x.as_mut_slice()[i as usize] = b_ux_sum / u[(i, i)];
+        x[i as usize] = b_ux_sum / u[(i, i)];
     }
     Array::from_vec(x)
 }
