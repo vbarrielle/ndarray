@@ -1,6 +1,9 @@
 use std::fmt;
 use super::{Array, Dimension};
 
+/// HACK: fmt::rt::FlagAlternate has been hidden away
+const FlagAlternate: usize = 2;
+
 fn format_array<A, D: Dimension, F>(view: &Array<A, D>, f: &mut fmt::Formatter,
                                     mut format: F) -> fmt::Result where
     F: FnMut(&mut fmt::Formatter, &A) -> fmt::Result,
@@ -36,7 +39,7 @@ fn format_array<A, D: Dimension, F>(view: &Array<A, D>, f: &mut fmt::Formatter,
                     try!(write!(f, "]"));
                 }
                 try!(write!(f, ","));
-                if f.flags() & (1 << (fmt::rt::FlagAlternate as usize)) == 0 {
+                if f.flags() & (1 << FlagAlternate) == 0 {
                     try!(write!(f, "\n"));
                 }
                 for _ in (0..sz - n) {
@@ -67,6 +70,18 @@ fn format_array<A, D: Dimension, F>(view: &Array<A, D>, f: &mut fmt::Formatter,
 }
 
 // NOTE: We can impl other fmt traits here
+impl<'a, A: fmt::Display, D: Dimension> fmt::Display for Array<A, D>
+{
+    /// Format the array using `Display` and apply the formatting parameters used
+    /// to each element.
+    ///
+    /// The array is shown in multiline style, unless the alternate form 
+    /// is used -- i.e. `{:#}`.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        format_array(self, f, |f, elt| elt.fmt(f))
+    }
+}
+
 impl<'a, A: fmt::Debug, D: Dimension> fmt::Debug for Array<A, D>
 {
     /// Format the array using `Debug` and apply the formatting parameters used

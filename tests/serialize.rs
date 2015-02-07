@@ -11,10 +11,9 @@ fn serial_many_dim()
 {
     {
         let a = arr0::<f32>(2.72);
-        println!("{:?}", a);
         let serial = json::encode(&a).unwrap();
-        println!("{:?}", serial);
-        let res = json::decode::<Array<f32, _>>(&serial[]);
+        println!("Encode {:?} => {:?}", a, serial);
+        let res = json::decode::<Array<f32, _>>(&serial);
         println!("{:?}", res);
         assert_eq!(a, res.unwrap());
     }
@@ -24,7 +23,7 @@ fn serial_many_dim()
         println!("{:?}", a);
         let serial = json::encode(&a).unwrap();
         println!("{:?}", serial);
-        let res = json::decode::<Array<f32, _>>(&serial[]);
+        let res = json::decode::<Array<f32, _>>(&serial);
         println!("{:?}", res);
         assert_eq!(a, res.unwrap());
     }
@@ -34,7 +33,7 @@ fn serial_many_dim()
         println!("{:?}", a);
         let serial = json::encode(&a).unwrap();
         println!("{:?}", serial);
-        let res = json::decode::<Array<f32, _>>(&serial[]);
+        let res = json::decode::<Array<f32, _>>(&serial);
         println!("{:?}", res);
         assert_eq!(a, res.unwrap());
         let text = r##"{"v":1,"dim":[2,3],"data":[3,1,2.2,3.1,4,7]}"##;
@@ -50,7 +49,7 @@ fn serial_many_dim()
         println!("{:?}", a);
         let serial = json::encode(&a).unwrap();
         println!("{:?}", serial);
-        let res = json::decode::<Array<f32, _>>(&serial[]);
+        let res = json::decode::<Array<f32, _>>(&serial);
         println!("{:?}", res);
         assert_eq!(a, res.unwrap());
     }

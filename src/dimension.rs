@@ -53,7 +53,7 @@ pub unsafe trait Dimension : Clone + Eq {
         {
             let mut it = strides.slice_mut().iter_mut().rev();
             // Set first element to 1
-            for rs in it {
+            for rs in it.by_ref() {
                 *rs = 1;
                 break;
             }
@@ -357,8 +357,8 @@ unsafe impl Dimension for (Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix, Ix) { fn 
 unsafe impl Dimension for Vec<Ix>
 {
     fn ndim(&self) -> usize { self.len() }
-    fn slice(&self) -> &[Ix] { &self[] }
-    fn slice_mut(&mut self) -> &mut [Ix] { self.as_mut_slice() }
+    fn slice(&self) -> &[Ix] { self }
+    fn slice_mut(&mut self) -> &mut [Ix] { self }
 }
 
 /// Helper trait to define a larger-than relation for array shapes:
@@ -382,7 +382,7 @@ impl RemoveAxis for ($from $(,$more)*)
                 if i == axis {
                     continue;
                 }
-                for rr in it {
+                for rr in it.by_ref() {
                     *rr = d;
                     break
                 }

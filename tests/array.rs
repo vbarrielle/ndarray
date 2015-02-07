@@ -243,11 +243,11 @@ fn dyn_dimension()
     let a = arr2(&[[1., 2.], [3., 4.0]]).reshape(vec![2, 2]);
     assert_eq!(&a - &a, Array::zeros(vec![2, 2]));
 
-    let mut dim = [1; 1024].to_vec();
-    dim.as_mut_slice()[16] = 4;
-    dim.as_mut_slice()[17] = 3;
+    let mut dim = vec![1; 1024];
+    dim[16] = 4;
+    dim[17] = 3;
     let z = Array::<f32, _>::zeros(dim.clone());
-    assert_eq!(z.shape(), &dim[]);
+    assert_eq!(z.shape(), dim);
 }
 
 #[test]
@@ -336,14 +336,4 @@ fn map1()
     // test map to reference with array's lifetime.
     let c = a.map(|x| x);
     assert_eq!(a[(0, 0)], *c[(0, 0)]);
-}
-
-#[test]
-fn rand()
-{
-    let mut rng = rand::weak_rng();
-    let a = Array::<f32, _>::random((3, 3), &mut rng);
-    assert_eq!(a.shape(), [3, 3]);
-    let b = Array::<char, _>::random((1, 2, 3), &mut rng);
-    assert_eq!(b.shape(), [1, 2, 3]);
 }

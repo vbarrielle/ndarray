@@ -1,3 +1,8 @@
+#![feature(
+    core,
+    hash,
+    alloc,
+    )]
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
 
@@ -16,7 +21,6 @@ use std::ops::{Add, Sub, Mul, Div, Rem, Neg, Not, Shr, Shl,
     BitOr,
     BitXor,
 };
-use std::rand::{Rand, Rng};
 
 pub use dimension::{Dimension, RemoveAxis, Si, S};
 use dimension::stride_offset;
@@ -197,15 +201,6 @@ impl<A, D> Array<A, D> where D: Dimension
         }
     }
 
-    /// Construct an Array with random elements
-    pub fn random<R: Rng>(dim: D, rng: &mut R) -> Array<A, D> where A: Rand
-    {
-        unsafe {
-            let sz = dim.size();
-            Array::from_vec_dim(dim, rng.gen_iter().take(sz).collect())
-        }
-    }
-
     /// Return the total number of elements in the Array.
     pub fn len(&self) -> usize
     {
@@ -240,7 +235,7 @@ impl<A, D> Array<A, D> where D: Dimension
     /// Array's view.
     pub fn raw_data<'a>(&'a self) -> &'a [A]
     {
-        &(*self.data)[]
+        &self.data
     }
 
     /// Return a sliced array.
@@ -663,7 +658,7 @@ impl<A, D> Array<A, D> where D: Dimension
     /// while it is mutably borrowed.
     pub fn raw_data_mut<'a>(&'a mut self) -> &'a mut [A] where A: Clone
     {
-        self.data.make_unique().as_mut_slice()
+        self.data.make_unique()
     }
 
 
@@ -763,7 +758,7 @@ unsafe impl<T> ArrInit<T> for [T]
 macro_rules! impl_arr_init {
     (__impl $n: expr) => (
         unsafe impl<T> ArrInit<T> for [T;  $n] {
-            fn as_init_slice(&self) -> &[T] { &self[] }
+            fn as_init_slice(&self) -> &[T] { self }
             fn is_fixed_size() -> bool { true }
         }
     );
