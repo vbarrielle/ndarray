@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["ixrange","Like `range`, except with array indexes."]],"struct":[["Indexes","An iterator of the indexes of an array shape."]]});

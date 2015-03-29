@@ -299,13 +299,13 @@ tweak rustdoc css
 <span class='doccomment'>/// Base for array iterators</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Iterator element type is `&amp;&#39;a A`.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Baseiter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Baseiter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>: <span class='lifetime'>&#39;a</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {
     <span class='comment'>// Can have pub fields because it is not itself pub.</span>
     <span class='kw'>pub</span> <span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>A</span>,
     <span class='kw'>pub</span> <span class='ident'>dim</span>: <span class='ident'>D</span>,
     <span class='kw'>pub</span> <span class='ident'>strides</span>: <span class='ident'>D</span>,
     <span class='kw'>pub</span> <span class='ident'>index</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>D</span><span class='op'>&gt;</span>,
-    <span class='kw'>pub</span> <span class='ident'>life</span>: <span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='ident'>life</span>: <span class='ident'>marker</span>::<span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>A</span><span class='op'>&gt;</span>,
 }
 
 
@@ -327,7 +327,7 @@ tweak rustdoc css
             <span class='ident'>index</span>: <span class='ident'>len</span>.<span class='ident'>first_index</span>(),
             <span class='ident'>dim</span>: <span class='ident'>len</span>,
             <span class='ident'>strides</span>: <span class='ident'>stride</span>,
-            <span class='ident'>life</span>: <span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span>,
+            <span class='ident'>life</span>: <span class='ident'>marker</span>::<span class='ident'>PhantomData</span>,
         }
     }
 }
@@ -416,7 +416,7 @@ tweak rustdoc css
             <span class='ident'>dim</span>: <span class='self'>self</span>.<span class='ident'>dim</span>.<span class='ident'>clone</span>(),
             <span class='ident'>strides</span>: <span class='self'>self</span>.<span class='ident'>strides</span>.<span class='ident'>clone</span>(),
             <span class='ident'>index</span>: <span class='self'>self</span>.<span class='ident'>index</span>.<span class='ident'>clone</span>(),
-            <span class='ident'>life</span>: <span class='self'>self</span>.<span class='ident'>life</span>
+            <span class='ident'>life</span>: <span class='self'>self</span>.<span class='ident'>life</span>,
         }
     }
 }

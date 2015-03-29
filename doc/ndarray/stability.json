@@ -1,1 +1,1 @@
-{"name":"ndarray","counts":{"unstable":2,"stable":38,"unmarked":149},"submodules":[{"name":"linalg","counts":{"unstable":0,"stable":0,"unmarked":14},"submodules":[]}]}
+{"name":"ndarray","counts":{"deprecated":0,"unstable":0,"stable":40,"unmarked":149},"submodules":[{"name":"linalg","counts":{"deprecated":0,"unstable":0,"stable":0,"unmarked":14},"submodules":[]}]}
