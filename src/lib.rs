@@ -1,7 +1,7 @@
 #![feature(
     core,
-    hash,
     alloc,
+    step_by,
     )]
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
@@ -11,8 +11,8 @@
 //!
 
 #[cfg(not(nocomplex))]
-extern crate "num" as libnum;
-extern crate "rustc-serialize" as serialize;
+extern crate num as libnum;
+extern crate rustc_serialize as serialize;
 
 use std::mem;
 use std::num::Float;
@@ -150,7 +150,7 @@ impl Array<f32, Ix>
     /// Create a one-dimensional Array from interval **[begin, end)**
     pub fn range(begin: f32, end: f32) -> Array<f32, Ix>
     {
-        Array::from_iter(std::iter::count(begin, 1.0).take_while(|&x| x < end))
+        Array::from_iter((begin..).step_by(1.).take_while(|&x| x < end))
     }
 }
 
@@ -1056,7 +1056,9 @@ impl<A: Float + PartialOrd, D: Dimension> Array<A, D>
 
 macro_rules! impl_binary_op(
     ($trt:ident, $mth:ident, $imethod:ident, $imth_scalar:ident) => (
-impl<A, D> Array<A, D> where A: Clone + $trt<A, Output=A>, D: Dimension
+impl<A, D> Array<A, D> where
+    A: Clone + $trt<A, Output=A>,
+    D: Dimension,
 {
     /// Perform an elementwise arithmetic operation between **self** and **other**,
     /// *in place*.
@@ -1089,8 +1091,10 @@ impl<A, D> Array<A, D> where A: Clone + $trt<A, Output=A>, D: Dimension
     }
 }
 
-impl<'a, A, D, E> $trt<Array<A, E>> for Array<A, D>
-where A: Clone + $trt<A, Output=A>, D: Dimension, E: Dimension
+impl<'a, A, D, E> $trt<Array<A, E>> for Array<A, D> where
+    A: Clone + $trt<A, Output=A>,
+    D: Dimension,
+    E: Dimension,
 {
     type Output = Array<A, D>;
     /// Perform an elementwise arithmetic operation between **self** and **other**,
@@ -1116,8 +1120,10 @@ where A: Clone + $trt<A, Output=A>, D: Dimension, E: Dimension
     }
 }
 
-impl<'a, A: Clone + $trt<A, Output=A>, D: Dimension, E: Dimension>
-$trt<&'a Array<A, E>> for &'a Array<A, D>
+impl<'a, A, D, E> $trt<&'a Array<A, E>> for &'a Array<A, D> where
+    A: Clone + $trt<A, Output=A>,
+    D: Dimension,
+    E: Dimension,
 {
     type Output = Array<A, D>;
     /// Perform an elementwise arithmetic operation between **self** and **other**,
@@ -1210,7 +1216,7 @@ Not for Array<A, D>
 /// An iterator over the elements of an array.
 ///
 /// Iterator element type is **&'a A**.
-pub struct Elements<'a, A, D> {
+pub struct Elements<'a, A: 'a, D> {
     inner: Baseiter<'a, A, D>,
 }
 
@@ -1240,7 +1246,7 @@ impl<'a, A, D> Elements<'a, A, D> where D: Clone
 /// An iterator over the elements of an array.
 ///
 /// Iterator element type is **&'a mut A**.
-pub struct ElementsMut<'a, A, D> {
+pub struct ElementsMut<'a, A: 'a, D> {
     inner: Baseiter<'a, A, D>,
 }
 
@@ -1266,13 +1272,13 @@ impl<'a, A, D> ElementsMut<'a, A, D> where D: Clone
 /// An iterator over the indexes and elements of an array.
 ///
 /// Iterator element type is **(D, &'a A)**.
-pub struct IndexedElements<'a, A, D> {
+pub struct IndexedElements<'a, A: 'a, D> {
     inner: Baseiter<'a, A, D>,
 }
 
 /// An iterator over the indexes and elements of an array.
 ///
 /// Iterator element type is **(D, &'a mut A)**.
-pub struct IndexedElementsMut<'a, A, D> {
+pub struct IndexedElementsMut<'a, A: 'a, D> {
     inner: Baseiter<'a, A, D>,
 }

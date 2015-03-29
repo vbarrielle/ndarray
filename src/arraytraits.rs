@@ -2,6 +2,7 @@ use serialize::{Encodable, Encoder, Decodable, Decoder};
 
 use std::hash;
 use std::iter::FromIterator;
+use std::iter::IntoIterator;
 use std::ops::{
     Index,
     IndexMut,
@@ -16,20 +17,19 @@ impl<'a, A, D: Dimension> Index<D> for Array<A, D>
     /// Access the element at **index**.
     ///
     /// **Panics** if index is out of bounds.
-    fn index(&self, index: &D) -> &A {
-        self.at(index.clone()).expect("Array::index: out of bounds")
+    fn index(&self, index: D) -> &A {
+        self.at(index).expect("Array::index: out of bounds")
     }
 }
 
 impl<'a, A: Clone, D: Dimension> IndexMut<D> for Array<A, D>
 {
-    type Output = A;
     #[inline]
     /// Access the element at **index** mutably.
     ///
     /// **Panics** if index is out of bounds.
-    fn index_mut(&mut self, index: &D) -> &mut A {
-        self.at_mut(index.clone()).expect("Array::index_mut: out of bounds")
+    fn index_mut(&mut self, index: D) -> &mut A {
+        self.at_mut(index).expect("Array::index_mut: out of bounds")
     }
 }
 
@@ -51,16 +51,16 @@ Eq for Array<A, D> {}
 
 impl<A> FromIterator<A> for Array<A, Ix>
 {
-    fn from_iter<I: Iterator<Item=A>>(it: I) -> Array<A, Ix>
+    fn from_iter<I: IntoIterator<Item=A>>(it: I) -> Array<A, Ix>
     {
-        Array::from_iter(it)
+        Array::from_iter(it.into_iter())
     }
 }
 
-impl<S: hash::Writer + hash::Hasher, A: hash::Hash<S>, D: Dimension>
-hash::Hash<S> for Array<A, D>
+impl<A: hash::Hash, D: Dimension>
+hash::Hash for Array<A, D>
 {
-    fn hash(&self, state: &mut S)
+    fn hash<S: hash::Hasher>(&self, state: &mut S)
     {
         self.shape().hash(state);
         for elt in self.iter() {
