@@ -5,6 +5,7 @@ extern crate ndarray;
 use ndarray::{Array, S, Si};
 use ndarray::{arr0, arr1, arr2};
 use ndarray::Indexes;
+use ndarray::SliceRange;
 
 #[test]
 fn test_matmul_rcarray()
@@ -39,7 +40,7 @@ fn test_slice()
         *elt = i;
     }
 
-    let vi = A.slice(&[Si(1, None, 1), Si(0, None, 2)]);
+    let vi = A.slice(&[(1..).slice(), (0..).step(2)]);
     assert_eq!(vi.dim(), (2, 2));
     let vi = A.slice(&[S, S]);
     assert_eq!(vi.shape(), A.shape());
@@ -54,13 +55,13 @@ fn test_index()
         *elt = i;
     }
 
-    for ((i, j), a) in Indexes::new2(2, 3).zip(A.iter()) {
+    for ((i, j), a) in Indexes::new((2, 3)).zip(A.iter()) {
         assert_eq!(*a, A[(i, j)]);
     }
 
     let vi = A.slice(&[Si(1, None, 1), Si(0, None, 2)]);
     let mut it = vi.iter();
-    for ((i, j), x) in Indexes::new2(1, 2).zip(it.by_ref()) {
+    for ((i, j), x) in Indexes::new((1, 2)).zip(it.by_ref()) {
         assert_eq!(*x, vi[(i, j)]);
     }
     assert!(it.next().is_none());
@@ -245,7 +246,7 @@ fn dyn_dimension()
     dim[16] = 4;
     dim[17] = 3;
     let z = Array::<f32, _>::zeros(dim.clone());
-    assert_eq!(z.shape(), dim);
+    assert_eq!(z.shape(), &dim[..]);
 }
 
 #[test]

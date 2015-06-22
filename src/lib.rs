@@ -1,7 +1,5 @@
 #![feature(
-    core,
-    alloc,
-    step_by,
+    rc_unique,
     )]
 #![crate_name="ndarray"]
 #![crate_type="dylib"]
@@ -10,32 +8,41 @@
 //! n-dimensional container similar to numpy's ndarray.
 //!
 
-#[cfg(not(nocomplex))]
-extern crate num as libnum;
+#[cfg(feature = "serde")]
+extern crate serde;
+#[cfg(feature = "rustc-serialize")]
 extern crate rustc_serialize as serialize;
 
+extern crate itertools as it;
+#[cfg(not(nocomplex))]
+extern crate num as libnum;
+
 use std::mem;
-use std::num::Float;
+use std::rc::Rc;
+use libnum::Float;
 use std::ops::{Add, Sub, Mul, Div, Rem, Neg, Not, Shr, Shl,
     BitAnd,
     BitOr,
     BitXor,
 };
 
-pub use dimension::{Dimension, RemoveAxis, Si, S};
+pub use dimension::{Dimension, RemoveAxis};
+pub use si::{Si, S, SliceRange};
 use dimension::stride_offset;
 
 pub use indexes::Indexes;
-pub use indexes::ixrange;
 
 use iterators::Baseiter;
 
 pub mod linalg;
 mod arraytraits;
+#[cfg(feature = "serde")]
+mod arrayserialize;
 mod arrayformat;
 mod dimension;
 mod indexes;
 mod iterators;
+mod si;
 //mod macros;
 
 // NOTE: In theory, the whole library should compile
@@ -108,7 +115,7 @@ unsafe fn to_ref_mut<'a, A>(ptr: *mut A) -> &'a mut A {
 pub struct Array<A, D> {
     // FIXME: Unsafecell around vec needed?
     /// Rc data when used as view, Uniquely held data when being mutated
-    data: std::rc::Rc<Vec<A>>,
+    data: Rc<Vec<A>>,
     /// A pointer into the buffer held by data, may point anywhere
     /// in its range.
     ptr: *mut A,
@@ -150,7 +157,11 @@ impl Array<f32, Ix>
     /// Create a one-dimensional Array from interval **[begin, end)**
     pub fn range(begin: f32, end: f32) -> Array<f32, Ix>
     {
-        Array::from_iter((begin..).step_by(1.).take_while(|&x| x < end))
+        let n = (end - begin) as usize;
+        let span = if n > 0 { (n - 1) as f32 } else { 0. };
+        Array::from_iter(it::linspace(begin,
+                                      begin + span,
+                                      n))
     }
 }
 
@@ -301,7 +312,7 @@ impl<A, D> Array<A, D> where D: Dimension
     /// **Note:** The array must be uniquely held when mutating it.
     #[inline]
     pub unsafe fn uchk_at_mut<'a>(&'a mut self, index: D) -> &'a mut A {
-        debug_assert!(std::rc::is_unique(&self.data));
+        debug_assert!(Rc::is_unique(&self.data));
         debug_assert!(self.dim.stride_offset_checked(&self.strides, &index).is_some());
         let off = Dimension::stride_offset(&index, &self.strides);
         to_ref_mut(self.ptr.offset(off))
@@ -327,9 +338,9 @@ impl<A, D> Array<A, D> where D: Dimension
     /// Return an iterator of references to the elements of the array.
     ///
     /// Iterator element type is **(D, &'a A)**.
-    pub fn indexed_iter<'a>(&'a self) -> IndexedElements<'a, A, D>
+    pub fn indexed_iter<'a>(&'a self) -> Indexed<Elements<'a, A, D>>
     {
-        IndexedElements { inner: self.base_iter() }
+        self.iter().indexed()
     }
 
     /// Collapse dimension **axis** into length one,
@@ -559,7 +570,7 @@ impl<A, D> Array<A, D> where D: Dimension
     /// This method is mostly only useful with unsafe code.
     pub fn ensure_unique(&mut self) where A: Clone
     {
-        if std::rc::is_unique(&self.data) {
+        if Rc::is_unique(&self.data) {
             return
         }
         if self.dim.size() <= self.data.len() / 2 {
@@ -571,7 +582,7 @@ impl<A, D> Array<A, D> where D: Dimension
         }
         let our_off = (self.ptr as isize - self.data.as_ptr() as isize)
             / mem::size_of::<A>() as isize;
-        let rvec = self.data.make_unique();
+        let rvec = Rc::make_unique(&mut self.data);
         unsafe {
             self.ptr = rvec.as_mut_ptr().offset(our_off);
         }
@@ -600,10 +611,9 @@ impl<A, D> Array<A, D> where D: Dimension
     /// Return an iterator of indexes and mutable references to the elements of the array.
     ///
     /// Iterator element type is **(D, &'a mut A)**.
-    pub fn indexed_iter_mut<'a>(&'a mut self) -> IndexedElementsMut<'a, A, D> where A: Clone
+    pub fn indexed_iter_mut<'a>(&'a mut self) -> Indexed<ElementsMut<'a, A, D>> where A: Clone
     {
-        self.ensure_unique();
-        IndexedElementsMut { inner: self.base_iter() }
+        self.iter_mut().indexed()
     }
 
     /// Return an iterator of mutable references into the sliced view
@@ -1235,10 +1245,10 @@ impl<'a, A, D> Elements<'a, A, D> where D: Clone
     /// **Note:** the indices run over the logical dimension of the iterator,
     /// i.e. a *.slice_iter()* will yield indices relative to the slice, not the
     /// base array.
-    pub fn indexed(self) -> IndexedElements<'a, A, D>
+    pub fn indexed(self) -> Indexed<Elements<'a, A, D>>
     {
-        IndexedElements {
-            inner: self.inner,
+        Indexed {
+            inner: self,
         }
     }
 }
@@ -1261,24 +1271,17 @@ impl<'a, A, D> ElementsMut<'a, A, D> where D: Clone
     /// Return an indexed version of the iterator.
     ///
     /// Iterator element type is **(D, &'a mut A)**.
-    pub fn indexed(self) -> IndexedElementsMut<'a, A, D>
+    pub fn indexed(self) -> Indexed<ElementsMut<'a, A, D>>
     {
-        IndexedElementsMut{
-            inner: self.inner,
+        Indexed {
+            inner: self,
         }
     }
 }
 
 /// An iterator over the indexes and elements of an array.
-///
-/// Iterator element type is **(D, &'a A)**.
-pub struct IndexedElements<'a, A: 'a, D> {
-    inner: Baseiter<'a, A, D>,
+#[derive(Clone)]
+pub struct Indexed<I> {
+    inner: I,
 }
 
-/// An iterator over the indexes and elements of an array.
-///
-/// Iterator element type is **(D, &'a mut A)**.
-pub struct IndexedElementsMut<'a, A: 'a, D> {
-    inner: Baseiter<'a, A, D>,
-}

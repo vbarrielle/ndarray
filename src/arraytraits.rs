@@ -1,3 +1,4 @@
+#[cfg(feature = "rustc-serialize")]
 use serialize::{Encodable, Encoder, Decodable, Decoder};
 
 use std::hash;
@@ -8,7 +9,7 @@ use std::ops::{
     IndexMut,
 };
 
-use super::{Array, Dimension, Ix};
+use super::{Array, Dimension, Ix, Elements, ElementsMut};
 
 impl<'a, A, D: Dimension> Index<D> for Array<A, D>
 {
@@ -57,6 +58,31 @@ impl<A> FromIterator<A> for Array<A, Ix>
     }
 }
 
+impl<'a, A, D> IntoIterator for &'a Array<A, D> where
+    D: Dimension,
+{
+    type Item = &'a A;
+    type IntoIter = Elements<'a, A, D>;
+
+    fn into_iter(self) -> Self::IntoIter
+    {
+        self.iter()
+    }
+}
+
+impl<'a, A, D> IntoIterator for &'a mut Array<A, D> where
+    A: Clone,
+    D: Dimension,
+{
+    type Item = &'a mut A;
+    type IntoIter = ElementsMut<'a, A, D>;
+
+    fn into_iter(self) -> Self::IntoIter
+    {
+        self.iter_mut()
+    }
+}
+
 impl<A: hash::Hash, D: Dimension>
 hash::Hash for Array<A, D>
 {
@@ -69,9 +95,11 @@ hash::Hash for Array<A, D>
     }
 }
 
+#[cfg(feature = "rustc-serialize")]
 // Use version number so we can add a packed format later.
 static ARRAY_FORMAT_VERSION: u8 = 1u8;
 
+#[cfg(feature = "rustc-serialize")]
 impl<A: Encodable, D: Dimension + Encodable> Encodable for Array<A, D>
 {
     fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error>
@@ -100,6 +128,7 @@ impl<A: Encodable, D: Dimension + Encodable> Encodable for Array<A, D>
     }
 }
 
+#[cfg(feature = "rustc-serialize")]
 impl<A: Decodable, D: Dimension + Decodable>
     Decodable for Array<A, D>
 {
