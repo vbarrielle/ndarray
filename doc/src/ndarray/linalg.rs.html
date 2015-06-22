@@ -13,14 +13,6 @@
 
     
     
-<!--
-tweak rustdoc css
--->
-<style type="text/css">
-.stability.Unmarked { visibility: hidden }
-</style>
-
-
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -290,15 +282,13 @@ tweak rustdoc css
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-<span id="243">243</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>non_snake_case</span>)]</span>
 
 <span class='doccomment'>//! A few linear algebra operations on two-dimensional arrays.</span>
 
 <span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>Num</span>, <span class='ident'>zero</span>, <span class='ident'>one</span>, <span class='ident'>Zero</span>, <span class='ident'>One</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>Float</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>nocomplex</span>))]</span>
+<span class='kw'>use</span> <span class='ident'>libnum</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>libnum</span>::<span class='ident'>Complex</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Add</span>, <span class='ident'>Sub</span>, <span class='ident'>Mul</span>, <span class='ident'>Div</span>};
 
@@ -568,6 +558,10 @@ pub fn inverse&lt;A: Primitive&gt;(a: &amp;Mat&lt;A&gt;) -&gt; Mat&lt;A&gt;
                 <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
             </p>
         </div>
     </div>

@@ -7,20 +7,12 @@
     <meta name="description" content="API documentation for the Rust `arr2` fn in crate `ndarray`.">
     <meta name="keywords" content="rust, rustlang, rust-lang, arr2">
 
-    <title>ndarray::arr2 - Rust</title>
+    <title>ndarray 0.0.1 - ndarray::arr2 - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
     
-<!--
-tweak rustdoc css
--->
-<style type="text/css">
-.stability.Unmarked { visibility: hidden }
-</style>
-
-
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -49,13 +41,15 @@ tweak rustdoc css
     </nav>
 
     <section id='main' class="content fn">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>ndarray</a>::<wbr><a class='fn' href=''>arr2</a><wbr></span><span class='out-of-band'><span id='render-detail'>
-            <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-9619' href='../src/ndarray/lib.rs.html#788-803'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn arr2&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, V: <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;A&gt;&gt;(xs: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[V]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</pre><div class='docblock'><p>Return a two-dimensional array with elements from <strong>xs</strong>.</p>
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>ndarray</a>::<wbr><a class='fn' href=''>arr2</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-9249' class='srclink' href='../src/ndarray/lib.rs.html#798-813' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn arr2&lt;A: <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>, V: <a class='trait' href='../ndarray/trait.ArrInit.html' title='ndarray::ArrInit'>ArrInit</a>&lt;A&gt;&gt;(xs: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>V<a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='../ndarray/struct.Array.html' title='ndarray::Array'>Array</a>&lt;A, <a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>, <a class='type' href='../ndarray/type.Ix.html' title='ndarray::Ix'>Ix</a>)</a>&gt;</pre><div class='docblock'><p>Return a two-dimensional array with elements from <strong>xs</strong>.</p>
 
 <p><strong>Panics</strong> if the slices are not all of the same length.</p>
-<pre id='rust-example-rendered' class='rust '>
+<pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>ndarray</span>::<span class='ident'>arr2</span>;
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>arr2</span>(<span class='kw-2'>&amp;</span>[[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>],
@@ -96,6 +90,10 @@ tweak rustdoc css
                 <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
             </p>
         </div>
     </div>

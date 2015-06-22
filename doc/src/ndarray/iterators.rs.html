@@ -13,14 +13,6 @@
 
     
     
-<!--
-tweak rustdoc css
--->
-<style type="text/css">
-.stability.Unmarked { visibility: hidden }
-</style>
-
-
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -282,19 +274,12 @@ tweak rustdoc css
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>;
 
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Dimension</span>, <span class='ident'>Ix</span>};
 <span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>to_ref</span>, <span class='ident'>to_ref_mut</span>};
-<span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Elements</span>, <span class='ident'>ElementsMut</span>, <span class='ident'>IndexedElements</span>, <span class='ident'>IndexedElementsMut</span>};
+<span class='kw'>use</span> <span class='ident'>super</span>::{<span class='ident'>Elements</span>, <span class='ident'>ElementsMut</span>, <span class='ident'>Indexed</span>};
 
 <span class='doccomment'>/// Base for array iterators</span>
 <span class='doccomment'>///</span>
@@ -453,24 +438,17 @@ tweak rustdoc css
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>ExactSizeIterator</span> <span class='kw'>for</span> <span class='ident'>Elements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>Ix</span><span class='op'>&gt;</span> { }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>IndexedElements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
-{
-    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>IndexedElements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span> {
-        <span class='ident'>IndexedElements</span>{<span class='ident'>inner</span>: <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>clone</span>()}
-    }
-}
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>IndexedElements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>Indexed</span><span class='op'>&lt;</span><span class='ident'>Elements</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span>
 {
     <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> (<span class='ident'>D</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>A</span>);
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>D</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>A</span>)<span class='op'>&gt;</span>
     {
-        <span class='kw'>let</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>index</span> {
+        <span class='kw'>let</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>index</span> {
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
             <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>ix</span>) <span class='op'>=&gt;</span> <span class='ident'>ix</span>.<span class='ident'>clone</span>()
         };
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>next_ref</span>() {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>next_ref</span>() {
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
             <span class='prelude-val'>Some</span>(<span class='ident'>p</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>((<span class='ident'>index</span>, <span class='ident'>p</span>))
         }
@@ -478,7 +456,7 @@ tweak rustdoc css
 
     <span class='kw'>fn</span> <span class='ident'>size_hint</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>)
     {
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>size_hint</span>();
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>size_hint</span>();
         (<span class='ident'>len</span>, <span class='prelude-val'>Some</span>(<span class='ident'>len</span>))
     }
 }
@@ -508,17 +486,17 @@ tweak rustdoc css
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>IndexedElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span>: <span class='ident'>Dimension</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>Indexed</span><span class='op'>&lt;</span><span class='ident'>ElementsMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>A</span>, <span class='ident'>D</span><span class='op'>&gt;&gt;</span>
 {
     <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> (<span class='ident'>D</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>);
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>D</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>A</span>)<span class='op'>&gt;</span>
     {
-        <span class='kw'>let</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>index</span> {
+        <span class='kw'>let</span> <span class='ident'>index</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>index</span> {
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
             <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>ix</span>) <span class='op'>=&gt;</span> <span class='ident'>ix</span>.<span class='ident'>clone</span>()
         };
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>next_ref_mut</span>() {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>next_ref_mut</span>() {
             <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
             <span class='prelude-val'>Some</span>(<span class='ident'>p</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>((<span class='ident'>index</span>, <span class='ident'>p</span>))
         }
@@ -526,7 +504,7 @@ tweak rustdoc css
 
     <span class='kw'>fn</span> <span class='ident'>size_hint</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>)
     {
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>size_hint</span>();
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>inner</span>.<span class='ident'>size_hint</span>();
         (<span class='ident'>len</span>, <span class='prelude-val'>Some</span>(<span class='ident'>len</span>))
     }
 }
@@ -564,6 +542,10 @@ tweak rustdoc css
                 <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
             </p>
         </div>
     </div>

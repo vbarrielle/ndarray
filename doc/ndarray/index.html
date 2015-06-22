@@ -7,20 +7,12 @@
     <meta name="description" content="API documentation for the Rust `ndarray` crate.">
     <meta name="keywords" content="rust, rustlang, rust-lang, ndarray">
 
-    <title>ndarray - Rust</title>
+    <title>ndarray 0.0.1 - ndarray - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
     
-<!--
-tweak rustdoc css
--->
-<style type="text/css">
-.stability.Unmarked { visibility: hidden }
-</style>
-
-
 </head>
 <body class="rustdoc">
     <!--[if lte IE 8]>
@@ -49,150 +41,180 @@ tweak rustdoc css
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>ndarray</a><wbr></span><span class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
-            <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-0' href='../src/ndarray/lib.rs.html#1-1284'>[src]</a></span></h1>
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>ndarray</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/ndarray/lib.rs.html#1-1286' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>The <strong>ndarray</strong> crate provides the <a href="./struct.Array.html"><strong>Array</strong></a> type, an
 n-dimensional container similar to numpy&#39;s ndarray.</p>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='mod' href='linalg/index.html'
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='linalg/index.html'
                                title='ndarray::linalg'>linalg</a></td>
-                        <td class='docblock short'><p>A few linear algebra operations on two-dimensional arrays.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>A few linear algebra operations on two-dimensional arrays.</p>
+
+                        </td>
                     </tr>
                 </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Array.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Array.html'
                                title='ndarray::Array'>Array</a></td>
-                        <td class='docblock short'><p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>The <strong>Array</strong> type is an <em>N-dimensional array</em>.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Elements.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Elements.html'
                                title='ndarray::Elements'>Elements</a></td>
-                        <td class='docblock short'><p>An iterator over the elements of an array.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>An iterator over the elements of an array.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.ElementsMut.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ElementsMut.html'
                                title='ndarray::ElementsMut'>ElementsMut</a></td>
-                        <td class='docblock short'><p>An iterator over the elements of an array.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>An iterator over the elements of an array.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.IndexedElements.html'
-                               title='ndarray::IndexedElements'>IndexedElements</a></td>
-                        <td class='docblock short'><p>An iterator over the indexes and elements of an array.</p>
-</td>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Indexed.html'
+                               title='ndarray::Indexed'>Indexed</a></td>
+                        <td class='docblock short'>
+                             <p>An iterator over the indexes and elements of an array.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.IndexedElementsMut.html'
-                               title='ndarray::IndexedElementsMut'>IndexedElementsMut</a></td>
-                        <td class='docblock short'><p>An iterator over the indexes and elements of an array.</p>
-</td>
-                    </tr>
-                
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Indexes.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Indexes.html'
                                title='ndarray::Indexes'>Indexes</a></td>
-                        <td class='docblock short'><p>An iterator of the indexes of an array shape.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>An iterator of the indexes of an array shape.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Si.html'
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Si.html'
                                title='ndarray::Si'>Si</a></td>
-                        <td class='docblock short'><p>A slice, a description of a range of an array axis.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>A slice, a description of a range of an array axis.</p>
+
+                        </td>
                     </tr>
                 </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='constant' href='constant.S.html'
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.S.html'
                                title='ndarray::S'>S</a></td>
-                        <td class='docblock short'><p>Slice value for the full range of an axis.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Slice value for the full range of an axis.</p>
+
+                        </td>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.ArrInit.html'
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.ArrInit.html'
                                title='ndarray::ArrInit'>ArrInit</a></td>
-                        <td class='docblock short'><p>Slice or fixed-size array used for array initialization</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Slice or fixed-size array used for array initialization</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.Dimension.html'
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.Dimension.html'
                                title='ndarray::Dimension'>Dimension</a></td>
-                        <td class='docblock short'><p>Trait for the shape and index types of arrays.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Trait for the shape and index types of arrays.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='trait' href='trait.RemoveAxis.html'
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.RemoveAxis.html'
                                title='ndarray::RemoveAxis'>RemoveAxis</a></td>
-                        <td class='docblock short'><p>Helper trait to define a larger-than relation for array shapes:
+                        <td class='docblock short'>
+                             <p>Helper trait to define a larger-than relation for array shapes:
 removing one axis from <em>Self</em> gives smaller dimension <em>Smaller</em>.</p>
-</td>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.SliceRange.html'
+                               title='ndarray::SliceRange'>SliceRange</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
                     </tr>
                 </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.arr0.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.arr0.html'
                                title='ndarray::arr0'>arr0</a></td>
-                        <td class='docblock short'><p>Return a zero-dimensional array with the element <strong>x</strong>.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Return a zero-dimensional array with the element <strong>x</strong>.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.arr1.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.arr1.html'
                                title='ndarray::arr1'>arr1</a></td>
-                        <td class='docblock short'><p>Return a one-dimensional array with elements from <strong>xs</strong>.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Return a one-dimensional array with elements from <strong>xs</strong>.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.arr2.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.arr2.html'
                                title='ndarray::arr2'>arr2</a></td>
-                        <td class='docblock short'><p>Return a two-dimensional array with elements from <strong>xs</strong>.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Return a two-dimensional array with elements from <strong>xs</strong>.</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.arr3.html'
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.arr3.html'
                                title='ndarray::arr3'>arr3</a></td>
-                        <td class='docblock short'><p>Return a three-dimensional array with elements from <strong>xs</strong>.</p>
-</td>
-                    </tr>
-                
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.ixrange.html'
-                               title='ndarray::ixrange'>ixrange</a></td>
-                        <td class='docblock short'><p>Like <code>range</code>, except with array indexes.</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Return a three-dimensional array with elements from <strong>xs</strong>.</p>
+
+                        </td>
                     </tr>
                 </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='type' href='type.Ix.html'
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.Ix.html'
                                title='ndarray::Ix'>Ix</a></td>
-                        <td class='docblock short'><p>Array index type</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Array index type</p>
+
+                        </td>
                     </tr>
                 
-                    <tr>
-                        <td><a class='stability Unmarked' title='No stability level'></a><a class='type' href='type.Ixs.html'
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.Ixs.html'
                                title='ndarray::Ixs'>Ixs</a></td>
-                        <td class='docblock short'><p>Array index type (signed)</p>
-</td>
+                        <td class='docblock short'>
+                             <p>Array index type (signed)</p>
+
+                        </td>
                     </tr>
                 </table></section>
     <section id='search' class="content hidden"></section>
@@ -226,6 +248,10 @@ removing one axis from <em>Self</em> gives smaller dimension <em>Smaller</em>.</
                 <code>struct</code>, <code>enum</code>,
                 <code>trait</code>, <code>typedef</code> (or
                 <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
             </p>
         </div>
     </div>
