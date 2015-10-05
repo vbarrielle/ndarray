@@ -17,6 +17,8 @@ extern crate num as libnum;
 use std::ops::{Deref, DerefMut};
 use std::mem;
 use libnum::Float;
+use std::rc::Rc;
+use std::sync::Arc;
 use std::ops::{Add, Sub, Mul, Div, Rem, Neg, Not, Shr, Shl,
     BitAnd,
     BitOr,
@@ -101,7 +103,7 @@ pub type Ixs = isize;
 /// );
 /// ```
 ///
-pub struct Array<A, S, D> where S: Deref<Target=[A]> {
+pub struct Array<A, S, D> {
     // FIXME: Unsafecell around vec needed?
     /// Rc data when used as view, Uniquely held data when being mutated
     data: S,
@@ -115,6 +117,8 @@ pub struct Array<A, S, D> where S: Deref<Target=[A]> {
 }
 
 pub type ArrayOwned<A, D> = Array<A, Vec<A>, D>;
+pub type ArrayRc<A, D> = Array<A, Rc<Box<[A]>>, D>;
+pub type ArrayArc<A, D> = Array<A, Arc<Box<[A]>>, D>;
 pub type ArrayView<'a, A, D> = Array<A, &'a [A], D>;
 pub type ArrayViewMut<'a, A, D> = Array<A, &'a mut [A], D>;
 
@@ -137,6 +141,34 @@ where A: Clone
         }
     }
 }
+
+impl<A, D: Clone> Clone for Array<A, Rc<Box<[A]>>, D>
+where A: Clone
+{
+    fn clone(&self) -> ArrayRc<A, D> {
+        Array {
+            data: self.data.clone(),
+            ptr: self.ptr.clone(),
+            dim: self.dim.clone(),
+            strides: self.strides.clone(),
+        }
+    }
+}
+
+impl<A, D: Clone> Clone for Array<A, Arc<Box<[A]>>, D>
+where A: Clone
+{
+    fn clone(&self) -> ArrayArc<A, D> {
+        Array {
+            data: self.data.clone(),
+            ptr: self.ptr.clone(),
+            dim: self.dim.clone(),
+            strides: self.strides.clone(),
+        }
+    }
+}
+
+
 
 impl<A> Array<A, Vec<A>, Ix>
 {
@@ -213,9 +245,160 @@ impl<A, D> Array<A, Vec<A>, D> where D: Dimension
         }
     }
 
+    /// Get a shared (Rc) version of this array
+    /// 
+    /// Reference counted arrays provide more convenient slicing
+    /// APIs, at the expense of performance
+    pub fn into_rc(self) -> ArrayRc<A, D>
+    {
+        ArrayRc {
+            data: Rc::new(self.data.into_boxed_slice()),
+            ptr: self.ptr,
+            dim: self.dim,
+            strides: self.strides,
+        }
+    }
+
+    /// Get a thread sharable (Arc) version of this array
+    /// 
+    /// Reference counted arrays provide more convenient slicing
+    /// APIs, at the expense of performance.
+    pub fn into_arc(self) -> ArrayArc<A, D>
+    {
+        ArrayArc {
+            data: Arc::new(self.data.into_boxed_slice()),
+            ptr: self.ptr,
+            dim: self.dim,
+            strides: self.strides,
+        }
+    }
 }
 
-impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
+impl<A, D> Array<A, Rc<Box<[A]>>, D> where D: Dimension
+{
+    pub fn unshare(self) -> Result<ArrayOwned<A, D>, ArrayRc<A, D>> {
+        match Rc::try_unwrap(self.data) {
+            Ok(data) => Ok(ArrayOwned {
+                data: data.into_vec(),
+                ptr: self.ptr,
+                dim: self.dim,
+                strides: self.strides,
+            }),
+            Err(data) => Err(ArrayRc {
+                data: data,
+                ptr: self.ptr,
+                dim: self.dim,
+                strides: self.strides,
+            }),
+        }
+    }
+
+    /// Transform the array into **shape**; any other shape
+    /// with the same number of elements is accepted.
+    ///
+    /// ```
+    /// use ndarray::{arr1, arr2};
+    ///
+    /// assert!(
+    ///     arr1(&[1., 2., 3., 4.]).into_rc().reshape((2, 2))
+    ///     == arr2(&[[1., 2.],
+    ///               [3., 4.]]).into_rc()
+    /// );
+    /// ```
+    pub fn reshape<E: Dimension>(&self, shape: E) -> ArrayRc<A, E>
+    where A: Clone
+    {
+        if shape.size() != self.dim.size() {
+            panic!("Incompatible sizes in reshape, attempted from: {:?}, to: {:?}",
+                   self.dim.slice(), shape.slice())
+        }
+        // Check if contiguous, if not => copy all, else just adapt strides
+        if self.is_standard_layout() {
+            let cl = self.clone();
+            Array{
+                data: cl.data,
+                ptr: cl.ptr,
+                strides: shape.default_strides(),
+                dim: shape,
+            }
+        } else {
+            let mut v = self.iter().map(|x| x.clone()).collect::<Vec<A>>();
+            let ptr = v.as_mut_ptr();
+            ArrayRc {
+                data: Rc::new(v.into_boxed_slice()),
+                ptr: ptr,
+                strides: shape.default_strides(),
+                dim: shape,
+            }
+        }
+    }
+}
+
+impl<A, D> Array<A, Arc<Box<[A]>>, D> where D: Dimension
+{
+    pub fn unshare(self) -> Result<ArrayOwned<A, D>, ArrayArc<A, D>> {
+        match Arc::try_unwrap(self.data) {
+            Ok(data) => Ok(ArrayOwned {
+                data: data.into_vec(),
+                ptr: self.ptr,
+                dim: self.dim,
+                strides: self.strides,
+            }),
+            Err(data) => Err(ArrayArc {
+                data: data,
+                ptr: self.ptr,
+                dim: self.dim,
+                strides: self.strides,
+            }),
+        }
+    }
+
+
+    /// Transform the array into **shape**; any other shape
+    /// with the same number of elements is accepted.
+    ///
+    /// **Panics** if sizes are incompatible.
+    /// 
+    /// ```
+    /// use ndarray::{arr1, arr2};
+    ///
+    /// assert!(
+    ///     arr1(&[1., 2., 3., 4.]).into_arc().reshape((2, 2))
+    ///     == arr2(&[[1., 2.],
+    ///               [3., 4.]]).into_arc()
+    /// );
+    /// ```
+    pub fn reshape<E: Dimension>(&self, shape: E) -> ArrayArc<A, E>
+    where A: Clone
+    {
+        if shape.size() != self.dim.size() {
+            panic!("Incompatible sizes in reshape, attempted from: {:?}, to: {:?}",
+                   self.dim.slice(), shape.slice())
+        }
+        // Check if contiguous, if not => copy all, else just adapt strides
+        if self.is_standard_layout() {
+            let cl = self.clone();
+            Array{
+                data: cl.data,
+                ptr: cl.ptr,
+                strides: shape.default_strides(),
+                dim: shape,
+            }
+        } else {
+            let mut v = self.iter().map(|x| x.clone()).collect::<Vec<A>>();
+            let ptr = v.as_mut_ptr();
+            ArrayArc {
+                data: Arc::new(v.into_boxed_slice()),
+                ptr: ptr,
+                strides: shape.default_strides(),
+                dim: shape,
+            }
+        }
+    }
+}
+
+
+impl<A, S, D> Array<A, S, D> where D: Dimension
 {
     /// Return the total number of elements in the Array.
     pub fn len(&self) -> usize
@@ -250,12 +433,15 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
     /// of the array. Neither is the raw data slice is restricted to just the
     /// Array's view.
     pub fn raw_data(& self) -> &[A]
+    where S: Deref<Target=[A]>
     {
         &self.data[..]
     }
 
     /// Get a view (borrow) into this array
-    pub fn view(&self) -> ArrayView<A, D> {
+    pub fn view(&self) -> ArrayView<A, D>
+    where S: Deref<Target=[A]>
+    {
         ArrayView {
             data: &self.data[..],
             ptr: self.ptr.clone(),
@@ -277,7 +463,8 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
 
     /// Get an owned copy of this array
     pub fn to_owned(&self) -> ArrayOwned<A, D>
-    where A: Clone {
+    where A: Clone, S: Deref<Target=[A]>
+    {
         let mut res = ArrayOwned {
             data: self.data.to_vec(),
             ptr: self.ptr.clone(),
@@ -297,6 +484,7 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
     ///
     /// **Panics** if **indexes** does not match the number of array axes.
     pub fn slice(&self, indexes: &[Si]) -> ArrayView<A, D>
+    where S: Deref<Target=[A]>
     {
         let mut arr = self.view();
         arr.islice(indexes);
@@ -539,7 +727,9 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
     }
 
     /// Return the diagonal as a one-dimensional array.
-    pub fn diag(&self) -> ArrayView<A, Ix> {
+    pub fn diag(&self) -> ArrayView<A, Ix>
+    where S: Deref<Target=[A]>
+    {
         let (len, stride) = self.diag_params();
         Array {
             data: &self.data[..],
@@ -594,7 +784,7 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
     /// ```
     pub fn subview(&self, axis: usize,
                    index: Ix) -> ArrayView<A, <D as RemoveAxis>::Smaller> where
-        D: RemoveAxis
+        D: RemoveAxis, S: Deref<Target=[A]>
     {
         let mut res = self.view();
         res.isubview(axis, index);
@@ -707,6 +897,7 @@ impl<A, S, D> Array<A, S, D> where D: Dimension, S: Deref<Target=[A]>
     /// ```
     pub fn reshape_view<E: Dimension>(&self, shape: E
                                      ) -> ArrayView<A, E>
+    where S: Deref<Target=[A]>
     {
         if shape.size() != self.dim.size() {
             panic!("Incompatible sizes in reshape, attempted from: {:?}, to: {:?}",

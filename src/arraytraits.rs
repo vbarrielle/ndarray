@@ -41,7 +41,6 @@ where S: DerefMut<Target=[A]>
 
 impl<A: PartialEq, S, D: Dimension>
 PartialEq for Array<A, S, D>
-where S: Deref<Target=[A]>
 {
     /// Return `true` if the array shapes and all elements of `self` and
     /// `other` are equal. Return `false` otherwise.
@@ -54,7 +53,6 @@ where S: Deref<Target=[A]>
 
 impl<A: Eq, S, D: Dimension>
 Eq for Array<A, S, D>
-where S: Deref<Target=[A]>
 {}
 
 impl<A> FromIterator<A> for Array<A, Vec<A>, Ix>
